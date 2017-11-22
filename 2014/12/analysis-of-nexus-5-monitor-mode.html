@@ -1,0 +1,1039 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="/theme/stylesheet/style.min.css">
+
+  <link rel="stylesheet" type="text/css" href="/theme/pygments/github.min.css">
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/font-awesome.min.css">
+
+
+
+
+    <link rel="shortcut icon" href="/resources/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/resources/favicon.ico" type="image/x-icon">
+
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+
+<meta name="author" content="Frédéric" />
+<meta name="description" content="This article will first describe how to locate the Monitor mode code in Nexus 5 firmware (hammerhead-ktu84p-factory-35ea0277, bootloader-hammerhead-hhz11k : c32f8bec310c659c1296739b00c6a8ac). Then, we will try to understand what it does (its functionalities). Finally, you will have to find bugs by yourself because I didn&#39;t find any...so far ! Note: Terms (Non-)Secure …" />
+<meta name="keywords" content="arm, security, qualcomm, firmware, android, nexus, trustzone">
+
+<meta property="og:site_name" content="fred's notes"/>
+<meta property="og:title" content="Analysis of Nexus 5 Monitor mode"/>
+<meta property="og:description" content="This article will first describe how to locate the Monitor mode code in Nexus 5 firmware (hammerhead-ktu84p-factory-35ea0277, bootloader-hammerhead-hhz11k : c32f8bec310c659c1296739b00c6a8ac). Then, we will try to understand what it does (its functionalities). Finally, you will have to find bugs by yourself because I didn&#39;t find any...so far ! Note: Terms (Non-)Secure …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="/2014/12/analysis-of-nexus-5-monitor-mode.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2014-12-25 13:28:00-08:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="/author/frederic.html">
+<meta property="article:section" content="Article"/>
+<meta property="article:tag" content="arm"/>
+<meta property="article:tag" content="security"/>
+<meta property="article:tag" content="qualcomm"/>
+<meta property="article:tag" content="firmware"/>
+<meta property="article:tag" content="android"/>
+<meta property="article:tag" content="nexus"/>
+<meta property="article:tag" content="trustzone"/>
+<meta property="og:image" content="/resources/sitelogo.jpg">
+
+  <title>fred's notes &ndash; Analysis of Nexus 5 Monitor mode</title>
+
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="/">
+        <img src="/resources/sitelogo.jpg" alt="fred's notes" title="fred's notes">
+      </a>
+      <h1><a href="/">fred's notes</a></h1>
+
+<p>Security & Stuff</p>
+      <nav>
+        <ul class="list">
+          <li><a href="/category/advisory.html">Advisory</a></li>
+          <li><a href="/category/article.html">Article</a></li>
+          <li><a href="/category/tool.html">Tool</a></li>
+          <li><a href="/pages/contact.html#contact">Contact</a></li>
+
+        </ul>
+      </nav>
+
+      <ul class="social">
+        <li><a class="sc-github" href="https://github.com/frederic" target="_blank"><i class="fa fa-github"></i></a></li>
+        <li><a class="sc-linkedin" href="https://www.linkedin.com/in/fredericbasse" target="_blank"><i class="fa fa-linkedin"></i></a></li>
+      </ul>
+    </div>
+
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="/">    Home
+</a>
+
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+
+
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="analysis-of-nexus-5-monitor-mode">Analysis of Nexus 5 Monitor mode</h1>
+    <p>
+          Posted on Thu 25 December 2014 in <a href="/category/article.html">Article</a>
+
+
+    </p>
+  </header>
+
+
+  <div>
+    <p>This article will first describe how to locate the Monitor mode
+code in Nexus 5 firmware (<a href=
+"https://dl.google.com/dl/android/aosp/hammerhead-ktu84p-factory-35ea0277.tgz">hammerhead-ktu84p-factory-35ea0277</a>,
+bootloader-hammerhead-hhz11k : c32f8bec310c659c1296739b00c6a8ac).
+Then, we will try to understand what it does (its functionalities).
+Finally, you will have to find bugs by yourself because I didn't
+find any...so far !</p>
+<p><em>Note: Terms (Non-)Secure world &amp; (Non-)Secure state are used as
+synonyms. Term Normal world is also used as synonym of Non-Secure
+world.</em>
+<h2>I. Quick introduction to ARM Security Extensions</h2>
+"The Security Extensions define two security states: Secure state
+and Non-secure state. All instruction execution takes place either
+in Secure state or in Non-secure state.[...] The Security
+Extensions also define an additional processor mode, Monitor mode,
+that provides a bridge between software running in Non-secure state
+and software running in Secure state."<br>
+"The Secure Monitor Call exception is implemented only as part of
+the Security Extensions. The Secure Monitor Call instruction, SMC ,
+requests a Secure Monitor function, causing the processor to enter
+Monitor mode."<br>
+"When an exception is taken, processor execution is forced to an
+address that corresponds to the type of exception. This address is
+called the exception vector for that exception. A set of exception
+vectors comprises eight consecutive word-aligned memory addresses,
+starting at an exception base address. These eight vectors form a
+vector table."<br>
+-- <a href=
+"http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0406c/index.html">
+ARM Architecture Reference Manual ARMv7-A</a><br>
+<h2>II. OpenSource TrustZone examples</h2>
+Trusted Execution Environment (TEE) is the "small" secure kernel
+executed in Secure state. The Monitor code <a href=
+"http://www.arm.com/products/processors/technologies/trustzone/index.php">
+is part of</a> the TEE code.<br>
+To get an idea of how the Monitor code works, we can take a look at
+two TrustZone examples:<br>
+<ul>
+<li><a href=
+"http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.faqs/ka15417.html">
+Cortex-A9 TrustZone example by ARM</a> : a simple example of secure
+and non-secure code that communicates through Monitor mode.</li>
+<li><a href="https://github.com/OP-TEE/optee_os">OP-TEE by
+STMicroelectronics</a> : an Open Source TEE 1.0
+implementation.</li>
+</ul>
+After studying these code samples, we can clearly distinguish two
+parts in Monitor code:<br>
+<h3>Monitor mode initialization:
+called once, at TEE initialization time.</h3>
+In this code, we can notice two specific instructions :<br>
+<ul>
+<li>Monitor Vector Base Address Register (MVBAR) setup: MVBAR
+contains the Monitor vector table address. Both samples use the
+same instructions to setup MVBAR :</li>
+<li style="list-style: none">&nbsp; &nbsp; MCR &nbsp; &nbsp; p15,
+0, $RX,c12,c0, 1<br>
+where $RX is a pointer to the monitor mode's vector table.<br>
+<br></li>
+<li>SP register setup: the Monitor mode stack address is set into
+SP register. This register is banked, which means this value will
+be automatically restored next time the processor enters in Monitor
+mode.</li>
+</ul>
+<h3>Exception vectors: called when
+an exception is taken to Monitor mode.</h3>
+Both samples implement a simple Secure Monitor Call (SMC) handler
+that switches between the normal and secure worlds when a SMC call
+is made. As SMC handler is an entry point to the Secure state, it
+would be interesting to analyze it in Nexus 5 firmware.<br>
+<h2>III. Extracting Nexus 5 firmware</h2>
+We know that the Monitor code may be embedded into the TEE image.
+In the case of Nexus 5, this image can be extracted from stock
+ROM.<br>
+Once downloaded, we use a small <a href=
+"https://gist.github.com/frederic/cd56923c8af46ae44fd5">tool to
+unpack bootloader-hammerhead-hhz11k.img file</a>. One of extracted
+files is an ELF ARM binary named "tz".<br>
+<h2>IV. Nexus 5 Monitor mode code</h2>
+To analyze the Nexus 5 TrustZone binary, we can use <a href=
+"https://www.hex-rays.com/products/ida/support/download_demo.shtml">
+IDA Demo 6.6</a>.<br>
+Given that setting up MVBAR is very specific to the monitor mode's
+initialization code, we use it to locate the Monitor mode's
+initialization code in Nexus 5 TrustZone binary.<br>
+Using IDA regex search in code disassembly, we look for the
+instruction used to write MVBAR :<br>
+<blockquote class="tr_bq" style=
+"background-color: white; color: black;"><span style=
+"color: navy; font-family: FixedSys; white-space: pre;">MCR</span>[[:space:]]+<span style="color: navy; font-family: FixedSys; white-space: pre;">p15,</span>
+<span style=
+"color: green; font-family: FixedSys; white-space: pre;">0</span><span style="color: navy; font-family: FixedSys; white-space: pre;">,</span>
+[^,]+<span style=
+"color: navy; font-family: FixedSys; white-space: pre;">,c12,c0,</span>
+<span style=
+"color: green; font-family: FixedSys; white-space: pre;">1</span></blockquote>
+This search returns only 3 occurrences, and one of them also sets
+the SP register. These instructions are expected to be found in
+Monitor mode initialization code.<br>
+<h3>IV.1. Monitor mode initialization function</h3>
+Here's the disassembly of the Monitor mode initialization code
+:<br></p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80DB4C</span> <span class="no">init_monitor</span>
+<span class="nl">LOAD:</span><span class="nf">FE80DB4C</span>                 <span class="no">MSR</span>             <span class="no">CPSR_c</span><span class="p">,</span> <span class="c">#0xD6 ; switch to Monitor mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DB50</span>                 <span class="no">LDR</span>             <span class="no">R0</span><span class="p">,</span> <span class="err">=</span><span class="no">monitor_vector_table</span> <span class="c">; load monitor vector table ptr into R0</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DB54</span>                 <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c12</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span> <span class="mi">1</span> <span class="c">; write R0 to MVBAR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DB58</span>                 <span class="no">BL</span>              <span class="no">sub_FE80DB88</span> <span class="c">; initialize Non-Secure world</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DB5C</span>                 <span class="no">LDR</span>             <span class="no">SP</span><span class="p">,</span> <span class="err">=</span><span class="mi">0xFE82B700</span>
+<span class="nl">LOAD:</span><span class="nf">FE80DB60</span>                 <span class="no">MRC</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span> <span class="mi">5</span> <span class="c">; write MPIDR value to R0</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DB64</span>                 <span class="no">AND</span>             <span class="no">R0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span> <span class="c">#0xFF ; keep Affinity level 0 : current virtual CPU id</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DB68</span>                 <span class="no">MOV</span>             <span class="no">R1</span><span class="p">,</span> <span class="c">#0x200</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DB6C</span>                 <span class="no">MUL</span>             <span class="no">R1</span><span class="p">,</span> <span class="no">R1</span><span class="p">,</span> <span class="no">R0</span> <span class="c">; compute stack offset for current vCPU</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DB70</span>                 <span class="no">SUB</span>             <span class="no">SP</span><span class="p">,</span> <span class="no">SP</span><span class="p">,</span> <span class="no">R1</span> <span class="c">; setup Monitor stack register SP</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DB74</span>                 <span class="no">MOV</span>             <span class="no">R0</span><span class="p">,</span> <span class="c">#0b100</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DB78</span>                 <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c1</span><span class="p">,</span><span class="no">c1</span><span class="p">,</span> <span class="mi">0</span> <span class="c">; set FIQ flag in SCR register</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DB7C</span>                 <span class="no">ISB</span>             <span class="no">SY</span>      <span class="c">; flush the pipeline in the processor</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DB80</span>                 <span class="no">MSR</span>             <span class="no">CPSR_c</span><span class="p">,</span> <span class="c">#0xD3 ; switch to Supervisor mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DB84</span>                 <span class="no">BX</span>              <span class="no">LR</span>
+<span class="nl">LOAD:</span><span class="nf">FE80DB84</span> <span class="c">; End of function init_monitor</span>
+</pre></div>
+
+
+<p><br>
+We will now proceed to a detailed analysis of each step.<br>
+<h5>IV.1.A Switch to Monitor mode</h5>
+MSR instruction moves an immediate value (here 0xD6) to a Special
+register (here CPSR_c).</p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80DB4C</span>                 <span class="no">MSR</span>             <span class="no">CPSR_c</span><span class="p">,</span> <span class="c">#0xD6 ; switch to Monitor mode</span>
+</pre></div>
+
+
+<p>The Current Program Status Register (CPSR) holds processor status
+and control information. CPSR with "_c" suffix enables writing of
+bits&lt;0:7&gt; of CPSR (<a href=
+"http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0406c/index.html">ARM
+Ref.</a> B9.3.11). This bitfield controls the processor mode and
+exception masks.</p>
+<p>We can use a simple IDAPython script to replace the immediate value
+0xD6 with symbols documented in <a href=
+"http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0406c/index.html">
+ARM Ref.</a> (B1-1148) :<br>
+<script src=
+"https://gist.github.com/frederic/251c453abc3c520a94be.js">
+</script>Thus, the instruction becomes:</p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80DB4C</span>                 <span class="no">MSR</span>             <span class="no">CPSR_c</span><span class="p">,</span> <span class="c">#CPSR_MODE_MON OR CPSR_MASK_FIQ OR CPSR_MASK_IRQ ; switch to Monitor mode</span>
+</pre></div>
+
+
+<p>This instruction switches the processor to Monitor mode. It also
+sets CPSR.F and CPSR.I bits to mask FIQ and IRQ exceptions, meaning
+they cannot be taken.
+<h5>IV.1.B Setup MVBAR</h5>
+The Move to Coprocessor from ARM core register instruction (MCR)
+passes the value of an ARM core register (here R0) to a coprocessor
+(here CP15).</p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80DB50</span>                 <span class="no">LDR</span>             <span class="no">R0</span><span class="p">,</span> <span class="err">=</span><span class="no">monitor_vector_table</span> <span class="c">; load monitor vector table ptr into R0</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DB54</span>                 <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c12</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span> <span class="mi">1</span> <span class="c">; write R0 to MVBAR</span>
+</pre></div>
+
+
+<p>CP15 c12 register is present on an ARMv7-A implementation that
+includes Security Extensions. This instruction writes R0 value to
+MVBAR. R0 contains a pointer to Monitor vector table. We will
+describe this table later.
+<h5>IV.1.C Initialize Non-Secure world</h5>
+The function&nbsp;sub_FE80DB88 is called to initialize the
+Non-Secure world context:</p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80DB88</span> <span class="no">sub_FE80DB88</span>
+<span class="nl">LOAD:</span><span class="nf">FE80DB88</span>                <span class="no">MRC</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R1</span><span class="p">,</span><span class="no">c1</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span> <span class="mi">0</span> <span class="c">; read Secure SCTLR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DB8C</span>               <span class="no">MOV</span>             <span class="no">R0</span><span class="p">,</span> <span class="c">#SCR_NS OR SCR_FW OR SCR_AW ; #0x31</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DB90</span>                <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c1</span><span class="p">,</span><span class="no">c1</span><span class="p">,</span> <span class="mi">0</span> <span class="c">; switch to Non-Secure (NS) state</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DB94</span>                <span class="no">ISB</span>             <span class="no">SY</span>
+<span class="nl">LOAD:</span><span class="nf">FE80DB98</span>               <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R1</span><span class="p">,</span><span class="no">c1</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span> <span class="mi">0</span> <span class="c">; write Secure SCTLR value to NS SCTLR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DB9C</span>               <span class="no">MOV</span>             <span class="no">R0</span><span class="p">,</span> <span class="c">#0</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DBA0</span>               <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span> <span class="mi">0</span> <span class="c">; clear CSSELR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DBA4</span>               <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c2</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span> <span class="mi">0</span> <span class="c">; clear TTBR0</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DBA8</span>               <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c2</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span> <span class="mi">1</span> <span class="c">; clear TTBR1</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DBAC</span>              <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c2</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span> <span class="mi">2</span> <span class="c">; clear TTBCR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DBB0</span>               <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c3</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span> <span class="mi">0</span> <span class="c">; clear DACR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DBB4</span>               <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c5</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span> <span class="mi">0</span> <span class="c">; clear DFSR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DBB8</span>               <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c5</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span> <span class="mi">1</span> <span class="c">; clear IFSR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DBBC</span>               <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c5</span><span class="p">,</span><span class="no">c1</span><span class="p">,</span> <span class="mi">0</span> <span class="c">; clear ADFSR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DBC0</span>              <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c5</span><span class="p">,</span><span class="no">c1</span><span class="p">,</span> <span class="mi">1</span> <span class="c">; clear AIFSR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DBC4</span>                 <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c6</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span> <span class="mi">0</span> <span class="c">; clear DFAR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DBC8</span>                 <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c6</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span> <span class="mi">2</span> <span class="c">; clear IFAR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DBCC</span>                 <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c7</span><span class="p">,</span><span class="no">c4</span><span class="p">,</span> <span class="mi">0</span> <span class="c">; clear PAR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DBD0</span>                 <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c10</span><span class="p">,</span><span class="no">c2</span><span class="p">,</span> <span class="mi">0</span> <span class="c">; clear PRRR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DBD4</span>                 <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c10</span><span class="p">,</span><span class="no">c2</span><span class="p">,</span> <span class="mi">1</span> <span class="c">; clear NMRR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DBD8</span>                 <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c10</span><span class="p">,</span><span class="no">c4</span><span class="p">,</span> <span class="mi">0</span> <span class="c">; clear &quot;MMUDMTR&quot; ?</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DBDC</span>                 <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c10</span><span class="p">,</span><span class="no">c4</span><span class="p">,</span> <span class="mi">1</span> <span class="c">; clear &quot;MMUDCPR&quot; ? </span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DBE0</span>                 <span class="no">LDR</span>             <span class="no">R1</span><span class="p">,</span> <span class="err">=</span><span class="no">dword_FE82B8CC</span> <span class="c">; load Non-Secure VBAR ptr to R1</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DBE4</span>                 <span class="no">LDR</span>             <span class="no">R0</span><span class="p">,</span> <span class="p">[</span><span class="no">R1</span><span class="p">]</span>
+<span class="nl">LOAD:</span><span class="nf">FE80DBE8</span>                 <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c12</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span> <span class="mi">0</span> <span class="c">; write Non-Secure VBAR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DBEC</span>                 <span class="no">MOV</span>             <span class="no">R0</span><span class="p">,</span> <span class="c">#0</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DBF0</span>                 <span class="no">STR</span>             <span class="no">R0</span><span class="p">,</span> <span class="p">[</span><span class="no">R1</span><span class="p">]</span> <span class="c">; clear Non-Secure VBAR ptr</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DBF4</span>                 <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c13</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span> <span class="mi">0</span> <span class="c">; clear FCSEIDR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DBF8</span>                 <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c13</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span> <span class="mi">1</span> <span class="c">; clear CONTEXTIDR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DBFC</span>                 <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c13</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span> <span class="mi">2</span> <span class="c">; clear TPIDRURW</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DC00</span>                 <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c13</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span> <span class="mi">3</span> <span class="c">; clear TPIDRURO</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DC04</span>                 <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c13</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span> <span class="mi">4</span> <span class="c">; clear TPIDRPRW</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DC08</span>                 <span class="no">MOV</span>             <span class="no">R0</span><span class="p">,</span> <span class="c">#SCR_FW OR SCR_AW ; #0x30</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DC0C</span>                 <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c1</span><span class="p">,</span><span class="no">c1</span><span class="p">,</span> <span class="mi">0</span> <span class="c">; switch back to Secure state</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DC10</span>                 <span class="no">ISB</span>             <span class="no">SY</span>
+<span class="nl">LOAD:</span><span class="nf">FE80DC14</span>                 <span class="no">BX</span>              <span class="no">LR</span>
+<span class="nl">LOAD:</span><span class="nf">FE80DC14</span> <span class="c">; End of function sub_FE80DB88</span>
+</pre></div>
+
+
+<p>First, the security state is switched to Non-Secure. Then, the
+coprocessor registers banked in both security states (<a href=
+"http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0406c/index.html">ARM
+Ref.</a> Banked system control registers) are initialized to zero.
+Finally, the security state is switched back to Secure.</p>
+<h5>IV.1.D Setup SP register</h5>
+
+<p>On ARMv7-A, Multiprocessor Affinity Register (MPIDR) holds the
+processor identification information. In this register,
+bits&lt;0:7&gt; are the affinity level 0 (Aff0). This number
+represents the current CPU id. Here, this id is used to compute the
+stack address of current CPU, which is then stored into SP
+register. The stack size for each CPU is 0x200 bytes.<br></p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80DB5C</span>                 <span class="no">LDR</span>             <span class="no">SP</span><span class="p">,</span> <span class="err">=</span><span class="mi">0xFE82B700</span>
+<span class="nl">LOAD:</span><span class="nf">FE80DB60</span>                 <span class="no">MRC</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span> <span class="mi">5</span> <span class="c">; write MPIDR value to R0</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DB64</span>                 <span class="no">AND</span>             <span class="no">R0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span> <span class="c">#0xFF ; keep Affinity level 0 : current virtual CPU id</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DB68</span>                 <span class="no">MOV</span>             <span class="no">R1</span><span class="p">,</span> <span class="c">#0x200</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DB6C</span>                 <span class="no">MUL</span>             <span class="no">R1</span><span class="p">,</span> <span class="no">R1</span><span class="p">,</span> <span class="no">R0</span> <span class="c">; compute stack offset for current vCPU</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DB70</span>                 <span class="no">SUB</span>             <span class="no">SP</span><span class="p">,</span> <span class="no">SP</span><span class="p">,</span> <span class="no">R1</span> <span class="c">; setup Monitor stack register SP</span>
+</pre></div>
+
+
+<h5>IV.1.E Route FIQ exceptions to Monitor mode</h5>
+
+<p>CP15 c1 register is present on an ARMv7-A implementation that
+includes Security Extensions. This instruction sets bit&lt;2&gt;
+(0x4) in Secure Configuration Register (SCR), which means FIQ
+exceptions are now taken to Monitor mode.<br></p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80DB74</span>                 <span class="no">MOV</span>             <span class="no">R0</span><span class="p">,</span> <span class="c">#0b100 ; SCR.FIQ</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DB78</span>                 <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c1</span><span class="p">,</span><span class="no">c1</span><span class="p">,</span> <span class="mi">0</span> <span class="c">; set FIQ flag in SCR register</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80DB7C</span>                 <span class="no">ISB</span>             <span class="no">SY</span>      <span class="c">; flush the pipeline in the processor</span>
+</pre></div>
+
+
+<p>We can also notice that bit&lt;0&gt; (SCR.NS : Non-Secure) is not
+set, meaning current execution state is Secure.</p>
+<h5>IV.1.F Switch back to Supervisor mode</h5>
+
+<p>This instruction switches the processor to Supervisor mode, and
+sets FIQ &amp; IRQ mask bits.<br></p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80DB80</span>                 <span class="no">MSR</span>             <span class="no">CPSR_c</span><span class="p">,</span> <span class="c">#CPSR_MODE_SVC OR CPSR_MASK_FIQ OR CPSR_MASK_IRQ ; switch to Supervisor mode</span>
+</pre></div>
+
+
+<p>Monitor mode setup is now complete. Monitor code can then be
+entered through its exception vector table.</p>
+<h3>IV.2. Monitor Exception Vector Table</h3>
+
+<p>The Monitor exception vector table defines exception vectors to
+handle exceptions taken to Monitor Mode.<br>
+Its structure is described in <a href=
+"http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0406c/index.html">
+ARM Ref.</a> (B1-1167) :<br>
+<table align="center" cellpadding="0" cellspacing="0" class=
+"tr-caption-container" style=
+"margin-left: auto; margin-right: auto; text-align: center;">
+<tbody>
+<tr>
+<td style="text-align: center;">
+<img alt="" src="/blog/nexus5-monitor/ref_vec_table.png">
+</td>
+</tr>
+<tr>
+<td class="tr-caption" style="text-align: center;">The vector table
+entries</td>
+</tr>
+</tbody>
+</table>
+Thanks to the Monitor initialization code, we know the address of
+Nexus 5's Monitor exception vector table:<br></p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80CEE0</span> <span class="no">monitor_vector_table</span>
+<span class="nl">LOAD:</span><span class="nf">FE80CEE0</span>                 <span class="no">B</span>               <span class="no">dead_loop</span> <span class="c">; not used</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80CEE4</span> <span class="c">; ---------------------------------------------------------------------------</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80CEE4</span>                 <span class="no">B</span>               <span class="no">dead_loop</span> <span class="c">; not used</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80CEE8</span> <span class="c">; ---------------------------------------------------------------------------</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80CEE8</span>                 <span class="no">B</span>               <span class="no">smc_handler</span> <span class="c">; Secure Monitor Call</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80CEEC</span> <span class="c">; ---------------------------------------------------------------------------</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80CEEC</span>                 <span class="no">B</span>               <span class="no">dead_loop</span> <span class="c">; Prefetch Abort</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80CEF0</span> <span class="c">; ---------------------------------------------------------------------------</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80CEF0</span>                 <span class="no">B</span>               <span class="no">dead_loop</span> <span class="c">; Data Abort</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80CEF4</span> <span class="c">; ---------------------------------------------------------------------------</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80CEF4</span>                 <span class="no">B</span>               <span class="no">dead_loop</span> <span class="c">; not used</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80CEF8</span> <span class="c">; ---------------------------------------------------------------------------</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80CEF8</span>                 <span class="no">B</span>               <span class="no">sub_FE80CF24</span> <span class="c">; IRQ interrupt</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80CEFC</span> <span class="c">; ---------------------------------------------------------------------------</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80CEFC</span>                 <span class="no">B</span>               <span class="no">sub_FE80CFB4</span> <span class="c">; FIQ interrupt</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80CEFC</span> <span class="c">; End of function monitor_vector_table</span>
+</pre></div>
+
+
+<p>We can see that 3 exception handlers are configured: SMC, FIQ, IRQ.
+Others are dead loops.</p>
+<h3>IV.3. Secure Monitor Call handler function</h3>
+
+<p>HLOS (non-Secure state) can call the TrustZone API (Secure state)
+using the SMC instruction to trigger a Secure Monitor Call
+exception. This exception is taken to the Monitor mode, which
+switches the processor to Secure Supervisor mode to proceed the
+call. When called TrustZone function returns, a second SMC
+exception is triggered, so the processor enters Monitor mode again.
+Finally, the Monitor mode returns results to the calling function
+(Non-Secure state).
+The Monitor mode acts as a bridge between Non-Secure state and
+Secure state. It's designed to handle calls initiated from the
+Non-Secure state only.</p>
+<p>The exception vector dedicated to SMC exceptions is a pointer to a
+function at offset 0x08 in Monitor Exception Vector Table.<br>
+In this function, which will be named SMC handler, the very first
+instruction checks if an exception occurred in Secure or Non-Secure
+state (When the processor is in Monitor mode, the processor is in
+Secure state regardless of the value of the SCR.NS bit).</p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80D028</span> <span class="no">smc_handler</span> 
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D028</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D028</span> <span class="no">varg_r0</span>         <span class="err">=</span> <span class="p">-</span><span class="mi">0x10</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D028</span> <span class="no">varg_r1</span>         <span class="err">=</span> <span class="p">-</span><span class="mi">0xC</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D028</span> <span class="no">varg_r2</span>         <span class="err">=</span> <span class="p">-</span><span class="mi">8</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D028</span> <span class="no">varg_r3</span>         <span class="err">=</span> <span class="p">-</span><span class="mi">4</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D028</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D028</span>                 <span class="no">STMFD</span>           <span class="no">SP</span><span class="p">!,</span> <span class="err">{</span><span class="no">R0-R3</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D02C</span>                 <span class="no">MRC</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c1</span><span class="p">,</span><span class="no">c1</span><span class="p">,</span> <span class="mi">0</span> <span class="c">; read SCR register</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D030</span>                 <span class="no">TST</span>             <span class="no">R0</span><span class="p">,</span> <span class="c">#1  ; test SCR.NS bit</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D034</span>                 <span class="no">BEQ</span>             <span class="no">loc_FE80D210</span> <span class="c">; jump if SCR.NS==0</span>
+</pre></div>
+
+
+<p>When an exception is taken to the Monitor mode, CPSR.{A,I, F} bits
+are set to 1, meaning Abort, IRQ and FIQ exceptions can no longer
+be taken.</p>
+<h3>IV.3.A. Call to Secure World</h3>
+
+<p>If SCR.NS bit is set, it means the Non-Secure world wants to call
+the Secure world. We will now analyze the operations performed by
+the SMC handler until the exception return to the Secure world.<br>
+<h5>IV.3.A.a Setup current security state</h5>
+This first step configures the Secure Configuration Register (SCR).
+Bits&lt;1:3&gt; (SCR.IRQ || SCR.FIQ || SCR.EA) are set to route
+IRQ, FIQ, and External Abort exceptions to Monitor mode. But the
+Non-Secure bit&lt;0&gt; is not set. So, this core will still be in
+the Secure state if it exits Monitor mode.</p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80D038</span>                 <span class="no">MOV</span>             <span class="no">R0</span><span class="p">,</span> <span class="c">#SCR_IRQ OR SCR_FIQ OR SCR_EA ; 0b1110</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D03C</span>                 <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c1</span><span class="p">,</span><span class="no">c1</span><span class="p">,</span> <span class="mi">0</span> <span class="c">; write SCR with SCR.NS==0</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D040</span>                 <span class="no">ISB</span>             <span class="no">SY</span>      <span class="c">; Instruction Synchronization Barrier</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D040</span>                                         <span class="c">; flushes the pipeline in the processor</span>
+</pre></div>
+
+
+<h5>IV.3.A.b Monitor calls</h5>
+
+<p>On a HLOS like Android, SMC exceptions are triggered by the
+<a href="https://android.googlesource.com/kernel/msm/+/android-msm-hammerhead-3.4-kitkat-mr2/arch/arm/mach-msm/scm.c">
+Secure Channel Manager (SCM), implemented in Linux kernel</a>.<br>
+A quick look at its source code tells us {R0-R3} registers hold
+arguments of SMC calls. We also learn that R0 is a bitfield that
+can be defined by the following macro:</p>
+<div class="highlight"><pre><span></span><span class="cp">#define SCM_ATOMIC(svc, cmd, n) (((((svc) &lt;&lt; 10)|((cmd) &amp; 0x3ff)) &lt;&lt; 12) | \</span>
+<span class="cp">    SCM_CLASS_REGISTER | \</span>
+<span class="cp">    SCM_MASK_IRQS | \</span>
+<span class="cp">    (n &amp; 0xf))</span>
+</pre></div>
+
+
+<p>With svc the service identifier, cmd the command identifier, and n
+the argument count of the SMC call.<br>
+<br>
+In SMC handler, R0 value is first shifted right by 12. Based on the
+SCM_ATOMIC macro definition, resulting R0 value represents a
+service identifier svc and a command identifier cmd defined as
+((svc) &lt;&lt; 10)|((cmd) &amp; 0x3ff).<br>
+Then R0 value is tested against several immediate values. For each
+case, a specific function is called if values match.</p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80D048</span>                 <span class="no">MOV</span>             <span class="no">R2</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">LSR</span><span class="c">#12 ; extract service &amp; command identifiers</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D04C</span>                 <span class="no">MOV</span>             <span class="no">R1</span><span class="p">,</span> <span class="c">#0x402 ; SCM_SVC_BOOT::SCM_CMD_TERMINATE_PC</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D050</span>                 <span class="no">CMP</span>             <span class="no">R1</span><span class="p">,</span> <span class="no">R2</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D054</span>                 <span class="no">LDMEQFD</span>         <span class="no">SP</span><span class="p">!,</span> <span class="err">{</span><span class="no">R1-R3</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D058</span>                 <span class="no">BEQ</span>             <span class="no">sub_FE80D360</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D05C</span>                 <span class="no">MOV</span>             <span class="no">R1</span><span class="p">,</span> <span class="c">#0xC05 ; SCM_SVC_UTIL::CACHE_BUFFER_DUMP_COMMAND_ID</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D060</span>                 <span class="no">CMP</span>             <span class="no">R1</span><span class="p">,</span> <span class="no">R2</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D064</span>                 <span class="no">LDMEQFD</span>         <span class="no">SP</span><span class="p">!,</span> <span class="err">{</span><span class="no">R1-R3</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D068</span>                 <span class="no">BEQ</span>             <span class="no">sub_FE80D68C</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D06C</span>                 <span class="no">MOV</span>             <span class="no">R1</span><span class="p">,</span> <span class="c">#0x404 ; SCM_SVC_BOOT::4</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D070</span>                 <span class="no">CMP</span>             <span class="no">R1</span><span class="p">,</span> <span class="no">R2</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D074</span>                 <span class="no">LDMEQFD</span>         <span class="no">SP</span><span class="p">!,</span> <span class="err">{</span><span class="no">R1-R3</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D078</span>                 <span class="no">BEQ</span>             <span class="no">sub_FE80D72C</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D07C</span>                 <span class="no">MOV</span>             <span class="no">R1</span><span class="p">,</span> <span class="c">#0x1401 ; SCM_SVC_IO::SCM_IO_READ</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D080</span>                 <span class="no">CMP</span>             <span class="no">R1</span><span class="p">,</span> <span class="no">R2</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D084</span>                 <span class="no">LDMEQFD</span>         <span class="no">SP</span><span class="p">!,</span> <span class="err">{</span><span class="no">R1-R3</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D088</span>                 <span class="no">BEQ</span>             <span class="no">sub_FE80D5AC</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D08C</span>                 <span class="no">MOV</span>             <span class="no">R1</span><span class="p">,</span> <span class="c">#0x1402 ; SCM_SVC_IO::SCM_IO_WRITE</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D090</span>                 <span class="no">CMP</span>             <span class="no">R1</span><span class="p">,</span> <span class="no">R2</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D094</span>                 <span class="no">LDMEQFD</span>         <span class="no">SP</span><span class="p">!,</span> <span class="err">{</span><span class="no">R1-R3</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D098</span>                 <span class="no">BEQ</span>             <span class="no">sub_FE80D5CC</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D09C</span>                 <span class="no">MOV</span>             <span class="no">R1</span><span class="p">,</span> <span class="c">#0x3404 ; SCM_SVC_DCVS::DCVS_CMD_EVENT</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D0A0</span>                 <span class="no">CMP</span>             <span class="no">R1</span><span class="p">,</span> <span class="no">R2</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D0A4</span>                 <span class="no">LDMEQFD</span>         <span class="no">SP</span><span class="p">!,</span> <span class="err">{</span><span class="no">R1-R3</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D0A8</span>                 <span class="no">BEQ</span>             <span class="no">sub_FE80D64C</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D0AC</span>                 <span class="no">MOV</span>             <span class="no">R1</span><span class="p">,</span> <span class="c">#0x1403 ; SCM_SVC_IO::TZ_RESET_ID</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D0B0</span>                 <span class="no">CMP</span>             <span class="no">R1</span><span class="p">,</span> <span class="no">R2</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D0B4</span>                 <span class="no">LDMEQFD</span>         <span class="no">SP</span><span class="p">!,</span> <span class="err">{</span><span class="no">R1-R3</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D0B8</span>                 <span class="no">BEQ</span>             <span class="no">sub_FE80D5EC</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D0BC</span>                 <span class="no">MOV</span>             <span class="no">R1</span><span class="p">,</span> <span class="c">#0x1404 ; SCM_SVC_IO::TZ_UPDATE_ID</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D0C0</span>                 <span class="no">CMP</span>             <span class="no">R1</span><span class="p">,</span> <span class="no">R2</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D0C4</span>                 <span class="no">LDMEQFD</span>         <span class="no">SP</span><span class="p">!,</span> <span class="err">{</span><span class="no">R1-R3</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D0C8</span>                 <span class="no">BEQ</span>             <span class="no">sub_FE80D618</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D0CC</span>                 <span class="no">MOV</span>             <span class="no">R1</span><span class="p">,</span> <span class="c">#0x2401 ; SCM_SVC_PWR::SCM_IO_DISABLE_PMIC_ARBITER</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D0D0</span>                 <span class="no">CMP</span>             <span class="no">R1</span><span class="p">,</span> <span class="no">R2</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D0D4</span>                 <span class="no">LDMEQFD</span>         <span class="no">SP</span><span class="p">!,</span> <span class="err">{</span><span class="no">R1-R3</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D0D8</span>                 <span class="no">BEQ</span>             <span class="no">sub_FE80D74C</span>
+</pre></div>
+
+
+<p>As Linux kernel itself initiates a lot of SMC calls, we explore
+<a href=
+"https://android.googlesource.com/kernel/msm/+/android-msm-hammerhead-3.4-kitkat-mr2/">
+Linux sources</a> to enumerate service and command identifiers
+passed to SMC calls. Thereby, we will get more information on
+corresponding functions without reversing them.<br>
+<table>
+<tbody>
+<tr>
+<th>Immediate value</th>
+<th>Service ID (imm&gt;&gt;10)</th>
+<th>Command ID (imm&amp;0x3ff)</th>
+<th>Function description</th>
+</tr>
+<tr>
+<td>0x402</td>
+<td>SCM_SVC_BOOT</td>
+<td>SCM_CMD_TERMINATE_PC</td>
+<td><a href=
+"https://android.googlesource.com/kernel/msm/+/b0650348df9152b11187a65d777d191bcae0817e%5E%21/">
+Put current core in low power state</a></td>
+</tr>
+<tr>
+<td>0xC05</td>
+<td>SCM_SVC_UTIL</td>
+<td>CACHE_BUFFER_DUMP_COMMAND_ID</td>
+<td><a href=
+"https://android.googlesource.com/kernel/msm/+/7b63736cd68dac64b889f18d3e9cfa037e12e076%5E%21/">
+Dump the L1 and L2 caches on panic</a></td>
+</tr>
+<tr>
+<td>0x404</td>
+<td>SCM_SVC_BOOT</td>
+<td>4</td>
+<td>Dummy function, returns to Non-Secure world</td>
+</tr>
+<tr>
+<td>0x1401</td>
+<td>SCM_SVC_IO</td>
+<td>SCM_IO_READ</td>
+<td>Dummy function, returns to Non-Secure world</td>
+</tr>
+<tr>
+<td>0x1402</td>
+<td>SCM_SVC_IO</td>
+<td>SCM_IO_WRITE</td>
+<td>Dummy function, returns to Non-Secure world</td>
+</tr>
+<tr>
+<td>0x3404</td>
+<td>SCM_SVC_DCVS</td>
+<td>DCVS_CMD_EVENT</td>
+<td><a href=
+"https://android.googlesource.com/kernel/msm/+/f53ef1b26b1a06255648e7db5db395d9439af483%5E%21/">
+Handle some Dynamic Clock and Voltage Scaling (DCVS)</a>&nbsp;See
+also&nbsp;<a href=
+"https://android.googlesource.com/kernel/msm/+/android-msm-hammerhead-3.4-kitkat-mr2/arch/arm/mach-msm/include/mach/msm_dcvs_scm.h">event
+definitions</a></td>
+</tr>
+<tr>
+<td>0x1403</td>
+<td>SCM_SVC_IO</td>
+<td>TZ_RESET_ID</td>
+<td>Related to GPU power management</td>
+</tr>
+<tr>
+<td>0x1404</td>
+<td>SCM_SVC_IO</td>
+<td>TZ_UPDATE_ID</td>
+<td>Related to GPU power management</td>
+</tr>
+<tr>
+<td>0x2401</td>
+<td>SCM_SVC_PWR</td>
+<td>SCM_IO_DISABLE_PMIC_ARBITER</td>
+<td><a href=
+"https://android.googlesource.com/kernel/msm/+/android-msm-hammerhead-3.4-kitkat-mr2/arch/arm/mach-msm/restart.c">
+"Force the SPMI PMIC arbiter to shutdown so that no more SPMI
+transactions are sent from the MSM to the PMIC."</a></td>
+</tr>
+</tbody>
+</table>
+All these functions have the same epilogue:</p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80D738</span>                 <span class="no">MOV</span>             <span class="no">R3</span><span class="p">,</span> <span class="c">#SCR_NS OR SCR_FIQ OR SCR_AW ; 0b100101</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D73C</span>                 <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R3</span><span class="p">,</span><span class="no">c1</span><span class="p">,</span><span class="no">c1</span><span class="p">,</span> <span class="mi">0</span> <span class="c">; write SCR : switch to Non-Secure state</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D740</span>                 <span class="no">ISB</span>             <span class="no">SY</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D744</span>                 <span class="no">MOV</span>             <span class="no">R3</span><span class="p">,</span> <span class="c">#0  ; clear R3 to avoid leak</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D748</span>                 <span class="no">MOVS</span>            <span class="no">PC</span><span class="p">,</span> <span class="no">LR</span>  <span class="c">; restore Non-Secure PC &amp; CPSR from LR_mon &amp; SPSR_mon</span>
+</pre></div>
+
+
+<p>These instructions switch the processor to Non-Secure state and
+restore PC &amp; CPSR to perform an exception return.<br>
+<br>
+So SMC calls associated with these specific command/service IDs are
+kind of "Monitor calls", entirely handled in Monitor mode.</p>
+<p>But if R0 value does not match these IDs, the execution continues
+in Monitor mode.</p>
+<h5>IV.3.A.c TrustZone lock</h5>
+
+<p>If the call has not been handled yet, Monitor code tries to acquire
+a lock to ensure that only one core at a time enters in
+TrustZone.</p>
+<p>First, current CPU id is retrieved from MPIDR. Then, this value is
+incremented (because 0 means not locked) and used as lock
+value.</p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80D0E0</span>                 <span class="no">LDR</span>             <span class="no">R1</span><span class="p">,</span> <span class="err">=</span><span class="no">tz_lock</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D0E4</span>                 <span class="no">MRC</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R2</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span> <span class="mi">5</span> <span class="c">; read MPIDR register</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D0E8</span>                 <span class="no">AND</span>             <span class="no">R2</span><span class="p">,</span> <span class="no">R2</span><span class="p">,</span> <span class="c">#0xFF ; extract Aff0 from MPIDR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D0EC</span>                 <span class="no">ADD</span>             <span class="no">R2</span><span class="p">,</span> <span class="no">R2</span><span class="p">,</span> <span class="c">#1</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D0F0</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D0F0</span> <span class="no">loc_FE80D0F0</span>                            <span class="c">; CODE XREF: smc_handler+D8j</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D0F0</span>                 <span class="no">LDREX</span>           <span class="no">R0</span><span class="p">,</span> <span class="p">[</span><span class="no">R1</span><span class="p">]</span> <span class="c">; read current tz_lock value</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D0F4</span>                 <span class="no">CMP</span>             <span class="no">R0</span><span class="p">,</span> <span class="c">#0  ; test if TrustZone is locked</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D0F8</span>                 <span class="no">STREXEQ</span>         <span class="no">R0</span><span class="p">,</span> <span class="no">R2</span><span class="p">,</span> <span class="p">[</span><span class="no">R1</span><span class="p">]</span> <span class="c">; if not locked, try to lock TrustZone</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D0FC</span>                 <span class="no">CMPEQ</span>           <span class="no">R0</span><span class="p">,</span> <span class="c">#0  ; test if TrustZone is now locked</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D100</span>                 <span class="no">BNE</span>             <span class="no">loc_FE80D0F0</span> <span class="c">; retry if TrustZone is still not locked</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D104</span>                 <span class="no">DMB</span>             <span class="no">SY</span>      <span class="c">; Data Memory Barrier acts as a memory barrier</span>
+</pre></div>
+
+
+<p>Then, it tries to acquire the TrustZone lock. This implementation
+is very similar to the example provided in <a href=
+"http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0406c/index.html">
+ARM Ref.</a> (D7.3.1 Acquiring a lock).</p>
+<p>It relies on synchronization primitives (LDREX/STREX) to support
+exclusive accesses to memory shared between cores.
+Once the lock is acquired, the current core is the only one running
+in TrustZone, and the execution can continue.</p>
+<h5>IV.3.A.d Pre-exception status</h5>
+
+<p>LR_mon and SPSR_mon are both banked registers. Their values are
+generated by the exception entry. LR_mon contains the return
+address in Non-Secure world (right after the SMC instruction). The
+purpose of SPSR_mon is to record the pre-exception value of the
+CPSR.</p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80D108</span>                 <span class="no">LDR</span>             <span class="no">R0</span><span class="p">,</span> <span class="err">=</span><span class="no">NS_core_status</span> <span class="c">; secure area to store Non-Secure (NS) status</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D10C</span>                 <span class="no">MOV</span>             <span class="no">R1</span><span class="p">,</span> <span class="no">LR</span>  <span class="c">; read NS return address (LR_mon)</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D110</span>                 <span class="no">MRS</span>             <span class="no">R2</span><span class="p">,</span> <span class="no">SPSR</span> <span class="c">; read NS CPSR (SPSR_mon)</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D114</span>                 <span class="no">STMIA</span>           <span class="no">R0</span><span class="p">,</span> <span class="err">{</span><span class="no">R1</span><span class="p">,</span><span class="no">R2</span><span class="err">}</span> <span class="c">; write LR_mon &amp; SPSR_mon</span>
+</pre></div>
+
+
+<p>These two registers are saved in Secure memory to be restored later on exception return.</p>
+<h5>IV.3.A.e IRQ interruption flag</h5>
+
+<p>Then a DWORD at a static address is unconditionally cleared:</p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80D118</span>                 <span class="no">LDR</span>             <span class="no">R1</span><span class="p">,</span> <span class="err">=</span><span class="no">tz_irq_interrupted</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D11C</span>                 <span class="no">MOV</span>             <span class="no">R0</span><span class="p">,</span> <span class="c">#0</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D120</span>                 <span class="no">STR</span>             <span class="no">R0</span><span class="p">,</span> <span class="p">[</span><span class="no">R1</span><span class="p">]</span> <span class="c">; clear tz_irq_interrupted value</span>
+</pre></div>
+
+
+<p>By looking at cross-references, we notice this DWORD is set to 1 in
+the IRQ handler of Monitor mode. But in both handlers (SMC &amp; IRQ),
+when an exception returns to the Non-Secure world, the returned
+value (in R0) is set to 1 if this DWORD is not null.</p>
+<p>Futhermore, we can have a look at how <a href=
+"https://android.googlesource.com/kernel/msm/+/android-msm-hammerhead-3.4-kitkat-mr2/arch/arm/mach-msm/scm.c">
+SCM</a> interprets the value returned by a SMC call:</p>
+<div class="highlight"><pre><span></span><span class="cp">#define SCM_INTERRUPTED  1</span>
+<span class="k">do</span> <span class="p">{</span>
+    <span class="k">asm</span> <span class="k">volatile</span><span class="p">(</span>
+        <span class="n">__asmeq</span><span class="p">(</span><span class="s">&quot;%0&quot;</span><span class="p">,</span> <span class="s">&quot;r0&quot;</span><span class="p">)</span>
+        <span class="n">__asmeq</span><span class="p">(</span><span class="s">&quot;%1&quot;</span><span class="p">,</span> <span class="s">&quot;r0&quot;</span><span class="p">)</span>
+        <span class="n">__asmeq</span><span class="p">(</span><span class="s">&quot;%2&quot;</span><span class="p">,</span> <span class="s">&quot;r1&quot;</span><span class="p">)</span>
+        <span class="n">__asmeq</span><span class="p">(</span><span class="s">&quot;%3&quot;</span><span class="p">,</span> <span class="s">&quot;r2&quot;</span><span class="p">)</span>
+<span class="cp">#ifdef REQUIRES_SEC</span>
+        <span class="s">&quot;.arch_extension sec</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="cp">#endif</span>
+        <span class="s">&quot;smc #0 @ switch to secure world</span><span class="se">\n</span><span class="s">&quot;</span>
+        <span class="o">:</span> <span class="s">&quot;=r&quot;</span> <span class="p">(</span><span class="n">r0</span><span class="p">)</span>
+        <span class="o">:</span> <span class="s">&quot;r&quot;</span> <span class="p">(</span><span class="n">r0</span><span class="p">),</span> <span class="s">&quot;r&quot;</span> <span class="p">(</span><span class="n">r1</span><span class="p">),</span> <span class="s">&quot;r&quot;</span> <span class="p">(</span><span class="n">r2</span><span class="p">)</span>
+        <span class="o">:</span> <span class="s">&quot;r3&quot;</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="n">r0</span> <span class="o">==</span> <span class="n">SCM_INTERRUPTED</span><span class="p">);</span>
+</pre></div>
+
+
+<p>SCM will reiterate each SMC call while the returned value is 1.</p>
+<p>We can deduce that this DWORD indicates if the exception return is
+due to an IRQ interrupt. TrustZone Whitepaper (<a href=
+"http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.prd29-genc-009492c/CACCDCDH.html">3.3.3
+Secure interrupts</a>) says ARM recommends the use of IRQ as a
+Normal world interrupt source. That's why IRQ interrupts are
+handled in the Normal world.</p>
+<h5>IV.3.A.f Configure Secure world MMU</h5>
+
+<p>Next block of instructions modifies the translation table of Secure
+MMU (<a href=
+"http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0406c/index.html">ARM
+Ref.</a> B3.1 About the VMSA) if two conditions are met:</p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80D124</span>                 <span class="no">MRC</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span> <span class="mi">5</span> <span class="c">; read MPIDR register</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D128</span>                 <span class="no">AND</span>             <span class="no">R0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span> <span class="c">#0xFF ; extract Aff0 from MPIDR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D12C</span>                 <span class="no">CMP</span>             <span class="no">R0</span><span class="p">,</span> <span class="c">#0</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D130</span>                 <span class="no">BNE</span>             <span class="no">loc_FE80D164</span> <span class="c">; jump if current core != CPU0</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D134</span>                 <span class="no">LDR</span>             <span class="no">R0</span><span class="p">,</span> <span class="err">=</span><span class="no">tz_ext_elf_loaded</span> <span class="c">; read external ELF status</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D138</span>                 <span class="no">LDR</span>             <span class="no">R0</span><span class="p">,</span> <span class="p">[</span><span class="no">R0</span><span class="p">]</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D13C</span>                 <span class="no">CMP</span>             <span class="no">R0</span><span class="p">,</span> <span class="c">#0</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D140</span>                 <span class="no">BEQ</span>             <span class="no">loc_FE80D164</span> <span class="c">; jump if no external ELF loaded</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D144</span>                 <span class="no">LDR</span>             <span class="no">R0</span><span class="p">,</span> <span class="err">=</span><span class="no">tz_ext_elf_ttbr0</span> <span class="c">; read TTBR0 ptr for external ELF</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D148</span>                 <span class="no">LDR</span>             <span class="no">R0</span><span class="p">,</span> <span class="p">[</span><span class="no">R0</span><span class="p">]</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D14C</span>                 <span class="no">DSB</span>             <span class="no">SY</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D150</span>                 <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c2</span><span class="p">,</span><span class="no">c0</span><span class="p">,</span> <span class="mi">0</span> <span class="c">; write new TTBR0</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D154</span>                 <span class="no">ISB</span>             <span class="no">SY</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D158</span>                 <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">c8</span><span class="p">,</span><span class="no">c7</span><span class="p">,</span> <span class="mi">0</span> <span class="c">; flush TLBs</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D15C</span>                 <span class="no">DSB</span>             <span class="no">SY</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D160</span>                 <span class="no">ISB</span>             <span class="no">SY</span>
+</pre></div>
+
+
+<p>First, it checks if the current core is CPU0.</p>
+<p>Then, it checks if a DWORD is not null. By looking at
+cross-references, we notice that this DWORD is modified in SCM
+handler of QSEOS_LOAD_EXTERNAL_ELF_COMMAND call (not part of the
+Monitor code). This SCM call is made by qseecom_load_external_elf()
+function in the&nbsp;<a href=
+"https://android.googlesource.com/kernel/msm/+/android-msm-hammerhead-3.4-kitkat-mr2/drivers/misc/qseecom.c">QSEECOM
+Linux driver</a>. This function allows the HLOS to load an external
+ELF binary into the Secure World. We can remark that this function
+first ensures to run on CPU0.</p>
+<div class="highlight"><pre><span></span><span class="k">static</span> <span class="kt">int</span> <span class="nf">qseecom_load_external_elf</span><span class="p">(</span><span class="k">struct</span> <span class="n">qseecom_dev_handle</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="kt">void</span> <span class="n">__user</span> <span class="o">*</span><span class="n">argp</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="p">[...]</span>
+ <span class="cm">/* SCM_CALL tied to Core0 */</span>
+ <span class="n">mask</span> <span class="o">=</span> <span class="n">CPU_MASK_CPU0</span><span class="p">;</span>
+ <span class="n">set_cpu_ret</span> <span class="o">=</span> <span class="n">set_cpus_allowed_ptr</span><span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">mask</span><span class="p">);</span>
+<span class="p">[...]</span>
+</pre></div>
+
+
+<p>You can also refer to TrustZone Whitepaper to learn more about
+"<a href=
+"http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.prd29-genc-009492c/ch05s04s01.html">Secure
+World processor affinity</a>" on multiprocessor systems.</p>
+<p>Finally, if those checks are successful, the Translation Table Base
+Register 0 (TTBR0) is modified, and data &amp; instruction TLBs are
+both flushed. TTBR0 holds the physical address of the first-level
+translation table used by the Secure MMU to perform table
+translation walks.</p>
+<p>This block of instructions will configure the MMU to create a
+dedicated address space in the Secure World if an external ELF is
+loaded on CPU0.</p>
+<h5>IV.3.A.g Context switching</h5>
+
+<p>Before switching to Secure World, Normal World context is saved
+into Secure memory (<a href=
+"http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.prd29-genc-009492c/ch05s03s01.html">TrustZone
+Whitepaper, 5.3.1 Context switching</a>). It includes :<br>
+<ul>
+<li>General purpose registers (R0-R12)</li>
+<li>Banked registers SPSR, SP and LR of each mode IRQ, SVC, ABT,
+UND.</li>
+<li>Banked registers SPSR, R8, R9, R10, R11, R12, SP and LR of FIQ
+mode.</li>
+</ul></p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80D168</span>                 <span class="no">MOV</span>             <span class="no">LR</span><span class="p">,</span> <span class="no">SP</span>  <span class="c">; save Monitor stack address</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D16C</span>                 <span class="no">LDR</span>             <span class="no">SP</span><span class="p">,</span> <span class="err">=</span><span class="no">NS_core_context</span> <span class="c">; secure area to store Non-Secure context</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D170</span>                 <span class="no">STMFD</span>           <span class="no">SP</span><span class="p">,</span> <span class="err">{</span><span class="no">R0-LR</span><span class="err">}^</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D174</span>                 <span class="no">MOV</span>             <span class="no">R4</span><span class="p">,</span> <span class="no">SP</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D178</span>                 <span class="no">CPS</span>             <span class="c">#CPSR_MODE_IRQ ; switch to IRQ mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D17C</span>                 <span class="no">MRS</span>             <span class="no">R12</span><span class="p">,</span> <span class="no">SPSR</span> <span class="c">; read SPSR_irq</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D180</span>                 <span class="no">STMIA</span>           <span class="no">R4</span><span class="p">!,</span> <span class="err">{</span><span class="no">R12-LR</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D184</span>                 <span class="no">CPS</span>             <span class="c">#CPSR_MODE_SVC ; switch to Supervisor mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D188</span>                 <span class="no">MRS</span>             <span class="no">R12</span><span class="p">,</span> <span class="no">SPSR</span> <span class="c">; read SPSR_svc</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D18C</span>                 <span class="no">STMIA</span>           <span class="no">R4</span><span class="p">!,</span> <span class="err">{</span><span class="no">R12-LR</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D190</span>                 <span class="no">CPS</span>             <span class="c">#CPSR_MODE_ABT ; switch to Abort mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D194</span>                 <span class="no">MRS</span>             <span class="no">R12</span><span class="p">,</span> <span class="no">SPSR</span> <span class="c">; read SPSR_abt</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D198</span>                 <span class="no">STMIA</span>           <span class="no">R4</span><span class="p">!,</span> <span class="err">{</span><span class="no">R12-LR</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D19C</span>                 <span class="no">CPS</span>             <span class="c">#CPSR_MODE_UND ; switch to Undefined mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D1A0</span>                 <span class="no">MRS</span>             <span class="no">R12</span><span class="p">,</span> <span class="no">SPSR</span> <span class="c">; read SPSR_und</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D1A4</span>                 <span class="no">STMIA</span>           <span class="no">R4</span><span class="p">!,</span> <span class="err">{</span><span class="no">R12-LR</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D1A8</span>                 <span class="no">CPS</span>             <span class="c">#CPSR_MODE_FIQ ; switch to FIQ mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D1AC</span>                 <span class="no">MRS</span>             <span class="no">R7</span><span class="p">,</span> <span class="no">SPSR</span> <span class="c">; read SPSR_fiq</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D1B0</span>                 <span class="no">STMIA</span>           <span class="no">R4</span><span class="p">,</span> <span class="err">{</span><span class="no">R7-LR</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D1B4</span>                 <span class="no">CPS</span>             <span class="c">#CPSR_MODE_MON ; switch back to Monitor mode</span>
+</pre></div>
+
+
+<p>Because the current security state is Secure (SCR.NS == 0), CPS
+instructions can be used to switch to each mode before finally
+switching back to Monitor mode. MRS instruction reads a Special
+Register (like SPSR) and writes it to a general purpose register.</p>
+<p>Later, this saved context will be restored when the processor
+switches back to the Normal World.</p>
+<p>Then, Secure World context is restored from a previous context
+switch (Secure to Normal World).</p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80D1B8</span>                 <span class="no">LDR</span>             <span class="no">SP</span><span class="p">,</span> <span class="err">=</span><span class="no">S_core_context</span> <span class="c">; secure area where previous Secure context is stored</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D1BC</span>                 <span class="no">MOV</span>             <span class="no">R1</span><span class="p">,</span> <span class="no">SP</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D1C0</span>                 <span class="no">CPS</span>             <span class="c">#CPSR_MODE_IRQ ; switch to IRQ mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D1C4</span>                 <span class="no">LDMIA</span>           <span class="no">R1</span><span class="p">!,</span> <span class="err">{</span><span class="no">R12-LR</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D1C8</span>                 <span class="no">MSR</span>             <span class="no">SPSR_cxsf</span><span class="p">,</span> <span class="no">R12</span> <span class="c">; write SPSR_irq</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D1CC</span>                 <span class="no">CPS</span>             <span class="c">#CPSR_MODE_SVC ; switch to Supervisor mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D1D0</span>                 <span class="no">LDMIA</span>           <span class="no">R1</span><span class="p">!,</span> <span class="err">{</span><span class="no">R12-LR</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D1D4</span>                 <span class="no">MSR</span>             <span class="no">SPSR_cxsf</span><span class="p">,</span> <span class="no">R12</span> <span class="c">; write SPSR_svc</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D1D8</span>                 <span class="no">CPS</span>             <span class="c">#CPSR_MODE_ABT ; switch to Abort mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D1DC</span>                 <span class="no">LDMIA</span>           <span class="no">R1</span><span class="p">!,</span> <span class="err">{</span><span class="no">R12-LR</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D1E0</span>                 <span class="no">MSR</span>             <span class="no">SPSR_cxsf</span><span class="p">,</span> <span class="no">R12</span> <span class="c">; write SPSR_abt</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D1E4</span>                 <span class="no">CPS</span>             <span class="c">#CPSR_MODE_UND ; switch to Undefined mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D1E8</span>                 <span class="no">LDMIA</span>           <span class="no">R1</span><span class="p">!,</span> <span class="err">{</span><span class="no">R12-LR</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D1EC</span>                 <span class="no">MSR</span>             <span class="no">SPSR_cxsf</span><span class="p">,</span> <span class="no">R12</span> <span class="c">; write SPSR_und</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D1F0</span>                 <span class="no">CPS</span>             <span class="c">#CPSR_MODE_FIQ ; switch to FIQ mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D1F4</span>                 <span class="no">LDMIA</span>           <span class="no">R1</span><span class="p">,</span> <span class="err">{</span><span class="no">R7-LR</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D1F8</span>                 <span class="no">MSR</span>             <span class="no">SPSR_cxsf</span><span class="p">,</span> <span class="no">R7</span> <span class="c">; write SPSR_fiq</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D1FC</span>                 <span class="no">CPS</span>             <span class="c">#CPSR_MODE_MON ; switch back to Monitor mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D200</span>                 <span class="no">LDMEA</span>           <span class="no">SP</span><span class="p">,</span> <span class="err">{</span><span class="no">R0-LR</span><span class="err">}^</span>
+</pre></div>
+
+
+<h5>IV.3.A.f Exception return to Secure world</h5>
+
+<p>Finally, the Monitor stack address is restored, and a Return From
+Exception (RFE) instruction loads the LR and the CPSR of
+interrupted Secure World from a specific address in Secure
+memory.</p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80D204</span>                 <span class="no">MOV</span>             <span class="no">SP</span><span class="p">,</span> <span class="no">LR</span>  <span class="c">; restore Monitor stack address</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D208</span>                 <span class="no">LDR</span>             <span class="no">LR</span><span class="p">,</span> <span class="err">=</span><span class="no">S_core_status</span> <span class="c">; ptr to previously-saved Secure LR &amp; CPSR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D20C</span>                 <span class="no">RFEIA</span>           <span class="no">LR</span>      <span class="c">; Return From Exception to Secure World</span>
+</pre></div>
+
+
+<h3>IV.3.B Return to Non-Secure World</h3>
+
+<p>In the case where SCR.NS is not set, the Secure world returns
+results to calling function in Non-Secure world.</p>
+<p>A lot of operations here are similar to those previously described
+in the "Call to Secure World" section.</p>
+<h5>IV.3.B.a Pre-exception status</h5>
+
+<p>First, LR_mon &amp; SPSR_mon registers are saved in Secure memory to be
+restored next time the TrustZone is entered. LR_mon contains the
+return address in Secure world (right after the SMC instruction).
+The purpose of SPSR_mon is to record the pre-exception value of the
+CPSR.</p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80D210</span>                 <span class="no">LDR</span>             <span class="no">R0</span><span class="p">,</span> <span class="err">=</span><span class="no">S_core_status</span> <span class="c">; secure area to store Secure status</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D214</span>                 <span class="no">MOV</span>             <span class="no">R1</span><span class="p">,</span> <span class="no">LR</span>  <span class="c">; read Secure return address (LR_mon)</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D218</span>                 <span class="no">MRS</span>             <span class="no">R2</span><span class="p">,</span> <span class="no">SPSR</span> <span class="c">; read Secure CPSR (SPSR_mon)</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D21C</span>                 <span class="no">STMIA</span>           <span class="no">R0</span><span class="p">,</span> <span class="err">{</span><span class="no">R1</span><span class="p">,</span><span class="no">R2</span><span class="err">}</span> <span class="c">; write LR_mon &amp; SPSR_mon</span>
+</pre></div>
+
+
+<h5>IV.3.B.b Context switching</h5>
+
+<p>Then, the Secure World context is saved, and the Normal World
+context is restored from a previous context switch (Normal to
+Secure World).</p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80D224</span>                 <span class="no">MOV</span>             <span class="no">LR</span><span class="p">,</span> <span class="no">SP</span>  <span class="c">; save Monitor stack address</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D228</span>                 <span class="no">LDR</span>             <span class="no">SP</span><span class="p">,</span> <span class="err">=</span><span class="no">S_core_context</span> <span class="c">; secure area to store Secure context</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D22C</span>                 <span class="no">STMFD</span>           <span class="no">SP</span><span class="p">,</span> <span class="err">{</span><span class="no">R0-LR</span><span class="err">}^</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D230</span>                 <span class="no">MOV</span>             <span class="no">R4</span><span class="p">,</span> <span class="no">SP</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D234</span>                 <span class="no">CPS</span>             <span class="c">#CPSR_MODE_IRQ ; switch to IRQ mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D238</span>                 <span class="no">MRS</span>             <span class="no">R12</span><span class="p">,</span> <span class="no">SPSR</span> <span class="c">; read SPSR_irq</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D23C</span>                 <span class="no">STMIA</span>           <span class="no">R4</span><span class="p">!,</span> <span class="err">{</span><span class="no">R12-LR</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D240</span>                 <span class="no">CPS</span>             <span class="c">#CPSR_MODE_SVC ; switch to Supervisor mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D244</span>                 <span class="no">MRS</span>             <span class="no">R12</span><span class="p">,</span> <span class="no">SPSR</span> <span class="c">; read SPSR_svc</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D248</span>                 <span class="no">STMIA</span>           <span class="no">R4</span><span class="p">!,</span> <span class="err">{</span><span class="no">R12-LR</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D24C</span>                 <span class="no">CPS</span>             <span class="c">#CPSR_MODE_ABT ; switch to Abort mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D250</span>                 <span class="no">MRS</span>             <span class="no">R12</span><span class="p">,</span> <span class="no">SPSR</span> <span class="c">; read SPSR_abt</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D254</span>                 <span class="no">STMIA</span>           <span class="no">R4</span><span class="p">!,</span> <span class="err">{</span><span class="no">R12-LR</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D258</span>                 <span class="no">CPS</span>             <span class="c">#CPSR_MODE_UND ; switch to Undefined mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D25C</span>                 <span class="no">MRS</span>             <span class="no">R12</span><span class="p">,</span> <span class="no">SPSR</span> <span class="c">; read SPSR_und</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D260</span>                 <span class="no">STMIA</span>           <span class="no">R4</span><span class="p">!,</span> <span class="err">{</span><span class="no">R12-LR</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D264</span>                 <span class="no">CPS</span>             <span class="c">#CPSR_MODE_FIQ ; switch to FIQ mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D268</span>                 <span class="no">MRS</span>             <span class="no">R7</span><span class="p">,</span> <span class="no">SPSR</span> <span class="c">; read SPSR_fiq</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D26C</span>                 <span class="no">STMIA</span>           <span class="no">R4</span><span class="p">,</span> <span class="err">{</span><span class="no">R7-LR</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D270</span>                 <span class="no">CPS</span>             <span class="c">#CPSR_MODE_MON ; switch back to Monitor mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D274</span>                 <span class="no">SUB</span>             <span class="no">SP</span><span class="p">,</span> <span class="no">SP</span><span class="p">,</span> <span class="c">#0x94 ; NS_core_context = SP (S_core_context) - 0x94</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D278</span>                 <span class="no">MOV</span>             <span class="no">R1</span><span class="p">,</span> <span class="no">SP</span>  <span class="c">; secure area where previous Non-Secure context is stored</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D27C</span>                 <span class="no">CPS</span>             <span class="c">#CPSR_MODE_IRQ ; switch to IRQ mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D280</span>                 <span class="no">LDMIA</span>           <span class="no">R1</span><span class="p">!,</span> <span class="err">{</span><span class="no">R12-LR</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D284</span>                 <span class="no">MSR</span>             <span class="no">SPSR_cxsf</span><span class="p">,</span> <span class="no">R12</span> <span class="c">; write SPSR_irq</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D288</span>                 <span class="no">CPS</span>             <span class="c">#CPSR_MODE_SVC ; switch to Supervisor mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D28C</span>                 <span class="no">LDMIA</span>           <span class="no">R1</span><span class="p">!,</span> <span class="err">{</span><span class="no">R12-LR</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D290</span>                 <span class="no">MSR</span>             <span class="no">SPSR_cxsf</span><span class="p">,</span> <span class="no">R12</span> <span class="c">; write SPSR_svc</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D294</span>                 <span class="no">CPS</span>             <span class="c">#CPSR_MODE_ABT ; switch to Abort mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D298</span>                 <span class="no">LDMIA</span>           <span class="no">R1</span><span class="p">!,</span> <span class="err">{</span><span class="no">R12-LR</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D29C</span>                 <span class="no">MSR</span>             <span class="no">SPSR_cxsf</span><span class="p">,</span> <span class="no">R12</span> <span class="c">; write SPSR_abt</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D2A0</span>                 <span class="no">CPS</span>             <span class="c">#CPSR_MODE_UND ; switch to Undefined mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D2A4</span>                 <span class="no">LDMIA</span>           <span class="no">R1</span><span class="p">!,</span> <span class="err">{</span><span class="no">R12-LR</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D2A8</span>                 <span class="no">MSR</span>             <span class="no">SPSR_cxsf</span><span class="p">,</span> <span class="no">R12</span> <span class="c">; write SPSR_und</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D2AC</span>                 <span class="no">CPS</span>             <span class="c">#CPSR_MODE_FIQ ; switch to FIQ mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D2B0</span>                 <span class="no">LDMIA</span>           <span class="no">R1</span><span class="p">,</span> <span class="err">{</span><span class="no">R7-LR</span><span class="err">}</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D2B4</span>                 <span class="no">MSR</span>             <span class="no">SPSR_cxsf</span><span class="p">,</span> <span class="no">R7</span> <span class="c">; write SPSR_fiq</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D2B8</span>                 <span class="no">CPS</span>             <span class="c">#CPSR_MODE_MON ; switch back to Monitor mode</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D2BC</span>                 <span class="no">LDMEA</span>           <span class="no">SP</span><span class="p">,</span> <span class="err">{</span><span class="no">R0-LR</span><span class="err">}^</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D2C0</span>                 <span class="no">MOV</span>             <span class="no">SP</span><span class="p">,</span> <span class="no">LR</span>  <span class="c">; restore Monitor stack address</span>
+</pre></div>
+
+
+<h5>IV.3.B.c IRQ interrupt flag</h5>
+
+<p>Next instructions check the DWORD value which indicates that an IRQ
+interrupt occurred. If this flag is set, the return value is set to
+1 in R0.</p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80D2C4</span>                 <span class="no">LDR</span>             <span class="no">R3</span><span class="p">,</span> <span class="err">=</span><span class="no">tz_irq_interrupted</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D2C8</span>                 <span class="no">LDR</span>             <span class="no">R2</span><span class="p">,</span> <span class="p">[</span><span class="no">R3</span><span class="p">]</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D2CC</span>                 <span class="no">CMP</span>             <span class="no">R2</span><span class="p">,</span> <span class="c">#0  ; if an IRQ interrupt occurred</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D2D0</span>                 <span class="no">MOVNE</span>           <span class="no">R0</span><span class="p">,</span> <span class="c">#1  ; then set return value to 1</span>
+</pre></div>
+
+
+<p>This may seem pointless in the context of the SMC handler. But
+actually this part of code is also used by the IRQ handler to
+return to the Normal World.</p>
+<h5>IV.3.B.d Non-secure CPSR & LR</h5>
+
+<p>Then CPSR and LR from previously interrupted Non-Secure state are
+written to SPSR_mon and LR_mon.</p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80D2D4</span>                 <span class="no">LDR</span>             <span class="no">LR</span><span class="p">,</span> <span class="err">=</span><span class="no">NS_core_status</span> <span class="c">; ptr to previously-saved Non-Secure LR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D2D8</span>                 <span class="no">LDR</span>             <span class="no">LR</span><span class="p">,</span> <span class="p">[</span><span class="no">LR</span><span class="p">]</span> <span class="c">; restore Non-Secure return address</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D2DC</span>                 <span class="no">LDR</span>             <span class="no">R3</span><span class="p">,</span> <span class="err">=</span><span class="no">NS_core_status.SPSR</span> <span class="c">; ptr to previously-saved Non-Secure CPSR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D2E0</span>                 <span class="no">LDR</span>             <span class="no">R3</span><span class="p">,</span> <span class="p">[</span><span class="no">R3</span><span class="p">]</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D2E4</span>                 <span class="no">BIC</span>             <span class="no">R3</span><span class="p">,</span> <span class="no">R3</span><span class="p">,</span> <span class="c">#CPSR_MASK_FIQ ; clear CPSR.F: FIQ exceptions not masked</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D2E8</span>                 <span class="no">MSR</span>             <span class="no">SPSR_cxsf</span><span class="p">,</span> <span class="no">R3</span> <span class="c">; write SPSR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D2EC</span>                 <span class="no">DMB</span>             <span class="no">SY</span>
+</pre></div>
+
+
+<p>They will be used later for the exception return.</p>
+<h5>IV.3.B.e TrustZone lock</h5>
+
+<p>After that, tz_lock DWORD is cleared to indicate that this core is no longer running in TrustZone.</p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80D2F0</span>                 <span class="no">LDR</span>             <span class="no">R3</span><span class="p">,</span> <span class="err">=</span><span class="no">tz_lock</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D2F4</span>                 <span class="no">MOV</span>             <span class="no">R2</span><span class="p">,</span> <span class="c">#0</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D2F8</span>                 <span class="no">STR</span>             <span class="no">R2</span><span class="p">,</span> <span class="p">[</span><span class="no">R3</span><span class="p">]</span> <span class="c">; clear tz_lock</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D2FC</span>                 <span class="no">DMB</span>             <span class="no">SY</span>
+</pre></div>
+
+
+<h5>IV.3.B.f Exception return to Non-Secure world</h5>
+
+<p>The MCR instruction writes to the SCR register to modify the
+configuration of the current security state:</p>
+<div class="highlight"><pre><span></span><span class="nl">LOAD:</span><span class="nf">FE80D300</span>                 <span class="no">MOV</span>             <span class="no">R2</span><span class="p">,</span> <span class="c">#0  ; clear R2 to avoid leak</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D304</span>                 <span class="no">MOV</span>             <span class="no">R3</span><span class="p">,</span> <span class="c">#0</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D308</span>                 <span class="no">MOV</span>             <span class="no">R3</span><span class="p">,</span> <span class="c">#SCR_NS OR SCR_FIQ OR SCR_AW ; 0b100101</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D30C</span>                 <span class="no">MCR</span>             <span class="no">p15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="no">R3</span><span class="p">,</span><span class="no">c1</span><span class="p">,</span><span class="no">c1</span><span class="p">,</span> <span class="mi">0</span> <span class="c">; write SCR : switch to Non-Secure state</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D310</span>                 <span class="no">ISB</span>             <span class="no">SY</span>
+<span class="nl">LOAD:</span><span class="nf">FE80D314</span>                 <span class="no">MOV</span>             <span class="no">R3</span><span class="p">,</span> <span class="c">#0  ; clear R3 to avoid leak</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D318</span>                 <span class="no">MOVS</span>            <span class="no">PC</span><span class="p">,</span> <span class="no">LR</span>  <span class="c">; restore Non-Secure PC &amp; CPSR</span>
+<span class="no">LOAD</span><span class="p">:</span><span class="no">FE80D318</span> <span class="c">; End of function smc_handler</span>
+</pre></div>
+
+
+<p>The Security state is switched to Non-Secure (SCR_NS). FIQ
+interrupts are taken to the Monitor Mode (SCR_FIQ), and the CPSR.A
+bit can be modified in any security state (SCR_AW), so the
+Non-Secure world can mask Abort exceptions.</p>
+<p>Finally, the exception return is made with a MOVS instruction which
+branches to the return address in Normal World, and also copies
+SPSR_mon to CPSR.</p>
+<h2>Conclusion</h2>
+
+<p>We have analyzed a part of Monitor code which allows to switch
+processor security state through SMC exceptions. We've learnt that
+some SMC exceptions are fully handled by Monitor code, while others
+are routed to TrustZone code in Secure Supervisor mode. The latter
+can be executed by only one core at a time. We have also found that
+an external ELF can be loaded and executed in TrustZone with a
+dedicated Secure memory space.
+However, this analysis is not complete since IRQ &amp; FIQ handlers
+have not been studied.</p>
+<p>--<em>I would like to thank Adrien &amp; Diane for their help!</em></p>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="/tag/arm.html">arm</a>
+      <a href="/tag/security.html">security</a>
+      <a href="/tag/qualcomm.html">qualcomm</a>
+      <a href="/tag/firmware.html">firmware</a>
+      <a href="/tag/android.html">android</a>
+      <a href="/tag/nexus.html">nexus</a>
+      <a href="/tag/trustzone.html">trustzone</a>
+    </p>
+  </div>
+
+
+
+    <div class="addthis_relatedposts_inline">
+
+
+</article>
+
+    <footer>
+<p>
+  &copy;   - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+</p>
+<p>    Powered by <a href="http://getpelican.com" target="_blank">Pelican</a> - Theme <a href="https://github.com/alexandrevicenzi/flex" target="_blank">Flex</a>
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses/by-sa/4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+         src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " fred's notes ",
+  "url" : "",
+  "image": "/resources/sitelogo.jpg",
+  "description": "Frédéric's Thoughts and Writings"
+}
+</script>
+
+</body>
+</html>

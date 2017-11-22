@@ -1,0 +1,315 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="/theme/stylesheet/style.min.css">
+
+  <link rel="stylesheet" type="text/css" href="/theme/pygments/github.min.css">
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/font-awesome.min.css">
+
+
+
+
+    <link rel="shortcut icon" href="/resources/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/resources/favicon.ico" type="image/x-icon">
+
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+
+<meta name="author" content="Frédéric" />
+<meta name="description" content="Summary Qualcomm TrustZone is prone to an integer signedness bug that may allow to write NULL words to barely controllable locations in memory. The vulnerability can be triggered from Non-Secure World through the TrustZone call &#34;tzbsp_smmu_fault_regs_dump&#34;. This issue has been discovered in Samsung Galaxy S5 firmware, but other devices can …" />
+<meta name="keywords" content="vulnerability, advisory, arm, security, qualcomm, android, trustzone">
+
+<meta property="og:site_name" content="fred's notes"/>
+<meta property="og:title" content="[QPSIIR-80] Qualcomm TrustZone Integer Signedness bug"/>
+<meta property="og:description" content="Summary Qualcomm TrustZone is prone to an integer signedness bug that may allow to write NULL words to barely controllable locations in memory. The vulnerability can be triggered from Non-Secure World through the TrustZone call &#34;tzbsp_smmu_fault_regs_dump&#34;. This issue has been discovered in Samsung Galaxy S5 firmware, but other devices can …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="/2014/12/qpsiir-80-qualcomm-trustzone-integer.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2014-12-18 02:05:00-08:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="/author/frederic.html">
+<meta property="article:section" content="Advisory"/>
+<meta property="article:tag" content="vulnerability"/>
+<meta property="article:tag" content="advisory"/>
+<meta property="article:tag" content="arm"/>
+<meta property="article:tag" content="security"/>
+<meta property="article:tag" content="qualcomm"/>
+<meta property="article:tag" content="android"/>
+<meta property="article:tag" content="trustzone"/>
+<meta property="og:image" content="/resources/sitelogo.jpg">
+
+  <title>fred's notes &ndash; [QPSIIR-80] Qualcomm TrustZone Integer Signedness bug</title>
+
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="/">
+        <img src="/resources/sitelogo.jpg" alt="fred's notes" title="fred's notes">
+      </a>
+      <h1><a href="/">fred's notes</a></h1>
+
+<p>Security & Stuff</p>
+      <nav>
+        <ul class="list">
+          <li><a href="/category/advisory.html">Advisory</a></li>
+          <li><a href="/category/article.html">Article</a></li>
+          <li><a href="/category/tool.html">Tool</a></li>
+          <li><a href="/pages/contact.html#contact">Contact</a></li>
+
+        </ul>
+      </nav>
+
+      <ul class="social">
+        <li><a class="sc-github" href="https://github.com/frederic" target="_blank"><i class="fa fa-github"></i></a></li>
+        <li><a class="sc-linkedin" href="https://www.linkedin.com/in/fredericbasse" target="_blank"><i class="fa fa-linkedin"></i></a></li>
+      </ul>
+    </div>
+
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="/">    Home
+</a>
+
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+
+
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="qpsiir-80-qualcomm-trustzone-integer">[QPSIIR-80] Qualcomm TrustZone Integer Signedness bug</h1>
+    <p>
+          Posted on Thu 18 December 2014 in <a href="/category/advisory.html">Advisory</a>
+
+
+    </p>
+  </header>
+
+
+  <div>
+    <h2>Summary</h2>
+
+<div style="text-align: justify;">Qualcomm TrustZone is prone to an
+integer signedness bug that may allow to write NULL words to barely
+controllable locations in memory.<br>
+<br>
+The vulnerability can be triggered from Non-Secure World through
+the TrustZone call "tzbsp_smmu_fault_regs_dump".<br>
+<br>
+This issue has been discovered in Samsung Galaxy S5 firmware, but
+other devices can be affected as well.</div>
+
+<h2>Details</h2>
+
+<div style="text-align: justify;">This vulnerability has been
+discovered in TrustZone binary of Samsung Galaxy S5 firmware,
+version 4.4.2.<br>
+The tzbsp_smmu_fault_regs_dump function can be called from
+Non-Secure World through the SMC instruction. It takes 4 arguments
+passed in R0-R3 registers.<br>
+When called with argument R0 &gt; 1, nested function subfunc_1 is
+called with arguments (R0 = 0xFFFFFFFF, R1) :</div>
+
+<div class="highlight"><pre><span></span><span class="nf">FE84B9B6</span> <span class="no">tzbsp_smmu_fault_regs_dump</span>
+<span class="nf">FE84B9B6</span>     <span class="no">PUSH.W</span>   <span class="err">{</span><span class="no">R4-R8</span><span class="p">,</span><span class="no">LR</span><span class="err">}</span>
+<span class="nf">FE84B9BA</span>     <span class="no">MOVS</span>     <span class="no">R6</span><span class="p">,</span> <span class="no">R2</span>
+<span class="nf">FE84B9BC</span>     <span class="no">MOV</span>      <span class="no">R8</span><span class="p">,</span> <span class="no">R1</span>
+<span class="nf">FE84B9BE</span>     <span class="no">MOV</span>      <span class="no">R7</span><span class="p">,</span> <span class="no">R3</span>
+<span class="nf">FE84B9C0</span>     <span class="no">MOV.W</span>    <span class="no">R4</span><span class="p">,</span> <span class="c">#0xFFFFFFFF</span>
+<span class="no">FE84B9C4</span>     <span class="no">MOV</span>      <span class="no">R5</span><span class="p">,</span> <span class="c">#0xFFFFFFEE</span>
+<span class="no">FE84B9C8</span>     <span class="no">BEQ</span>      <span class="no">loc_FE84BA1A</span>
+<span class="nf">FE84B9CA</span>     <span class="no">CBZ</span>      <span class="no">R0</span><span class="p">,</span> <span class="no">loc_FE84B9D2</span> <span class="c">; R0 &gt; 1 : branch not taken</span>
+<span class="no">FE84B9CC</span>     <span class="no">CMP</span>      <span class="no">R0</span><span class="p">,</span> <span class="c">#1</span>
+<span class="no">FE84B9CE</span>     <span class="no">BEQ</span>      <span class="no">loc_FE84B9D6</span> <span class="c">; R0 &gt; 1 : branch not taken</span>
+<span class="no">FE84B9D0</span>     <span class="no">B</span>        <span class="no">loc_FE84B9D8</span> <span class="c">; branch</span>
+<span class="no">FE84B9D2</span> <span class="c">; ---------------------------------------------------------</span>
+<span class="no">FE84B9D2</span> <span class="no">loc_FE84B9D2</span>        <span class="c">; if R0 == 0</span>
+<span class="no">FE84B9D2</span>     <span class="no">MOVS</span>     <span class="no">R4</span><span class="p">,</span> <span class="c">#1</span>
+<span class="no">FE84B9D4</span>     <span class="no">B</span>        <span class="no">loc_FE84B9D8</span>
+<span class="nf">FE84B9D6</span> <span class="c">; ---------------------------------------------------------</span>
+<span class="no">FE84B9D6</span> <span class="no">loc_FE84B9D6</span>        <span class="c">; if R0 == 1</span>
+<span class="no">FE84B9D6</span>     <span class="no">MOVS</span>     <span class="no">R4</span><span class="p">,</span> <span class="c">#0</span>
+<span class="no">FE84B9D8</span>
+<span class="nf">FE84B9D8</span> <span class="no">loc_FE84B9D8</span>        <span class="c">; for any value of R0</span>
+<span class="no">FE84B9D8</span>     <span class="no">MOVS</span>     <span class="no">R0</span><span class="p">,</span> <span class="c">#1</span>
+<span class="no">FE84B9DA</span>     <span class="no">BL</span>       <span class="no">subfunc_0</span> <span class="c">; kind of &quot;is retail hardware?&quot; test</span>
+<span class="no">FE84B9DE</span>     <span class="no">CBZ</span>      <span class="no">R0</span><span class="p">,</span> <span class="no">loc_FE84B9EE</span> <span class="c">; not taken</span>
+<span class="no">FE84B9E0</span>     <span class="no">MOV</span>      <span class="no">R1</span><span class="p">,</span> <span class="no">R8</span>
+<span class="nf">FE84B9E2</span>     <span class="no">MOV</span>      <span class="no">R0</span><span class="p">,</span> <span class="no">R4</span> <span class="c">; R4 == #0xFFFFFFFF</span>
+<span class="no">FE84B9E4</span>     <span class="no">BL</span>       <span class="no">subfunc_1</span>
+<span class="nf">FE84B9E8</span>     <span class="p">[...]</span>
+</pre></div>
+
+
+<div style="text-align: justify;">Then subfunc_1 checks if R0 value
+is valid. It will Branch and return if R0 is Greater than or Equal
+to 2. However, BGE instruction operates on signed integers. So R0
+== -1 &lt; 2 will pass the test and the execution will continue
+:</div>
+
+<div class="highlight"><pre><span></span><span class="nf">FE853124</span> <span class="no">subfunc_1</span>
+<span class="nf">FE853124</span>     <span class="no">CMP</span>      <span class="no">R0</span><span class="p">,</span> <span class="c">#2 ; R0 == #0xFFFFFFFF</span>
+<span class="no">FE853126</span>     <span class="no">BGE</span>      <span class="no">locret_FE85314C</span> <span class="c">; signed comparison :</span>
+<span class="no">FE853126</span>                              <span class="c">; R0(-1) &lt; 2 so branch not taken</span>
+<span class="no">FE853128</span>     <span class="no">MOVW</span>     <span class="no">R2</span><span class="p">,</span> <span class="c">#0x9EE0</span>
+<span class="no">FE85312C</span>     <span class="no">ADD.W</span>    <span class="no">R3</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">LSL</span><span class="c">#1</span>
+<span class="no">FE853130</span>     <span class="no">MOVT.W</span>   <span class="no">R2</span><span class="p">,</span> <span class="c">#0xFE82</span>
+<span class="no">FE853134</span>     <span class="no">ADD.W</span>    <span class="no">R0</span><span class="p">,</span> <span class="no">R3</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">LSL</span><span class="c">#3</span>
+<span class="no">FE853138</span>     <span class="no">LDR</span>      <span class="no">R2</span><span class="p">,</span> <span class="p">[</span><span class="no">R2</span><span class="p">,</span><span class="c">#(dword_FE829EE4 - 0xFE829EE0)]</span>
+<span class="no">FE85313A</span>     <span class="no">ADD.W</span>    <span class="no">R0</span><span class="p">,</span> <span class="no">R2</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">LSL</span><span class="c">#4</span>
+<span class="no">FE85313E</span>     <span class="no">LDRB</span>     <span class="no">R2</span><span class="p">,</span> <span class="p">[</span><span class="no">R0</span><span class="p">,</span><span class="c">#4]</span>
+<span class="no">FE853140</span>     <span class="no">CMP</span>      <span class="no">R2</span><span class="p">,</span> <span class="no">R1</span> <span class="c">; with R1 &lt; R2</span>
+<span class="no">FE853142</span>     <span class="no">BLS</span>      <span class="no">locret_FE85314C</span>
+<span class="nf">FE853144</span>     <span class="no">LDR</span>      <span class="no">R0</span><span class="p">,</span> <span class="p">[</span><span class="no">R0</span><span class="p">]</span>
+<span class="nf">FE853146</span>     <span class="no">MOVS</span>     <span class="no">R2</span><span class="p">,</span> <span class="c">#0</span>
+<span class="no">FE853148</span>     <span class="no">B.W</span>      <span class="no">sub_FE856C84</span> <span class="c">; write NULL DWORD to a barely arbitrary address (derived from R1 value)</span>
+<span class="no">FE85314C</span>     <span class="p">[...]</span>
+</pre></div>
+
+
+<div style="text-align: justify;">Finally, the last nested function
+could allow to write NULL words to a limited range of memory
+locations.</div>
+
+<h2>Fix</h2>
+
+<div style="text-align: justify;">This bug is fixed in Lolipop
+version of the firmware. Several changes have been made. First,
+subfunc_1 function is not reachable anymore with an invalid R0
+value:</div>
+
+<div class="highlight"><pre><span></span><span class="nf">FE84B970</span> <span class="no">tzbsp_smmu_fault_regs_dump</span>
+<span class="nf">FE84B970</span>     <span class="no">PUSH.W</span>   <span class="err">{</span><span class="no">R4-R8</span><span class="p">,</span><span class="no">LR</span><span class="err">}</span>
+<span class="nf">FE84B974</span>     <span class="no">MOVS</span>     <span class="no">R6</span><span class="p">,</span> <span class="no">R2</span>
+<span class="nf">FE84B976</span>     <span class="no">MOV</span>      <span class="no">R8</span><span class="p">,</span> <span class="no">R1</span>
+<span class="nf">FE84B978</span>     <span class="no">MOV</span>      <span class="no">R7</span><span class="p">,</span> <span class="no">R3</span>
+<span class="nf">FE84B97A</span>     <span class="no">MOV</span>      <span class="no">R5</span><span class="p">,</span> <span class="c">#0xFFFFFFEE</span>
+<span class="no">FE84B97E</span>     <span class="no">BEQ</span>      <span class="no">loc_FE84B9D2</span>
+<span class="nf">FE84B980</span>     <span class="no">CBZ</span>      <span class="no">R0</span><span class="p">,</span> <span class="no">loc_FE84B98A</span>
+<span class="nf">FE84B982</span>     <span class="no">CMP</span>      <span class="no">R0</span><span class="p">,</span> <span class="c">#1</span>
+<span class="no">FE84B984</span>     <span class="no">BEQ</span>      <span class="no">loc_FE84B98E</span>
+<span class="nf">FE84B986</span>     <span class="no">ADDS</span>     <span class="no">R0</span><span class="p">,</span> <span class="no">R5</span><span class="p">,</span> <span class="c">#2</span>
+<span class="no">FE84B988</span>     <span class="no">B</span>        <span class="no">locret_FE84B7AA</span> <span class="c">; branch if R0 &gt; 1</span>
+<span class="no">FE84B98A</span> <span class="c">; ---------------------------------------------------------</span>
+<span class="no">FE84B98A</span> <span class="no">loc_FE84B98A</span>        <span class="c">; if R0 == 0</span>
+<span class="no">FE84B98A</span>     <span class="no">MOVS</span>     <span class="no">R4</span><span class="p">,</span> <span class="c">#1</span>
+<span class="no">FE84B98C</span>     <span class="no">B</span>        <span class="no">loc_FE84B990</span>
+<span class="nf">FE84B98E</span> <span class="c">; ---------------------------------------------------------</span>
+<span class="no">FE84B98E</span> <span class="no">loc_FE84B98E</span>        <span class="c">; if R0 == 1</span>
+<span class="no">FE84B98E</span>     <span class="no">MOVS</span>     <span class="no">R4</span><span class="p">,</span> <span class="c">#0</span>
+<span class="no">FE84B990</span>
+<span class="nf">FE84B990</span> <span class="no">loc_FE84B990</span>        <span class="c">; if 0 &lt;= R0 &lt; 2</span>
+<span class="no">FE84B990</span>     <span class="no">MOVS</span>     <span class="no">R0</span><span class="p">,</span> <span class="c">#1</span>
+<span class="no">FE84B992</span>     <span class="no">BL</span>       <span class="no">subfunc_0</span> <span class="c">; kind of &quot;is retail hardware?&quot; test</span>
+<span class="no">FE84B996</span>     <span class="no">CBZ</span>      <span class="no">R0</span><span class="p">,</span> <span class="no">loc_FE84B9A6</span> <span class="c">; not taken</span>
+<span class="no">FE84B998</span>     <span class="no">MOV</span>      <span class="no">R1</span><span class="p">,</span> <span class="no">R8</span>
+<span class="nf">FE84B99A</span>     <span class="no">MOV</span>      <span class="no">R0</span><span class="p">,</span> <span class="no">R4</span> <span class="c">; R4 is either 0 or 1</span>
+<span class="no">FE84B99C</span>     <span class="no">BL</span>       <span class="no">subfunc_1</span>
+<span class="nf">FE84B9A0</span>     <span class="p">[...]</span>
+</pre></div>
+
+
+<div style="text-align: justify;">Then in (sub)subfunc_1, R0 value
+is now tested with an unsigned comparison:</div>
+
+<div class="highlight"><pre><span></span><span class="nf">FE852B94</span> <span class="p">(</span><span class="no">sub</span><span class="p">)</span><span class="no">subfunc_1</span>
+<span class="nf">FE852B94</span>     <span class="no">CMP</span>      <span class="no">R0</span><span class="p">,</span> <span class="c">#2</span>
+<span class="no">FE852B96</span>     <span class="no">BCS</span>      <span class="no">loc_FE852BBA</span> <span class="c">;unsigned comparison: branch if R0 &gt; 1</span>
+<span class="no">FE852B98</span>     <span class="no">MOVW</span>     <span class="no">R2</span><span class="p">,</span> <span class="c">#0x9F38</span>
+<span class="no">FE852B9C</span>     <span class="p">[...]</span>
+</pre></div>
+
+
+<div style="text-align: justify;">The bug can no longer be
+triggered.</div>
+
+<h2>CVSS Version 2 Metrics</h2>
+
+<p>Access Vector: Local</p>
+<p>Access Complexity: High</p>
+<p>Authentication: Single</p>
+<p>Confidentiality Impact: Complete</p>
+<p>Integrity Impact: Complete</p>
+<p>Availability Impact: Complete</p>
+<h2>Disclosure Timeline</h2>
+
+<p>2014-08-28 Intial vendor notification</p>
+<p>2014-09-03 Vendor reply; severity of the issue rated as high</p>
+<p>2014-00-00 Vendor has notified all OEMs</p>
+<p>2014-12-18 Public advisory</p>
+<hr>
+<p>References:</span><br>
+<span style="white-space: pre;"><a href=
+"https://www.qualcomm.com/connect/contact/security/product-security/hall-of-fame">
+https://www.qualcomm.com/connect/contact/security/product-security/hall-of-fame</a></span><br></p>
+<hr>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="/tag/vulnerability.html">vulnerability</a>
+      <a href="/tag/advisory.html">advisory</a>
+      <a href="/tag/arm.html">arm</a>
+      <a href="/tag/security.html">security</a>
+      <a href="/tag/qualcomm.html">qualcomm</a>
+      <a href="/tag/android.html">android</a>
+      <a href="/tag/trustzone.html">trustzone</a>
+    </p>
+  </div>
+
+
+
+    <div class="addthis_relatedposts_inline">
+
+
+</article>
+
+    <footer>
+<p>
+  &copy;   - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+</p>
+<p>    Powered by <a href="http://getpelican.com" target="_blank">Pelican</a> - Theme <a href="https://github.com/alexandrevicenzi/flex" target="_blank">Flex</a>
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses/by-sa/4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+         src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " fred's notes ",
+  "url" : "",
+  "image": "/resources/sitelogo.jpg",
+  "description": "Frédéric's Thoughts and Writings"
+}
+</script>
+
+</body>
+</html>

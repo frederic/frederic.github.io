@@ -1,0 +1,310 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="/theme/stylesheet/style.min.css">
+
+  <link rel="stylesheet" type="text/css" href="/theme/pygments/github.min.css">
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/font-awesome.min.css">
+
+
+
+
+    <link rel="shortcut icon" href="/resources/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/resources/favicon.ico" type="image/x-icon">
+
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+
+<meta name="author" content="Frédéric" />
+<meta name="description" content="D-Link 1565 is one of the few routers which integrates a PLC (Power line Communication) chipset (in this case QCA AR7400). Unfortunately, OpenWrt does not provide support for this feature yet. This post presents configuration steps to enable PLC support in OpenWrt for this device. Hardware configuration By digging into …" />
+<meta name="keywords" content="PLC, dhp-1565, AR7400, openwrt">
+
+<meta property="og:site_name" content="fred's notes"/>
+<meta property="og:title" content="PowerLine (PLC) support in OpenWrt for D-Link DHP-1565"/>
+<meta property="og:description" content="D-Link 1565 is one of the few routers which integrates a PLC (Power line Communication) chipset (in this case QCA AR7400). Unfortunately, OpenWrt does not provide support for this feature yet. This post presents configuration steps to enable PLC support in OpenWrt for this device. Hardware configuration By digging into …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="/2016/02/powerline-plc-support-in-openwrt-for-d.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2016-02-20 13:55:00-08:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="/author/frederic.html">
+<meta property="article:section" content="Article"/>
+<meta property="article:tag" content="PLC"/>
+<meta property="article:tag" content="dhp-1565"/>
+<meta property="article:tag" content="AR7400"/>
+<meta property="article:tag" content="openwrt"/>
+<meta property="og:image" content="/resources/sitelogo.jpg">
+
+  <title>fred's notes &ndash; PowerLine (PLC) support in OpenWrt for D-Link DHP-1565</title>
+
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="/">
+        <img src="/resources/sitelogo.jpg" alt="fred's notes" title="fred's notes">
+      </a>
+      <h1><a href="/">fred's notes</a></h1>
+
+<p>Security & Stuff</p>
+      <nav>
+        <ul class="list">
+          <li><a href="/category/advisory.html">Advisory</a></li>
+          <li><a href="/category/article.html">Article</a></li>
+          <li><a href="/category/tool.html">Tool</a></li>
+          <li><a href="/pages/contact.html#contact">Contact</a></li>
+
+        </ul>
+      </nav>
+
+      <ul class="social">
+        <li><a class="sc-github" href="https://github.com/frederic" target="_blank"><i class="fa fa-github"></i></a></li>
+        <li><a class="sc-linkedin" href="https://www.linkedin.com/in/fredericbasse" target="_blank"><i class="fa fa-linkedin"></i></a></li>
+      </ul>
+    </div>
+
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="/">    Home
+</a>
+
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+
+
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="powerline-plc-support-in-openwrt-for-d">PowerLine (PLC) support in OpenWrt for D-Link DHP-1565</h1>
+    <p>
+          Posted on Sat 20 February 2016 in <a href="/category/article.html">Article</a>
+
+
+    </p>
+  </header>
+
+
+  <div>
+    <p>D-Link 1565 is one of the few routers which integrates a PLC (Power
+line Communication) chipset (in this case QCA AR7400).
+Unfortunately, OpenWrt does not provide support for this feature
+yet.<br>
+<br>
+This post presents configuration steps to enable PLC support in
+OpenWrt for this device.
+<h2>Hardware configuration</h2>
+By digging into <a href="http://tsd.dlink.com.tw/">D-Link GPL
+source code</a>&nbsp;released for this device, especially function
+<b>proprietary_s17_init()</b> in file
+<strong>DHP1565A1_1.01b13_FOSS/src/AthSDK/platform/PLC/drivers/ethernet/phys/athrs17_phy.c</strong>,
+we notice the port 6 of internal switch AR8327 &nbsp;is related to
+PLC:<br>
+<div class="separator" style="clear: both; text-align: center;">
+<img alt="" src="/blog/dhp-1665-plc/athsdk_port6config.png">
+</div>
+<br>
+This port 6 is configured as a RGMII interface to communicate with
+PLC chipset. The following patch reproduces the same configuration
+in OpenWrt:<br>
+<script src=
+"https://gist.github.com/frederic/d9d91c2221f04df3a36a.js">
+</script> To build a custom firmware image, please see <a href=
+"https://wiki.openwrt.org/doc/howto/build">OpenWrt build system
+wiki page</a>.<br>
+To flash an OpenWrt image, please see <a href=
+"https://wiki.openwrt.org/doc/howto/generic.flashing">OpenWrt
+flashing wiki page</a>. Don't forget to choose
+the&nbsp;<i>factory</i> image if you're still running the OEM
+firmware. If you are already using an OpenWrt firmware, you can use
+the <i>sysupgrade</i> image.
+<h2>Network configuration</h2>
+Once our customized OpenWrt image is flashed &amp; booted, we are
+already able to see PLC bootloader probes with the swconfig
+command:<br></p>
+<div class="highlight"><pre><span></span>$ swconfig dev switch0 show
+<span class="o">[</span>...<span class="o">]</span>
+Port <span class="m">6</span>:
+ mib: Port <span class="m">6</span> MIB counters
+RxBroad     : <span class="m">2282</span>
+Rx64Byte    : <span class="m">2282</span>
+RxGoodByte  : <span class="m">146048</span>
+Filtered    : <span class="m">2152</span>
+<span class="o">[</span>...<span class="o">]</span>
+ enable_eee: ???
+ pvid: <span class="m">0</span>
+ link: port:6 link:up speed:1000baseT full-duplex txflow rxflow
+<span class="o">[</span>...<span class="o">]</span>
+</pre></div>
+
+
+<p>The <b>pvid</b> field indicates that the primary VLAN
+identifier&nbsp;of port 6 is 0. In
+file&nbsp;<b>/etc/config/network</b>, we add the port 6 to VLAN
+identifier 2, which is dedicated to WAN interface in default
+configuration:<br>
+<blockquote class="tr_bq">config switch_vlan<br>
+&nbsp;&nbsp;option device 'switch0'<br>
+&nbsp;&nbsp;option vlan '2'<br>
+&nbsp;&nbsp;option ports '0t 5 <b>6</b>'</blockquote>
+<i>Warning: configuring PLC port into WAN interface could be a
+security issue: any host on WAN side can access to PLC chipset. To
+prevent this risk, you might need to set up a different VLAN
+configuration.</i>
+<h2>System configuration</h2>
+<h3>open-plc-utils</h3>
+Since the PLC chipset is flashless on this board, PLC firmware
+needs to be loaded at each boot. We can use&nbsp;<a href=
+"https://github.com/qca/open-plc-utils">Qualcomm Atheros Open
+Powerline Toolkit</a> to manage &amp; configure this PLC chipset.<br>
+<br>
+We can cross-compile <a href=
+"https://github.com/qca/open-plc-utils">open-plc-utils</a> with the
+<a href=
+"https://downloads.openwrt.org/snapshots/trunk/ar71xx/generic/">OpenWrt
+toolchain</a>.<br>
+First, we setup the following environment variables:<br></p>
+<div class="highlight"><pre><span></span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:&lt;OpenWrt-Toolchain-ar71xx&gt;/bin
+<span class="nv">CROSS</span><span class="o">=</span>mips-openwrt-linux-musl-
+<span class="nv">ROOTFS</span><span class="o">=</span>&lt;open-plc-utils&gt;/build
+</pre></div>
+
+
+<p>Then, <b>make</b> &amp; <b>make install</b> commands are enough to
+build it.<br>
+Finally, we copy these freshly built binaries to the device in
+<b>/overlay/upper/open-plc-utils/</b>.<br>
+<br>
+To do a quick test, we can try the <b>Request Information</b>
+command:<br>
+<blockquote class="tr_bq"># /overlay/upper/open-plc-utils/amptool
+-i eth0.2 -Iar<br>
+eth0.2 00:B0:52:00:00:01 Request Version Information<br>
+eth0.2 00:B0:52:00:00:01 <b>AR7400 BootLoader</b><br>
+eth0.2 00:B0:52:00:00:01 Fetch Device Attributes<br>
+eth0.2 00:B0:52:00:00:01 Device Identity</blockquote>
+<div>The line "AR7400 Bootloader" indicates that PLC chipset is
+ready to load a firmware.
+<h3>PLC firmware</h3>
+<div>The PLC firmware blob can be found in the <a href=
+"http://tsd.dlink.com.tw/">original firmware image</a>. Using
+<a href="http://binwalk.org/">Binwalk</a>, we extract the content
+of the <b>/plc</b> directory from the original rootfs, and copy it
+to <b>/overlay/upper/plc/</b>.</div>
+<div>The NVM file is the firmware blob, and PIB files are
+configuration files: <i>ceb</i> stands for Europe, and <i>na</i>
+for North America.</div>
+<div><br></div>
+<div>The <b>ampboot</b> tool allows to load the firmware:</div>
+<blockquote class="tr_bq"># /open-plc-utils/ampboot -i eth0.2 -P
+/plc/plc.ceb.pib -N /plc/plc.nvm<br>
+eth0.2 00:B0:52:00:00:01 Write /plc/plc.nvm (0)
+(00000040:17256)<br>
+eth0.2 00:B0:52:00:00:01 Start /plc/plc.nvm (0) (000000C0)<br>
+eth0.2 00:B0:52:00:00:01 Write /plc/plc.ceb.pib (0)
+(00200000:16352)<br>
+eth0.2 00:B0:52:00:00:01 Write /plc/plc.nvm (3)
+(00341194:423788)<br>
+eth0.2 00:B0:52:00:00:01 Start /plc/plc.nvm (3) (00341A88)<br>
+eth0.2 00:11:22:33:44:55
+INT7400-MAC-5-2-5203-01-913-20110713-FINAL-B is
+running</blockquote>
+<div>By default, the HomeplugAV key is used. You can get more
+information with the amptool command used earlier. This can also be
+used to discover/join/leave a network, modify the NMK key,
+etc...</div>
+<h3>init.d script</h3>
+<div>To load the PLC firmware at each boot, create the following
+init script <b>/etc/rc.d/S25amphost</b>&nbsp;:</div>
+<div></p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/sh /etc/rc.common</span>
+<span class="c1">#start right after network</span>
+<span class="nv">START</span><span class="o">=</span><span class="m">25</span>
+<span class="nv">USE_PROCD</span><span class="o">=</span><span class="m">1</span>
+start_service<span class="o">()</span> <span class="o">{</span>
+ procd_open_instance
+ procd_set_param <span class="nb">command</span> /open-plc-utils/amphost -i eth0.2 -P /plc/plc.ceb.pib -N /plc/plc.nvm
+ procd_set_param respawn
+ procd_close_instance
+<span class="o">}</span>
+service_triggers<span class="o">()</span>
+<span class="o">{</span>
+ procd_add_reload_trigger <span class="s2">&quot;amphost&quot;</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p></div>
+<div>Then, to enable this script at startup:</div></p>
+<div class="highlight"><pre><span></span>$ /etc/init.d/amphost <span class="nb">enable</span>
+</pre></div>
+
+
+<div>Et voilà !</div>
+
+</div>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="/tag/plc.html">PLC</a>
+      <a href="/tag/dhp-1565.html">dhp-1565</a>
+      <a href="/tag/ar7400.html">AR7400</a>
+      <a href="/tag/openwrt.html">openwrt</a>
+    </p>
+  </div>
+
+
+
+    <div class="addthis_relatedposts_inline">
+
+
+</article>
+
+    <footer>
+<p>
+  &copy;   - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+</p>
+<p>    Powered by <a href="http://getpelican.com" target="_blank">Pelican</a> - Theme <a href="https://github.com/alexandrevicenzi/flex" target="_blank">Flex</a>
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses/by-sa/4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+         src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " fred's notes ",
+  "url" : "",
+  "image": "/resources/sitelogo.jpg",
+  "description": "Frédéric's Thoughts and Writings"
+}
+</script>
+
+</body>
+</html>

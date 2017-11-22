@@ -1,0 +1,758 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="/theme/stylesheet/style.min.css">
+
+  <link rel="stylesheet" type="text/css" href="/theme/pygments/github.min.css">
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/font-awesome.min.css">
+
+
+
+
+    <link rel="shortcut icon" href="/resources/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/resources/favicon.ico" type="image/x-icon">
+
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+
+<meta name="author" content="Frédéric" />
+<meta name="description" content="The Amlogic S905 System-On-Chip is an ARM processor designed for video applications. It&#39;s widely used in Android/Kodi media boxes. The SoC implements the TrustZone security extensions to run a Trusted Execution Environment (TEE) that enables DRM &amp; other security features : Amlogic S905 System Block Diagram The SoC contains a Secure …" />
+<meta name="keywords" content="vulnerability, amlogic, arm, security, firmware, trustzone, bootrom, bug">
+
+<meta property="og:site_name" content="fred's notes"/>
+<meta property="og:title" content="Amlogic S905 SoC: bypassing the (not so) Secure Boot to dump the BootROM"/>
+<meta property="og:description" content="The Amlogic S905 System-On-Chip is an ARM processor designed for video applications. It&#39;s widely used in Android/Kodi media boxes. The SoC implements the TrustZone security extensions to run a Trusted Execution Environment (TEE) that enables DRM &amp; other security features : Amlogic S905 System Block Diagram The SoC contains a Secure …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="/2016/10/amlogic-s905-soc-bypassing-not-so.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2016-10-05 00:00:00.001000-07:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="/author/frederic.html">
+<meta property="article:section" content="Article"/>
+<meta property="article:tag" content="vulnerability"/>
+<meta property="article:tag" content="amlogic"/>
+<meta property="article:tag" content="arm"/>
+<meta property="article:tag" content="security"/>
+<meta property="article:tag" content="firmware"/>
+<meta property="article:tag" content="trustzone"/>
+<meta property="article:tag" content="bootrom"/>
+<meta property="article:tag" content="bug"/>
+<meta property="og:image" content="/resources/sitelogo.jpg">
+
+  <title>fred's notes &ndash; Amlogic S905 SoC: bypassing the (not so) Secure Boot to dump the BootROM</title>
+
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="/">
+        <img src="/resources/sitelogo.jpg" alt="fred's notes" title="fred's notes">
+      </a>
+      <h1><a href="/">fred's notes</a></h1>
+
+<p>Security & Stuff</p>
+      <nav>
+        <ul class="list">
+          <li><a href="/category/advisory.html">Advisory</a></li>
+          <li><a href="/category/article.html">Article</a></li>
+          <li><a href="/category/tool.html">Tool</a></li>
+          <li><a href="/pages/contact.html#contact">Contact</a></li>
+
+        </ul>
+      </nav>
+
+      <ul class="social">
+        <li><a class="sc-github" href="https://github.com/frederic" target="_blank"><i class="fa fa-github"></i></a></li>
+        <li><a class="sc-linkedin" href="https://www.linkedin.com/in/fredericbasse" target="_blank"><i class="fa fa-linkedin"></i></a></li>
+      </ul>
+    </div>
+
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="/">    Home
+</a>
+
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+
+
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="amlogic-s905-soc-bypassing-not-so">Amlogic S905 SoC: bypassing the (not so) Secure Boot to dump the BootROM</h1>
+    <p>
+          Posted on Wed 05 October 2016 in <a href="/category/article.html">Article</a>
+
+
+    </p>
+  </header>
+
+
+  <div>
+    <p>The <a href=
+"http://www.amlogic.com/#Products/176/index.html">Amlogic S905
+System-On-Chip</a> is an ARM processor designed for video
+applications. It's widely used in Android/Kodi media boxes. The SoC
+implements the TrustZone security extensions to run a Trusted
+Execution Environment (TEE) that enables DRM &amp; other security
+features :<br>
+<br>
+<table align="center" cellpadding="0" cellspacing="0" class=
+"tr-caption-container" style=
+"margin-left: auto; margin-right: auto; text-align: center;">
+<tbody>
+<tr>
+<td style="text-align: center;">
+<img alt="S905 block diagram" src="/blog/amlogic-sb/S905_arch.png">
+</td>
+</tr>
+<tr>
+<td class="tr-caption" style="text-align: center;">Amlogic S905
+System Block Diagram</td>
+</tr>
+</tbody>
+</table>
+<br>
+The SoC contains a Secure Boot mechanism to authenticate the TEE
+image before loading it in TrustZone. And the first link of this
+Secure Boot chain is the BootROM code, stored directly in the
+chip.<br>
+<span style="background-color: red;"><br></span>This articles
+describes how to extract the BootROM code from this SoC in the
+Android-based&nbsp;<a href="http://www.inphic.com/">Inphic Spot i7
+device</a>.<br>
+<h2>Technical documentation</h2>
+Amlogic released a public version of the S905 datasheet thanks to
+<a href=
+"http://www.hardkernel.com/main/products/prdt_info.php?g_code=G145457216438&amp;tab_idx=2">
+Hardkernel</a>. However, it's heavily redacted, and most parts
+regarding the Secure Boot or the TrustZone have been removed. But
+we can still find a lot of technical information in GPL source code
+packages released by <a href=
+"http://openlinux.amlogic.com:8000/download/ARM/">Amlogic</a> &amp;
+<a href=
+"https://github.com/150balbes/Amlogic_s905-kernel">OEMs</a>.<br>
+For example, we can find a potential address for the BootROM
+code:<br></p>
+<div class="highlight"><pre><span></span><span class="cp">#define ROMBOOT_START   0xD9040000</span>
+<span class="cp">#define ROM_SIZE        (64 * 1024)</span>
+<span class="cp">#define ROMBOOT_END     (ROMBOOT_START + ROM_SIZE)</span>
+</pre></div>
+
+
+<h2>Root access over the UART</h2>
+
+<p>We start by connecting the serial port (or UART) because this
+interface could provide a quick &amp; easy access to debug messages &amp;
+serial console on bootloaders and Linux kernel.<br>
+<a href=
+"http://www.devttys0.com/2012/11/reverse-engineering-serial-ports/">
+Identifying the serial port</a>&nbsp;on this board is quite simple
+since there is a port header with labels for the pinout:<br>
+<table align="center" cellpadding="0" cellspacing="0" class=
+"tr-caption-container" style=
+"margin-left: auto; margin-right: auto; text-align: center;">
+<tbody>
+<tr>
+<td style="text-align: center;">
+<img alt="UART" src="/blog/amlogic-sb/uart_header.jpg">
+</td>
+</tr>
+<tr>
+<td class="tr-caption" style="text-align: center;">UART on Inphic
+Spot i7 board</td>
+</tr>
+</tbody>
+</table>
+<br>
+We connect an USB to UART adapter to this port. Once the Linux
+kernel boot process is finished, we have directly access to a root
+shell.<br>
+We can start to explore the (Non-Secure side of the)
+system.&nbsp;For example, we can dump the partitions :<br></p>
+<div class="highlight"><pre><span></span>root@p200:/# ls -l /dev/block/platform/d0074000.emmc/
+lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 boot -&gt; /dev/block/boot
+lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 bootloader -&gt; /dev/block/bootloader
+drwxr-xr-x root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 by-num
+lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 cache -&gt; /dev/block/cache
+lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 crypt -&gt; /dev/block/crypt
+lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 data -&gt; /dev/block/data
+lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 env -&gt; /dev/block/env
+lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 instaboot -&gt; /dev/block/instaboot
+lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 logo -&gt; /dev/block/logo
+lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 misc -&gt; /dev/block/misc
+lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 mmcblk0 -&gt; /dev/block/mmcblk0
+lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 mmcblk0boot0 -&gt; /dev/block/mmcblk0boot0
+lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 mmcblk0boot1 -&gt; /dev/block/mmcblk0boot1
+lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 mmcblk0rpmb -&gt; /dev/block/mmcblk0rpmb
+lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 recovery -&gt; /dev/block/recovery
+lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 reserved -&gt; /dev/block/reserved
+lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 rsv -&gt; /dev/block/rsv
+lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 system -&gt; /dev/block/system
+lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 tee -&gt; /dev/block/tee
+</pre></div>
+
+
+<div>While the&nbsp;<i>tee</i> partition (Trusted Execution
+Environment) turns out to be empty, the <i>bootloader</i> partition
+contains several bootloaders. But not the BootROM&nbsp;because it's
+stored in the SoC, not the flash.</div>
+
+<h2>(Fail at) Reading the BootROM</h2>
+
+<p>Since we have root permissions and a potential memory address for
+the BootROM, we can try to read it directly. The provided Android
+ROM contains a handy debugfs interface to peek &amp; poke physical
+memory from user-land:<br></p>
+<div class="highlight"><pre><span></span>root@p200:/# <span class="nb">echo</span> <span class="s2">&quot;d0070000&quot;</span> &gt;/sys/kernel/debug/aml_reg/paddr               
+root@p200:/# cat /sys/kernel/debug/aml_reg/paddr                             
+<span class="o">[</span>0xd0070000<span class="o">]</span> <span class="o">=</span> 0x1000254
+</pre></div>
+
+
+<div>This <i>aml_reg</i> driver uses the <i>ioremap</i> kernel
+function to set up an appropriate kernel page-table mapping for the
+requested address.</div>
+
+<div><br></div>
+
+<div>However, if we try to read the
+hypothetical&nbsp;BootROM&nbsp;area:</div>
+
+<div class="highlight"><pre><span></span>root@p200:/# <span class="nb">echo</span> <span class="s2">&quot;d9040000&quot;</span> &gt;/sys/kernel/debug/aml_reg/paddr
+root@p200:/# cat /sys/kernel/debug/aml_reg/paddr
+<span class="o">[</span>  <span class="m">376</span>.546491@0<span class="o">]</span> Unhandled fault: synchronous external abort <span class="o">(</span>0x96000010<span class="o">)</span> at 0xffffff80001aa000
+<span class="o">[</span>  <span class="m">376</span>.549396@0<span class="o">]</span> Internal error: : <span class="m">96000010</span> <span class="o">[</span><span class="c1">#1] PREEMPT SMP</span>
+<span class="o">[</span>  <span class="m">376</span>.554712@0<span class="o">]</span> Modules linked in: dwc_otg dhd<span class="o">(</span>O<span class="o">)</span> aml_thermal<span class="o">(</span>O<span class="o">)</span> mali<span class="o">(</span>O<span class="o">)</span> aml_nftl_dev<span class="o">(</span>PO<span class="o">)</span>
+</pre></div>
+
+
+<p>&nbsp;
+<div>The kernel crashes. So either the&nbsp;BootROM&nbsp;address is
+wrong or this memory area is set as <a href=
+"http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.prd29-genc-009492c/ch03s03s02.html">
+secure</a>.</div>
+<div>Since we don't have other candidates for
+the&nbsp;BootROM&nbsp;address, let's say the&nbsp;BootROM&nbsp;area
+is not accessible from&nbsp;the&nbsp;Non-Secure World.</div>
+<h2>Enter the Secure World</h2>
+<div>In theory, the Secure Boot chain prevents loading unauthorized
+code in the Secure World.<br>
+A quick inspection of debug logs from the UART during the early
+phases of boot indicates that the bootloaders are based on
+the&nbsp;<a href=
+"https://github.com/ARM-software/arm-trusted-firmware">ARM Trusted
+Firmware (ATF)</a> reference implementation.</div>
+<div>
+<table align="center" cellpadding="0" cellspacing="0" class=
+"tr-caption-container" style=
+"margin-left: auto; margin-right: auto; text-align: center;">
+<tbody>
+<tr>
+<td style="text-align: center;">
+<img alt="ARM Trusted Firmware Design" src="/blog/amlogic-sb/securebootflow.png">
+</td>
+</tr>
+<tr>
+<td class="tr-caption" style="text-align: center;">ARM Trusted
+Firmware Design</td>
+</tr>
+</tbody>
+</table>
+We will now explore some ways to get access to Secure World.<br>
+<h2>U-Boot bootloader</h2>
+Using the console over UART, we can interrupt the U-Boot boot
+sequence to access to the prompt. From here we can run arbitrary
+U-boot commands:<br>
+<blockquote class="tr_bq">Hit any key to stop autoboot: 0<br>
+gxb_p200_v1#help<br>
+? &nbsp; &nbsp; &nbsp; - alias for 'help'<br>
+aml_sysrecovery- Burning with amlogic format package from partition
+sysrecovery<br>
+amlmmc &nbsp;- AMLMMC sub system<br>
+amlnf &nbsp; - aml nand sub-system<br>
+amlnf_test- AMLPHYNAND sub-system<br>
+autoping- do auto ping test<br>
+autoscr - run script from memory</blockquote>
+However the U-Boot bootloader (named BL33 in the ATF design) runs
+in Non-Secure mode as we can see in boot logs from the UART
+console:</div>
+<div>
+<blockquote>INFO: &nbsp; &nbsp;BL3-1: Preparing for EL3 exit to
+normal world<br>
+INFO: &nbsp; &nbsp;BL3-1: Next image address = 0x1000000<br>
+INFO: &nbsp; &nbsp;BL3-1: Next image spsr = 0x3c9<br>
+<br>
+U-Boot 2015.01-ga9e9562-dirty (May 06 2016 - 03:36:02)</blockquote>
+So at this point we are already locked out of the Secure World.
+Next.<br>
+<h2>SMC interface</h2>
+Secure &amp; Non-Secure Worlds can communicate through the ARM Secure
+Monitor Call (SMC). When a core executes the SMC instruction, it
+switches to Secure Monitor mode (exception level EL3).</div>
+<div>In the ATF design, the code that runs in EL3 is named the Boot
+Loader stage 3-1 (BL31). We can find this image in the
+<i>bootloader</i> partition we've dumped previously. This code is
+highly critical for TrustZone security so we should explore it.<br>
+<br>
+The open-source ATF code base in the BL31 image facilitates the
+analysis by reverse engineering, since we can quickly recover the
+ATF code structure.<br>
+Here is the list of registered services that handle SMC interrupts
+from Normal World:<br>
+<br>
+<table align="center" cellpadding="0" cellspacing="0" class=
+"tr-caption-container" style=
+"margin-left: auto; margin-right: auto; text-align: center;">
+<tbody>
+<tr>
+<td style="text-align: center;">
+<img alt="" src="/blog/amlogic-sb/rt_svc_descs.png">
+</td>
+</tr>
+<tr>
+<td class="tr-caption" style="text-align: center;">Registered
+services in BL31 image</td>
+</tr>
+</tbody>
+</table>
+<br>
+The <i>sip_svc</i> service&nbsp;is interesting because it contains
+several custom functions developed by Amlogic:<br>
+<br>
+<table align="center" cellpadding="0" cellspacing="0" class=
+"tr-caption-container" style=
+"margin-left: auto; margin-right: auto; text-align: center;">
+<tbody>
+<tr>
+<td style="text-align: center;">
+<img alt="" src="/blog/amlogic-sb/sip_svc_plat_ops.png">
+</td>
+</tr>
+<tr>
+<td class="tr-caption" style="text-align: center;">List of handlers
+in the SIP service</td>
+</tr>
+</tbody>
+</table>
+At first glance, functions&nbsp;<i>hdcp22_sec_read_reg</i>
+&amp;&nbsp;<i>hdcp22_sec_write_reg</i> look promising because they
+are read &amp; write primitives for the secure memory. However, they
+strictly restrict access to specific memory ranges:<br>
+<div class="separator" style="clear: both; text-align: center;">
+</div>
+<table align="center" cellpadding="0" cellspacing="0" class=
+"tr-caption-container" style=
+"margin-left: auto; margin-right: auto; text-align: center;">
+<tbody>
+<tr>
+<td style="text-align: center;">
+<img alt="" src="/blog/amlogic-sb/hdcp22_sec_read_reg.png">
+</td>
+</tr>
+<tr>
+<td class="tr-caption" style="text-align: center;">
+Function&nbsp;hdcp22_sec_read_reg decompiled</td>
+</tr>
+</tbody>
+</table>
+A quick (incomplete) analysis of other functions didn't reveal any
+trivial flaw in parameters sanitization (arbitrary read/write
+bugs). Some of them are quite complex, especially the cryptographic
+functions, so they have not been inspected at all.<br>
+<br>
+We may be able to trigger Secure World memory corruption from the
+Normal World&nbsp;if <a href=
+"http://www.fredericb.info/2014/12/qpsiir-80-qualcomm-trustzone-integer.html">
+we find bugs</a>&nbsp;in one of these functions, and then achieve
+privilege escalation to Secure World. However that would require
+some expert skills to <a href=
+"http://bits-please.blogspot.fr/2016/05/qsee-privilege-escalation-vulnerability.html">
+actually exploit them</a>. So let's explore another attack
+vector.<br>
+<h2>Bypass the Secure Boot chain</h2>
+</div>
+<div>Another solution to get access to the Secure World is to
+break/bypass/fool/kindly ask the Secure Boot chain at one of its
+stage. A common attack surface of a Secure Boot chain is the
+loading, parsing and authentication steps of the next stage.</div>
+<div><br></div>
+<div>We don't have access to BL1 code (yet!) since it's stored in
+the SoC. But we have the BL2 image from
+the&nbsp;<i>bootloader</i>&nbsp;partition we have dumped
+previously. So we will analyze the mechanism used by BL2 to parse
+and authenticate the BL31 image in the hope of finding interesting
+flaws.<br>
+<br>
+Here start the lengthy process of reverse engineering a binary
+without any syscall and very few strings to guide our efforts.
+Fortunately, the BL2 image is quite small: ~40KB. And we have some
+ideas to save time:</div>
+<div><span style="background-color: red;"><br></span>Like BL31, the
+BL2 image follows the ATF code logic, so reverse engineering
+efforts are a bit simplified: we can quickly spot main functions &amp;
+structures defined in the ATF code base.</div>
+<div><br></div>
+<div>Another RE trick is to identify the memory-mapped devices
+accessed by functions to deduce their role.</div>
+<div>Several address ranges of these memory areas can be found in
+the SoC datasheet and the <a href=
+"https://github.com/150balbes/Amlogic_S905-u-boot/blob/32cbae9c92a0a5b5a5d0f58f8fd3ca31d1f9ce66/arch/arm/include/asm/arch-gxb/secure_apb.h">
+GPL source code</a>. For example, we can expect that cryptographic
+functions access memory registers dedicated to the hardware
+cryptographic engine.<br>
+<br>
+Finally, we don't want to spend time reversing open source code,
+especially cryptographic code because the task is quite hard. And
+since it's also complex from the developer perspective, we can
+expect they used a library, which may be open source. So we looked
+for similarities in function prototypes, call sequence &amp;
+initialization of context structures between BL2 code and few
+potential OSS libraries. In our case, we quickly figured out that
+the&nbsp;cryptographic&nbsp;code comes from the <a href=
+"https://tls.mbed.org/">OSS PolarSSL/mbed TLS project</a>.<br>
+<div><br></div>
+<h3>Analyzing BL2 authentication routine</h3>
+Once BL2 has loaded the BL3 image from the NAND, the header is
+parsed. We don't have any information on the header structure yet
+(not present in the ATF code), but we can notice it starts with a
+constant <i>magic</i> value "<b>@AML</b>". This helps to quickly
+locate the parsing code in the BL2 binary.<br>
+We combine "guessing" (i.e. looking at the BL31 header in a hex
+editor) and reverse engineering of the BL2 parsing code to figure
+out some members of the header structure:<br></p>
+<div class="highlight"><pre><span></span><span class="k">struct</span> <span class="n">aml_img_header</span> <span class="p">{</span>
+  <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">magic</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span><span class="c1">// &quot;@AML&quot;</span>
+  <span class="kt">uint32_t</span> <span class="n">total_len</span><span class="p">;</span>
+  <span class="kt">uint8_t</span> <span class="n">header_len</span><span class="p">;</span>
+  <span class="kt">uint8_t</span> <span class="n">unk_x9</span><span class="p">;</span>
+  <span class="kt">uint8_t</span> <span class="n">unk_xA</span><span class="p">;</span>
+  <span class="kt">uint8_t</span> <span class="n">unk_xB</span><span class="p">;</span>
+  <span class="kt">uint32_t</span> <span class="n">unk_xC</span><span class="p">;</span>
+  <span class="kt">uint32_t</span> <span class="n">sig_type</span><span class="p">;</span>
+  <span class="kt">uint32_t</span> <span class="n">sig_offset</span><span class="p">;</span>
+  <span class="kt">uint32_t</span> <span class="n">sig_size</span><span class="p">;</span>
+  <span class="kt">uint32_t</span> <span class="n">data_offset</span><span class="p">;</span>
+  <span class="kt">uint32_t</span> <span class="n">unk_x20</span><span class="p">;</span>
+  <span class="kt">uint32_t</span> <span class="n">cert_offset</span><span class="p">;</span>
+  <span class="kt">uint32_t</span> <span class="n">cert_size</span><span class="p">;</span>
+  <span class="kt">uint32_t</span> <span class="n">data_len</span><span class="p">;</span>
+  <span class="kt">uint32_t</span> <span class="n">unk_x30</span><span class="p">;</span>
+  <span class="kt">uint32_t</span> <span class="n">code_offset</span><span class="p">;</span>
+  <span class="kt">uint32_t</span> <span class="n">code_len</span><span class="p">;</span>
+  <span class="kt">uint32_t</span> <span class="n">unk_x3C</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">aml_img_header_t</span><span class="p">;</span>
+</pre></div>
+
+
+<p>The header indicates that the image is split in 4 parts:<br>
+<ul>
+<li>header : always 64 bytes</li>
+<li>signature : RSA-1024, RSA-2048, RSA-4096 or SHA-256</li>
+<li>cert : x509 certificate</li>
+<li>code: payload</li>
+</ul>
+On our target device, the signature type of the BL31 image
+(<i>sig_type</i> in the header) is SHA-256. This is intriguing
+because a SHA-256 hash alone is not enough to provide
+authentication.<br>
+The following pseudocode is the simplified algorithm of the
+authentication routine in BL2 :<br></p>
+<div class="highlight"><pre><span></span><span class="kt">int</span> <span class="nf">auth_image</span><span class="p">(</span><span class="n">aml_img_header_t</span> <span class="o">*</span><span class="n">img</span><span class="p">){</span>
+  <span class="n">validate_header</span><span class="p">(</span><span class="n">img</span><span class="p">);</span> <span class="c1">// checks on magic value &amp; header length</span>
+  <span class="n">hash</span> <span class="o">=</span> <span class="n">hash_sha256</span><span class="p">(</span><span class="n">img</span><span class="p">);</span><span class="c1">// hash whole image except signature</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">img</span><span class="o">-&gt;</span><span class="n">sig_type</span> <span class="o">==</span> <span class="n">RSA</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">check_rsa_signature</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">hash</span><span class="p">)</span>
+  <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+    <span class="k">return</span> <span class="n">memcmp</span><span class="p">(</span><span class="n">hash</span><span class="p">,</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">img</span> <span class="o">+</span> <span class="p">(</span><span class="n">img</span><span class="o">-&gt;</span><span class="n">sig_offset</span><span class="p">));</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>We can confirm that the SHA-256 option will only hash the loaded
+image and compare the result against the precomputed hash in the
+same image. We could have imagined a more complex solution like a
+HMAC, but actually in this case only the integrity is checked,
+there is no authentication.<br>
+<br>
+And even if the loaded image is signed with RSA, we can still
+switch the signature type to SHA-256 and regenerate the correct
+hash.<br>
+This issue could have been avoided if the signature type was
+enforced by an eFuse.<br>
+<br>
+This means we can easily modify the BL31 image, the most privileged
+code in TrustZone.<br>
+<h3>Customizing BL31 image</h3>
+In a previous section, we described the SMC function
+<i>hdcp22_sec_read_reg</i> that can read restricted ranges of
+secure memory from Normal World.<br>
+Time to practice our NOPing-fu to get rid of these limitations and
+thus obtain full access to secure memory.<br>
+<br>
+<table align="center" cellpadding="0" cellspacing="0" class=
+"tr-caption-container" style=
+"margin-left: auto; margin-right: auto; text-align: center;">
+<tbody>
+<tr>
+<td style="text-align: center;">
+<img alt="" src="/blog/amlogic-sb/bl31-hdcp22_sec_read_reg-asm-custom.png">
+</td>
+</tr>
+<tr>
+<td class="tr-caption" style="text-align: center;">
+Modified&nbsp;hdcp22_sec_read_reg function</td>
+</tr>
+</tbody>
+</table>
+<br>
+We also need to extend the page tables because the BootROM memory
+area is not mapped. The MMU initialization is implemented in the
+ATF code base, so again this is easy to spot and analyze in the
+BL31 binary.<br>
+By default, the following memory regions are mapped:<br>
+<table align="center" cellpadding="0" cellspacing="0" class=
+"tr-caption-container" style=
+"margin-left: auto; margin-right: auto; text-align: center;">
+<tbody>
+<tr>
+<td style="text-align: center;">
+<img alt="" src="/blog/amlogic-sb/plat_gxb_mmap.png">
+</td>
+</tr>
+<tr>
+<td class="tr-caption" style="text-align: center;">Original list of
+memory regions mapped in BL31</td>
+</tr>
+</tbody>
+</table>
+<br>
+We extend the size of one of them to cover the BootROM region:<br>
+<table align="center" cellpadding="0" cellspacing="0" class=
+"tr-caption-container" style=
+"margin-left: auto; margin-right: auto; text-align: center;">
+<tbody>
+<tr>
+<td style="text-align: center;">
+<img alt="" src="/blog/amlogic-sb/bl31-plat_gxb_mmap-custom.png">
+</td>
+</tr>
+<tr>
+<td class="tr-caption" style="text-align: center;">Modified list of
+memory regions mapped in BL31</td>
+</tr>
+</tbody>
+</table>
+<br>
+The new size of mapped region 0xD9000000 is 0x80000 so it includes
+the BootROM area 0xD9040000-0xD9050000.<br>
+We're almost done with BL31 modifications: we still need to update
+the SHA-256 hash.<br>
+<br>
+<h3>aml_bootloader_tool: parse and rehash Amlogic bootloaders</h3>
+This tool can parse and regenerate the SHA-256 of bootloaders
+contained in the <i>bootloader</i> partition. The <a href=
+"https://github.com/frederic/aml_bootloader_tool">source code is on
+GitHub</a>.<br>
+Each bootloader is identified by an UUID, they are <a href=
+"https://github.com/ARM-software/arm-trusted-firmware/blob/master/include/common/firmware_image_package.h">
+defined in the ATF source code</a>. In our case, the BL31 image is
+entry #2:<br></p>
+<div class="highlight"><pre><span></span>$ ./aml_bootloader_tool ./dump/bootloader.img H <span class="m">2</span>
+fip_toc_header.name:        aa640001
+fip_toc_header.serial_number:        <span class="m">12345678</span>
+fip_toc_header.flags:        <span class="m">0</span>
+TOC ENTRY <span class="c1">#2</span>
+fip_toc_entry.uuid:        47D4086D4CFE98469B952950CBBD5A00
+fip_toc_entry.offset_address:    <span class="m">14000</span> <span class="o">(</span>absolute: 0x20000<span class="o">)</span>
+fip_toc_entry.size:        0x11130
+fip_toc_entry.flags:        0x0
+magic<span class="o">[</span>@0x0<span class="o">]</span>:        @AML
+total_len<span class="o">[</span>@0x4<span class="o">]</span>:    0x11130
+header_len<span class="o">[</span>@0x8<span class="o">]</span>:    0x40
+unk_xC<span class="o">[</span>@0xC<span class="o">]</span>:        0x5eec9094
+sig_type<span class="o">[</span>@0x10<span class="o">]</span>:    0x0
+sig_offset<span class="o">[</span>@0x14<span class="o">]</span>:    0x40
+sig_len<span class="o">[</span>@0x18<span class="o">]</span>:        0x20
+data_offset<span class="o">[</span>@0x1c<span class="o">]</span>:    0x60
+unk_x20<span class="o">[</span>@0x20<span class="o">]</span>:        0x0
+cert_offset<span class="o">[</span>@0x24<span class="o">]</span>:    0x60
+cert_len:        0x0
+data_len:        0x110d0
+unk_x30<span class="o">[</span>@0x30<span class="o">]</span>:        0x0
+code_offset<span class="o">[</span>@0x34<span class="o">]</span>:    0x60
+code_len<span class="o">[</span>@0x38<span class="o">]</span>:    0x110d0
+unk_x3C<span class="o">[</span>@0x3C<span class="o">]</span>:        0x0
+signature:        263BEFAFC5A051C550D31791EC1212576BE65DB8AD365074560F0BABC076D3CA
+computed_sha256:    35AD6B284EE2D6B5672DD0958592028D5BF455A6DCD1EB086D8336FB86533853
+</pre></div>
+
+
+<p>The hash of the BL31 image has been updated, we can now reflash the
+dump on the device:<br></p>
+<div class="highlight"><pre><span></span>$ dd <span class="k">if</span><span class="o">=</span>./bootloader.img <span class="nv">of</span><span class="o">=</span>/dev/block/bootloader
+</pre></div>
+
+
+<p>Finally, we reboot the device to load our customized BL31 image in
+TrustZone.<br>
+<h2>Dumping the BootROM</h2>
+The SMC system call can only be invoked from EL1 and above. So we
+create a simple kernel module that will perform SMC calls to our
+modified function <i>hdcp22_sec_read_reg</i>&nbsp;in
+EL3<i>.</i><br>
+This quick 'n dirty hack is based on the Amlogic debugfs driver
+<i>reg_access</i>. The <a href=
+"https://github.com/frederic/smc_access">source code is on
+GitHub</a>.<br>
+Once loaded, to initiate a SMC call, we write arguments to the
+file&nbsp;<i>/sys/kernel/debug/aml_smc/smc</i>. The first argument
+is the ID of the called SMC function (0x82000018 in the case
+of&nbsp;<i>hdcp22_sec_read_reg</i>). The second argument (for this
+specific SMC ID) is the read memory address. The result DWORD is
+directly printed in kernel logs (we said dirty).<br></p>
+<div class="highlight"><pre><span></span>$ insmod ./smc_access.ko
+$ <span class="nb">echo</span> <span class="m">82000018</span> D9040000 &gt; /sys/kernel/debug/aml_smc/smc
+<span class="o">[</span>  <span class="m">219</span>.092948@0<span class="o">]</span> smc_access: SMC call <span class="m">82000018</span> returns: aa1f03e0
+</pre></div>
+
+
+<div>The result <b>aa1f03e0</b> is promising, it corresponds to the
+ARM instruction:&nbsp;<b>MOV &nbsp;X0, XZR</b><br>
+To automate the extraction of the entire BootROM memory region, we
+create a simple script:</div>
+
+<div class="highlight"><pre><span></span>$ seq -f %1.f 0xD9040000 0x4 0xD9050000 <span class="p">|</span> xargs <span class="nb">printf</span> <span class="s2">&quot;echo \&quot;82000018 %x\&quot; &gt; /sys/kernel/debug/aml_smc/smc\n&quot;</span>
+<span class="nb">echo</span> <span class="s2">&quot;82000018 d9040000&quot;</span> &gt; /sys/kernel/debug/aml_smc/smc
+<span class="nb">echo</span> <span class="s2">&quot;82000018 d9040004&quot;</span> &gt; /sys/kernel/debug/aml_smc/smc
+<span class="nb">echo</span> <span class="s2">&quot;82000018 d9040008&quot;</span> &gt; /sys/kernel/debug/aml_smc/smc
+<span class="o">[</span>...<span class="o">]</span>
+<span class="nb">echo</span> <span class="s2">&quot;82000018 d904fff8&quot;</span> &gt; /sys/kernel/debug/aml_smc/smc
+<span class="nb">echo</span> <span class="s2">&quot;82000018 d904fffc&quot;</span> &gt; /sys/kernel/debug/aml_smc/smc
+</pre></div>
+
+
+<div>And finally, we concate all these DWORDS into a file
+<b>bootrom.bin</b>.&nbsp;</div>
+
+<div class="highlight"><pre><span></span>$ ls -l ./bootrom.bin
+-rw-r--r-- <span class="m">1</span> user user <span class="m">65537</span> juil.  <span class="m">8</span> <span class="m">12</span>:43 ./bootrom.bin
+$ sha1sum bootrom.bin
+bff0c7fb88b4f03e732dc7a4ce504d748d0d47dd  bootrom.bin
+$ strings bootrom.bin <span class="p">|</span>tail -22
+BL1:
+FEAT
+READ
+EMMC
+NAND
+LOOP
+auth failed, reboot...
+08dafda0fd31778
+glacier.amlogic
+qian
+<span class="m">04</span>/14/15_14:23:08
+gcc version <span class="m">4</span>.8
+08dafda0fd31778
+boot@USB
+boot@SDC
+BAD PASSWORD
+!!!!
+vRQ&gt;
+8STs
+LwH<span class="err">&#39;</span>
+Err:sha
+<span class="m">0</span>!0
+</pre></div>
+
+
+<h2>Conclusion</h2>
+
+<p>The S905 SoC provides hardware features to support Secure Boot,
+however OEMs can still choose to enable it or not. But even when
+Secure Boot is enforced, a flaw in the current version of Amlogic's
+BL2 allows to bypass it. So Trusted Execution Environment cannot be
+trusted. The good news is BL2 can be patched, unlike BootROM.<br>
+<br>
+<i>I would like to thank @Karnalzi for the help!</i><br>
+<h2>Disclosure Timeline</h2>
+2016-08-08 : Flaw discovered<br>
+2016-08-08 : Amlogic &amp; some affected OEMs contacted by email to
+find a security PoC<br>
+2016-08-10 : OEM #1 replies that "Amlogic doesn't provide any
+direct contact."<br>
+2016-08-20 : Second attempt to contact Amlogic by email<br>
+2016-09-05 : Bug report shared with Amlogic<br>
+2016-09-13 : Status update requested<br>
+2016-09-25 : Status update requested<br>
+2016-10-05 : Public disclosure</div></p>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="/tag/vulnerability.html">vulnerability</a>
+      <a href="/tag/amlogic.html">amlogic</a>
+      <a href="/tag/arm.html">arm</a>
+      <a href="/tag/security.html">security</a>
+      <a href="/tag/firmware.html">firmware</a>
+      <a href="/tag/trustzone.html">trustzone</a>
+      <a href="/tag/bootrom.html">bootrom</a>
+      <a href="/tag/bug.html">bug</a>
+    </p>
+  </div>
+
+
+
+    <div class="addthis_relatedposts_inline">
+
+
+</article>
+
+    <footer>
+<p>
+  &copy;   - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+</p>
+<p>    Powered by <a href="http://getpelican.com" target="_blank">Pelican</a> - Theme <a href="https://github.com/alexandrevicenzi/flex" target="_blank">Flex</a>
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses/by-sa/4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+         src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " fred's notes ",
+  "url" : "",
+  "image": "/resources/sitelogo.jpg",
+  "description": "Frédéric's Thoughts and Writings"
+}
+</script>
+
+</body>
+</html>

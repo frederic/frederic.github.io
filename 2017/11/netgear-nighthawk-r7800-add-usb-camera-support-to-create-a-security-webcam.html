@@ -1,0 +1,443 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="/theme/stylesheet/style.min.css">
+
+  <link rel="stylesheet" type="text/css" href="/theme/pygments/github.min.css">
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/font-awesome.min.css">
+
+
+
+
+    <link rel="shortcut icon" href="/resources/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/resources/favicon.ico" type="image/x-icon">
+
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+
+<meta name="author" content="Frédéric" />
+<meta name="description" content="This article explains how to customize Nighthawk X4S firmware to add a security camera feature to this always-online &amp; almost-always-idle device. Alternative firmwares like OpenWRT or LEDE exist, but they don&#39;t fully support all stock features yet. So instead this approach is based on modified stock firmware. Main steps are: Customize …" />
+<meta name="keywords" content="kernel, netgear, usb, v4l2">
+
+<meta property="og:site_name" content="fred's notes"/>
+<meta property="og:title" content="Netgear Nighthawk R7800 : add USB camera support to create a security webcam"/>
+<meta property="og:description" content="This article explains how to customize Nighthawk X4S firmware to add a security camera feature to this always-online &amp; almost-always-idle device. Alternative firmwares like OpenWRT or LEDE exist, but they don&#39;t fully support all stock features yet. So instead this approach is based on modified stock firmware. Main steps are: Customize …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="/2017/11/netgear-nighthawk-r7800-add-usb-camera-support-to-create-a-security-webcam.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2017-11-22 00:00:00-08:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="/author/frederic.html">
+<meta property="article:section" content="Article"/>
+<meta property="article:tag" content="kernel"/>
+<meta property="article:tag" content="netgear"/>
+<meta property="article:tag" content="usb"/>
+<meta property="article:tag" content="v4l2"/>
+<meta property="og:image" content="/resources/sitelogo.jpg">
+
+  <title>fred's notes &ndash; Netgear Nighthawk R7800 : add USB camera support to create a security webcam</title>
+
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="/">
+        <img src="/resources/sitelogo.jpg" alt="fred's notes" title="fred's notes">
+      </a>
+      <h1><a href="/">fred's notes</a></h1>
+
+<p>Security & Stuff</p>
+      <nav>
+        <ul class="list">
+          <li><a href="/category/advisory.html">Advisory</a></li>
+          <li><a href="/category/article.html">Article</a></li>
+          <li><a href="/category/tool.html">Tool</a></li>
+          <li><a href="/pages/contact.html#contact">Contact</a></li>
+
+        </ul>
+      </nav>
+
+      <ul class="social">
+        <li><a class="sc-github" href="https://github.com/frederic" target="_blank"><i class="fa fa-github"></i></a></li>
+        <li><a class="sc-linkedin" href="https://www.linkedin.com/in/fredericbasse" target="_blank"><i class="fa fa-linkedin"></i></a></li>
+      </ul>
+    </div>
+
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="/">    Home
+</a>
+
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+
+
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="netgear-nighthawk-r7800-add-usb-camera-support-to-create-a-security-webcam">Netgear Nighthawk R7800 : add USB camera support to create a security webcam</h1>
+    <p>
+          Posted on Wed 22 November 2017 in <a href="/category/article.html">Article</a>
+
+
+    </p>
+  </header>
+
+
+  <div>
+    <p>This article explains how to customize Nighthawk X4S firmware to add a security camera feature to this always-online &amp; almost-always-idle device.
+Alternative firmwares like <a href="https://openwrt.org/">OpenWRT</a> or <a href="https://lede-project.org/">LEDE</a> exist, but they don't fully support all stock features yet. So instead this approach is based on modified stock firmware.</p>
+<p><img alt="Netgear Nighthawk X4S" src="/blog/r7800-custom/x4s.jpg">
+<img alt="Serious webcam" src="/blog/r7800-custom/webcam.jpg"></p>
+<p>Main steps are:</p>
+<ul>
+<li>Customize kernel to add USB video support (uvc, v4l2)</li>
+<li>Install additional software packages for motion detection</li>
+<li>Configure motion detection alerts</li>
+</ul>
+<h1>#YOLO</h1>
+<p>There's always a risk of bricking the device if something goes wrong. However, a <a href="https://kb.netgear.com/22688/How-to-upload-firmware-to-a-NETGEAR-router-using-TFTP">recovery procedure via TFTP</a> exists.</p>
+<p>Software downloads are performed over HTTP, due to client limitation on target side.</p>
+<h1>Hardware</h1>
+<ul>
+<li><a href="https://www.netgear.com/home/products/networking/wifi-routers/R7800.aspx">Neatgear Nighthawk X4S router</a></li>
+<li><a href="https://www.aliexpress.com/item/Newest-Webcam-USB-12-Megapixel-High-Definition-Camera-Web-Cam-360-Degree-MIC-Clip-on-For/32659656232.html">random cheap USB webcam</a> (don't buy that one, quality is terrible)</li>
+</ul>
+<h1>Root that firmware</h1>
+<p>I first thought that this step would be a pain, but then reminded the device manufacturer name. By grepping 'telnet' in the <a href="https://www.netgear.com/support/product/r7800.aspx#download">firmware binary</a>, we discover the existence of a debug page <em>/debug.htm</em> , with telnet option:</p>
+<p><img alt="R7800 debug webpage" src="/blog/r7800-custom/r7800_debug_page.png" width="852px"></p>
+<p>Telnet access is protected with the same password as WebUI, and gives a root shell.</p>
+<h1>Backup all the things</h1>
+<p>Thanks to telnet access, we backup the original kernel partition on an external USB drive :</p>
+<div class="highlight"><pre><span></span>$ telnet <span class="m">192</span>.168.1.1
+Trying <span class="m">192</span>.168.1.1...
+Connected to <span class="m">192</span>.168.1.1.
+Escape character is <span class="s1">&#39;^]&#39;</span>.
+ <span class="o">===</span> <span class="nv">LOGIN</span> <span class="o">===============================</span>
+  Please enter your password,It<span class="s1">&#39;s the same</span>
+<span class="s1">  with DUT login password</span>
+<span class="s1"> ------------------------------------------</span>
+<span class="s1">telnet password:JCVD4l1FE</span>
+<span class="s1">=== IMPORTANT ============================</span>
+<span class="s1"> Use &#39;</span>passwd<span class="s1">&#39; to set your login password</span>
+<span class="s1"> this will disable telnet and enable SSH</span>
+<span class="s1">------------------------------------------</span>
+
+
+<span class="s1">BusyBox v1.4.2 (2017-08-29 13:01:25 CST) Built-in shell (ash)</span>
+<span class="s1">Enter &#39;</span>help<span class="s1">&#39; for a list of built-in commands.</span>
+
+<span class="s1">     MM           NM                    MMMMMMM          M       M</span>
+<span class="s1">   $MMMMM        MMMMM                MMMMMMMMMMM      MMM     MMM</span>
+<span class="s1">  MMMMMMMM     MM MMMMM.              MMMMM:MMMMMM:   MMMM   MMMMM</span>
+<span class="s1">MMMM= MMMMMM  MMM   MMMM       MMMMM   MMMM  MMMMMM   MMMM  MMMMM&#39;</span>
+<span class="nv">MMMM</span><span class="o">=</span>  MMMMM MMMM    MM       MMMMM    MMMM    MMMM   MMMMNMMMMM
+<span class="nv">MMMM</span><span class="o">=</span>   MMMM  MMMMM          MMMMM     MMMM    MMMM   MMMMMMMM
+<span class="nv">MMMM</span><span class="o">=</span>   MMMM   MMMMMM       MMMMM      MMMM    MMMM   MMMMMMMMM
+<span class="nv">MMMM</span><span class="o">=</span>   MMMM     MMMMM,    NMMMMMMMM   MMMM    MMMM   MMMMMMMMMMM
+<span class="nv">MMMM</span><span class="o">=</span>   MMMM      MMMMMM   MMMMMMMM    MMMM    MMMM   MMMM  MMMMMM
+<span class="nv">MMMM</span><span class="o">=</span>   MMMM   MM    MMMM    MMMM      MMMM    MMMM   MMMM    MMMM
+MMMM$ ,MMMMM  MMMMM  MMMM    MMM       MMMM   MMMMM   MMMM    MMMM
+  MMMMMMM:      MMMMMMM     M         MMMMMMMMMMMM  MMMMMMM MMMMMMM
+    MMMMMM       MMMMN     M           MMMMMMMMM      MMMM    MMMM
+     MMMM          M                    MMMMMMM        M       M
+       M
+ ---------------------------------------------------------------
+   For those about to rock... <span class="o">(</span>%C, %R<span class="o">)</span>
+ ---------------------------------------------------------------
+root@R7800:/# cat /proc/mtd <span class="p">|</span> grep kernel
+mtd5: <span class="m">00220000</span> <span class="m">00020000</span> <span class="s2">&quot;kernel&quot;</span>
+
+root@R7800:/# dd <span class="k">if</span><span class="o">=</span>/dev/mtd5 <span class="nv">of</span><span class="o">=</span>/mnt/sda1/kernel.img
+<span class="m">4352</span>+0 records in
+<span class="m">4352</span>+0 records out
+</pre></div>
+
+
+<h1>Kernel</h1>
+<p>Netgear has released <a href="https://github.com/frederic/netgear-R7800-GPL">GPL source code</a> for the Linux kernel used in this device. 
+This copy on GitHub integrates few fixes to compile with newer GCC and V4L2 headers, and also the original kernel configuration dumped from live device.</p>
+<div class="highlight"><pre><span></span>$ git clone https://github.com/frederic/netgear-R7800-GPL.git
+$ <span class="nb">cd</span> netgear-R7800-GPL/
+</pre></div>
+
+
+<h2>Build mkimage tool</h2>
+<p>The <em>mkimage</em> tool is used at the end of kernel building process to create the new kernel image partition for the device.</p>
+<div class="highlight"><pre><span></span>$ make tools/mkimage/install
+ make<span class="o">[</span><span class="m">1</span><span class="o">]</span> tools/mkimage/install
+ make<span class="o">[</span><span class="m">2</span><span class="o">]</span> -C tools/sed compile
+ make<span class="o">[</span><span class="m">2</span><span class="o">]</span> -C tools/sed install
+ make<span class="o">[</span><span class="m">2</span><span class="o">]</span> -C tools/mkimage compile
+ make<span class="o">[</span><span class="m">2</span><span class="o">]</span> -C tools/mkimage install
+</pre></div>
+
+
+<p>Add freshly built <em>mkimage</em> binary to our PATH environment:</p>
+<div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$PWD</span>/build_dir/host/u-boot-2012.04.01/tools:<span class="nv">$PATH</span>
+</pre></div>
+
+
+<h2>Build Linux kernel</h2>
+<p>To build a kernel for this ARM-based device, we need to add a cross-compilation toolchain to our build environment :</p>
+<div class="highlight"><pre><span></span>$ git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-eabi-4.8
+$ <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$PWD</span>/arm-eabi-4.8/bin:<span class="nv">$PATH</span>
+</pre></div>
+
+
+<p>Then we create a new kernel configuration based on the original one :</p>
+<div class="highlight"><pre><span></span>$ <span class="nb">cd</span> git_home/linux.git/sourcecode/
+$ make r7800_defconfig <span class="nv">ARCH</span><span class="o">=</span>arm <span class="nv">CROSS_COMPILE</span><span class="o">=</span>arm-eabi-
+$ make menuconfig <span class="nv">ARCH</span><span class="o">=</span>arm <span class="nv">CROSS_COMPILE</span><span class="o">=</span>arm-eabi-
+</pre></div>
+
+
+<p>In the kernel configuration menu, we enable the following options to get V4L2 &amp; USB Video support :</p>
+<div class="highlight"><pre><span></span>Device Drivers ---&gt;
+-&gt; &lt;*&gt; Multimedia support ---&gt;
+--&gt; &lt;*&gt; Video For Linux
+--&gt; &lt;*&gt; Video capture adapters ---&gt;
+---&gt; &lt;*&gt; V4L USB devices ---&gt;
+----&gt; &lt;*&gt; USB Video Class (UVC)
+----&gt; &lt;*&gt; GSPCA based webcams
+</pre></div>
+
+
+<p>For info, that should correspond to these options :</p>
+<div class="highlight"><pre><span></span>CONFIG_USB_VIDEO_CLASS=y
+CONFIG_USB_GSPCA=y
+CONFIG_VIDEO_V4L2_COMMON=y
+CONFIG_VIDEO_V4L2=y
+CONFIG_V4L_USB_DRIVERS=y
+</pre></div>
+
+
+<p>Finally, we build the kernel image :</p>
+<div class="highlight"><pre><span></span>$ make -j8 uImage <span class="nv">ARCH</span><span class="o">=</span>arm <span class="nv">CROSS_COMPILE</span><span class="o">=</span>arm-eabi-
+<span class="o">[</span>...<span class="o">]</span>
+  Kernel: arch/arm/boot/Image is ready
+  Kernel: arch/arm/boot/zImage is ready
+  UIMAGE  arch/arm/boot/uImage
+Image Name:   Linux-3.4.103
+Created:      Mon Nov <span class="m">13</span> <span class="m">23</span>:20:31 <span class="m">2017</span>
+Image Type:   ARM Linux Kernel Image <span class="o">(</span>uncompressed<span class="o">)</span>
+Data Size:    <span class="m">2237008</span> <span class="nv">Bytes</span> <span class="o">=</span> <span class="m">2184</span>.58 <span class="nv">kB</span> <span class="o">=</span> <span class="m">2</span>.13 MB
+Load Address: <span class="m">41508000</span>
+Entry Point:  <span class="m">41508000</span>
+  Image arch/arm/boot/uImage is ready
+</pre></div>
+
+
+<p>Output kernel image is <strong>arch/arm/boot/uImage</strong></p>
+<div class="highlight"><pre><span></span>$ file arch/arm/boot/uImage
+arch/arm/boot/uImage: u-boot legacy uImage, Linux-3.4.103, Linux/ARM, OS Kernel Image <span class="o">(</span>Not compressed<span class="o">)</span>, <span class="m">2237008</span> bytes, Tue Nov <span class="m">14</span> <span class="m">07</span>:20:31 <span class="m">2017</span>, Load Address: 0x41508000, Entry Point: 0x41508000, Header CRC: 0xF8A5433E, Data CRC: 0x6C79765B
+</pre></div>
+
+
+<p>We copy that image to a USB drive and then, <strong>from the telnet shell</strong>, we overwrite original kernel with the new image :</p>
+<div class="highlight"><pre><span></span>root@R7800:/# dd <span class="k">if</span><span class="o">=</span>/mnt/sda1/uImage <span class="nv">of</span><span class="o">=</span>/dev/mtd5
+root@R7800:/# sync
+root@R7800:/# reboot
+</pre></div>
+
+
+<p><em>Note: You have to enable telnet in WebUI after each reboot.</em></p>
+<p>Now the router detects USB camera when plugged in :</p>
+<div class="highlight"><pre><span></span>usb 3-1: new high-speed USB device number 5 using xhci-hcd
+usb 3-1: New USB device found, idVendor=1908, idProduct=2310
+usb 3-1: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+usb 3-1: Product: USB2.0 PC CAMERA
+usb 3-1: Manufacturer: Generic
+usb 3-1: SerialNumber: 20100331010203
+INFO008C: Add device intf d39cc400, dev d39a5000
+INFO0C15:  filter audio device
+uvcvideo: Found UVC 1.00 device USB2.0 PC CAMERA (1908:2310)
+input: USB2.0 PC CAMERA as /devices/platform/ipq-dwc3.1/dwc3.1/xhci-hcd.1/usb3/3-1/3-1:1.0/input/input3
+</pre></div>
+
+
+<h1>Install software packages</h1>
+<p><em>"<a href="https://motion-project.github.io/">Motion</a> is a program that monitors the video signal from cameras. It is able to detect if a significant part of the picture has changed; in other words, it can detect motion."</em></p>
+<p>Fortunately, this package is available in OpenWrt repositories for our architecture.
+And stock firmware includes the OpenWrt package manager <strong>opkg</strong>.</p>
+<p>However, <strong>opkg</strong> is outdated and needs to be <a href="https://gist.github.com/frederic/fcb7ddc14c46aa630143aaeafe2d706f">patched</a> first :</p>
+<div class="highlight"><pre><span></span>root@R7800:/# curl -k https://gist.githubusercontent.com/frederic/fcb7ddc14c46aa630143aaeafe2d706f/raw/8242c18a514f19b58c74387d4bfa0e5511bbb4e5/functions.sh -o <span class="s1">&#39;/lib/functions.sh&#39;</span>
+</pre></div>
+
+
+<p>Then, we can install <em>motion</em> &amp; <em>libjpeg</em> packages :</p>
+<div class="highlight"><pre><span></span>root@R7800:/# opkg install http://downloads.openwrt.org/chaos_calmer/15.05-rc3/ipq806x/generic/packages/packages/libjpeg_9a-1_ipq806x.ipk
+Downloading http://downloads.openwrt.org/chaos_calmer/15.05-rc3/ipq806x/generic/packages/packages/libjpeg_9a-1_ipq806x.ipk.
+Installing libjpeg <span class="o">(</span>9a-1<span class="o">)</span> to root...
+Configuring libjpeg.
+
+root@R7800:/# opkg install http://downloads.openwrt.org/chaos_calmer/15.05-rc3/ipq806x/generic/packages/packages/motion_3.4.0-20141018-9479d910f2149b5558788bb86f97f26522794212-1_ipq806x.ipk
+Downloading http://downloads.openwrt.org/chaos_calmer/15.05-rc3/ipq806x/generic/packages/packages/motion_3.4.0-20141018-9479d910f2149b5558788bb86f97f26522794212-1_ipq806x.ipk.
+Installing motion <span class="o">(</span><span class="m">3</span>.4.0-20141018-9479d910f2149b5558788bb86f97f26522794212-1<span class="o">)</span> to root...
+Configuring motion.
+</pre></div>
+
+
+<p>Note that motion software expects its default configuration file at different path than the one actually provided. So we move it back to default path :</p>
+<div class="highlight"><pre><span></span>root@R7800:/# mkdir /etc/motion
+root@R7800:/# mv /overlay/etc/motion.conf /etc/motion/motion.conf
+</pre></div>
+
+
+<h1>Configuration</h1>
+<p>To enable motion detection only when our smartphone (hence we) is not at home, we call our custom script in Hostapd script <strong>/lib/wifi/wps-hostapd-update-uci</strong>.
+It will only be triggered when a station connects or disconnects from the router.</p>
+<div class="highlight"><pre><span></span><span class="gh">diff --git a/lib/wifi/wps-hostapd-update-uci b/lib/wifi/wps-hostapd-update-uci</span>
+<span class="gh">index f60abe3..dd6f3f2 100755</span>
+<span class="gd">--- a/lib/wifi/wps-hostapd-update-uci</span>
+<span class="gi">+++ b/lib/wifi/wps-hostapd-update-uci</span>
+<span class="gu">@@ -157,6 +157,9 @@ check_ap_lock_down()</span>
+ }
+
+ case &quot;$CMD&quot; in
+<span class="gi">+        AP-STA-CONNECTED|AP-STA-DISCONNECTED)</span>
+<span class="gi">+                /etc/motion_cron.sh $CMD $3</span>
+<span class="gi">+        ;;</span>
+        WPS-NEW-AP-SETTINGS|WPS-NEW-AP-SETTINGS-AP-PIN)
+                local ssid=$(hostapd_cli -i$IFNAME -p/var/run/hostapd-$parent get_config | grep ^ssid= | cut -f2- -d =)
+                local wpa=$(hostapd_cli -i$IFNAME -p/var/run/hostapd-$parent get_config | grep ^wpa= | cut -f2- -d=)
+</pre></div>
+
+
+<p>We create the following script in <strong>/etc/motion_cron.sh</strong> :</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/sh</span>
+<span class="c1"># Start or stop motion service depending on </span>
+<span class="c1"># Usage: motion_cron.sh [&lt;event_type&gt; &lt;mac addr&gt;]</span>
+
+<span class="nv">HWADDR</span><span class="o">=</span><span class="m">00</span>:11:22:33:44:55 <span class="c1"># Update with your smartphone MAC address</span>
+
+<span class="nv">CONNECTED</span><span class="o">=</span><span class="m">0</span>
+<span class="nv">CMD</span><span class="o">=</span>motion
+<span class="nv">CMD_PID</span><span class="o">=</span>/var/run/<span class="nv">$CMD</span>.pid
+<span class="nv">CMD_BIN</span><span class="o">=</span>/usr/bin/<span class="nv">$CMD</span>
+<span class="nv">PID</span><span class="o">=</span><span class="sb">`</span>pidof <span class="nv">$CMD</span><span class="sb">`</span>
+
+<span class="k">if</span> <span class="o">[</span> <span class="nv">$#</span> -eq <span class="m">2</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+ <span class="nv">EVENT</span><span class="o">=</span><span class="nv">$1</span>
+ <span class="nv">EVENT_MAC</span><span class="o">=</span><span class="nv">$2</span>
+ <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$EVENT_MAC</span><span class="s2">&quot;</span> <span class="o">==</span> <span class="s2">&quot;</span><span class="nv">$HWADDR</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+  <span class="k">case</span> <span class="s2">&quot;</span><span class="nv">$EVENT</span><span class="s2">&quot;</span> in
+    AP-STA-DISCONNECTED<span class="o">)</span>
+      <span class="nv">CONNECTED</span><span class="o">=</span><span class="m">0</span>
+      <span class="p">;;</span>
+    AP-STA-CONNECTED<span class="o">)</span>
+      <span class="nv">CONNECTED</span><span class="o">=</span><span class="m">1</span>
+      <span class="p">;;</span>
+    *<span class="o">)</span>
+      <span class="nb">echo</span> <span class="s2">&quot;Non-interesting event, ignore...&quot;</span>
+      <span class="nb">exit</span> <span class="m">0</span>
+  <span class="k">esac</span>
+  <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$EVENT</span><span class="s2"> </span><span class="nv">$EVENT_MAC</span><span class="s2">&quot;</span>
+ <span class="k">else</span>
+  <span class="nb">echo</span> <span class="s2">&quot;Not our MAC, ignore...&quot;</span>
+  <span class="nb">exit</span> <span class="m">0</span>
+ <span class="k">fi</span>
+<span class="k">else</span>
+ <span class="k">if</span> grep <span class="s2">&quot;0x2\W\+</span><span class="nv">$HWADDR</span><span class="s2">&quot;</span> /proc/net/arp <span class="p">;</span> <span class="k">then</span>
+  <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$HWADDR</span><span class="s2"> is connected in arp table&quot;</span>
+  <span class="nv">CONNECTED</span><span class="o">=</span><span class="m">1</span>
+ <span class="k">else</span>
+  <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$HWADDR</span><span class="s2"> is disconnected in arp table&quot;</span>
+  <span class="nv">CONNECTED</span><span class="o">=</span><span class="m">0</span>
+ <span class="k">fi</span>
+<span class="k">fi</span>
+
+<span class="k">if</span> <span class="o">[</span> <span class="nv">$CONNECTED</span> -eq <span class="m">1</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+ <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$HWADDR</span><span class="s2"> is connected&quot;</span>
+ <span class="k">if</span> <span class="o">[</span> -n <span class="s2">&quot;</span><span class="nv">$PID</span><span class="s2">&quot;</span> <span class="o">]</span>
+ <span class="k">then</span>
+      <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$CMD</span><span class="s2"> is running, stopping it...&quot;</span>
+      start-stop-daemon -K -x <span class="nv">$CMD_BIN</span> -p <span class="nv">$CMD_PID</span>
+ <span class="k">fi</span>
+<span class="k">else</span>
+ <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$HWADDR</span><span class="s2"> is disconnected&quot;</span>
+ <span class="k">if</span> <span class="o">[</span> -z <span class="s2">&quot;</span><span class="nv">$PID</span><span class="s2">&quot;</span> <span class="o">]</span>
+ <span class="k">then</span>
+      <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$CMD</span><span class="s2"> is not running, starting it...&quot;</span>
+      start-stop-daemon -S -x <span class="nv">$CMD_BIN</span> -- -b -p <span class="nv">$CMD_PID</span>
+ <span class="k">fi</span>
+<span class="k">fi</span>
+</pre></div>
+
+
+<p><strong>$HWADDR</strong> has to be set to MAC address of our smartphone.</p>
+<p>As failsafe mechanism, we can also add this script to cron :</p>
+<div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s2">&quot;  0 *  *   *   *     /etc/motion_cron.sh&quot;</span> &gt;&gt; /etc/crontabs/root
+</pre></div>
+
+
+<p>Finally, we edit the file <em>/etc/motion/motion.conf</em> to configure motion. A <a href="http://htmlpreview.github.io/?https://github.com/Motion-Project/motion/blob/master/motion_guide.html">guide is available on official motion website</a>.
+In addition of your own settings, I recommend to set the output storage path to an external USB drive :</p>
+<div class="highlight"><pre><span></span>target_dir /mnt/sda1
+</pre></div>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="/tag/kernel.html">kernel</a>
+      <a href="/tag/netgear.html">netgear</a>
+      <a href="/tag/usb.html">usb</a>
+      <a href="/tag/v4l2.html">v4l2</a>
+    </p>
+  </div>
+
+
+
+    <div class="addthis_relatedposts_inline">
+
+
+</article>
+
+    <footer>
+<p>
+  &copy;   - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+</p>
+<p>    Powered by <a href="http://getpelican.com" target="_blank">Pelican</a> - Theme <a href="https://github.com/alexandrevicenzi/flex" target="_blank">Flex</a>
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses/by-sa/4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+         src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " fred's notes ",
+  "url" : "",
+  "image": "/resources/sitelogo.jpg",
+  "description": "Frédéric's Thoughts and Writings"
+}
+</script>
+
+</body>
+</html>
