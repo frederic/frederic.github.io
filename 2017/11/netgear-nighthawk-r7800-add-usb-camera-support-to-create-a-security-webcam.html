@@ -320,7 +320,7 @@ It will only be triggered when a station connects or disconnects from the router
 
 <p>We create the following script in <strong>/etc/motion_cron.sh</strong> :</p>
 <div class="highlight"><pre><span></span><span class="ch">#!/bin/sh</span>
-<span class="c1"># Start or stop motion service depending on </span>
+<span class="c1"># Start or stop motion service depending on wifi client status</span>
 <span class="c1"># Usage: motion_cron.sh [&lt;event_type&gt; &lt;mac addr&gt;]</span>
 
 <span class="nv">HWADDR</span><span class="o">=</span><span class="m">00</span>:11:22:33:44:55 <span class="c1"># Update with your smartphone MAC address</span>
