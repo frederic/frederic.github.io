@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="/theme/stylesheet/style.min.css">
+
+  <link rel="stylesheet" type="text/css" href="/theme/pygments/github.min.css">
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/font-awesome.min.css">
+
+
+    <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="fred's notes Atom">
+
+
+    <link rel="shortcut icon" href="/resources/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/resources/favicon.ico" type="image/x-icon">
+
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+
+<meta name="author" content="Frédéric" />
+<meta name="description" content="Prequel On October 21st 2015, mobile forensics company Cellebrite published a video that demonstrates how their solution can dump eMMC of Samsung Galaxy devices : This video strongly suggests that Samsung Galaxy bootloader can be exploited to execute arbitrary code. Summary Several bugs in Samsung Galaxy bootloader allow an attacker with …" />
+<meta name="keywords" content="vulnerability, advisory, samsung, cellebrite, bootloader, exploit, firmware, security, usb, arm, odin">
+
+<meta property="og:site_name" content="fred's notes"/>
+<meta property="og:title" content="SVE-2016-7930: Multiple buffer overflows in Samsung Galaxy bootloader"/>
+<meta property="og:description" content="Prequel On October 21st 2015, mobile forensics company Cellebrite published a video that demonstrates how their solution can dump eMMC of Samsung Galaxy devices : This video strongly suggests that Samsung Galaxy bootloader can be exploited to execute arbitrary code. Summary Several bugs in Samsung Galaxy bootloader allow an attacker with …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="/2017/07/sve-2016-7930-multiple-buffer-overflows-in-samsung-galaxy-bootloader.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2017-07-23 00:00:00-07:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="/author/frederic.html">
+<meta property="article:section" content="Advisory"/>
+<meta property="article:tag" content="vulnerability"/>
+<meta property="article:tag" content="advisory"/>
+<meta property="article:tag" content="samsung"/>
+<meta property="article:tag" content="cellebrite"/>
+<meta property="article:tag" content="bootloader"/>
+<meta property="article:tag" content="exploit"/>
+<meta property="article:tag" content="firmware"/>
+<meta property="article:tag" content="security"/>
+<meta property="article:tag" content="usb"/>
+<meta property="article:tag" content="arm"/>
+<meta property="article:tag" content="odin"/>
+<meta property="og:image" content="/resources/sitelogo.jpg">
+
+  <title>fred's notes &ndash; SVE-2016-7930: Multiple buffer overflows in Samsung Galaxy bootloader</title>
+
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="/">
+        <img src="/resources/sitelogo.jpg" alt="fred's notes" title="fred's notes">
+      </a>
+      <h1><a href="/">fred's notes</a></h1>
+
+<p>Security & Stuff</p>
+      <nav>
+        <ul class="list">
+          <li><a href="/category/advisory.html">Advisory</a></li>
+          <li><a href="/category/article.html">Article</a></li>
+          <li><a href="/category/tool.html">Tool</a></li>
+          <li><a href="/pages/contact.html#contact">Contact</a></li>
+
+        </ul>
+      </nav>
+
+      <ul class="social">
+        <li><a class="sc-github" href="https://github.com/frederic" target="_blank"><i class="fa fa-github"></i></a></li>
+        <li><a class="sc-linkedin" href="https://www.linkedin.com/in/fredericbasse" target="_blank"><i class="fa fa-linkedin"></i></a></li>
+        <li><a class="sc-rss" href="/feeds/all.atom.xml" target="_blank"><i class="fa fa-rss"></i></a></li>
+      </ul>
+    </div>
+
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="/">    Home
+</a>
+
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+
+      <a href="/feeds/all.atom.xml">    Atom
+</a>
+
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="sve-2016-7930-multiple-buffer-overflows-in-samsung-galaxy-bootloader">SVE-2016-7930: Multiple buffer overflows in Samsung Galaxy bootloader</h1>
+    <p>
+          Posted on Sun 23 July 2017 in <a href="/category/advisory.html">Advisory</a>
+
+
+    </p>
+  </header>
+
+
+  <div>
+    <h1>Prequel</h1>
+<p>On October 21st 2015, mobile forensics company <a href="https://www.cellebrite.com/">Cellebrite</a> published a video that demonstrates how their solution can dump eMMC of Samsung Galaxy devices :</p>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/ZsGBbswJGi4?rel=0" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
+
+<p>This video strongly suggests that Samsung Galaxy bootloader can be exploited to execute arbitrary code.</p>
+<h1>Summary</h1>
+<p>Several bugs in Samsung Galaxy bootloader allow an attacker with physical access to execute arbitrary code. Protections like OS lock screen and reactivation lock can be defeated.</p>
+<p>Download mode (a.k.a. ODIN) doesn't properly sanitize headers of flashed images. This can lead to integer &amp; buffer overflows.</p>
+<p>Bugs and exploitation technique are detailed in the <a href="https://www.sstic.org/media/SSTIC2017/SSTIC-actes/attacking_samsung_secure_boot/SSTIC2017-Article-attacking_samsung_secure_boot-basse.pdf">paper released at SSTIC 2017 conference</a>.</p>
+<h1>Proof-of-Concept</h1>
+<p>PoC code for Samsung Galaxy S5 has been <a href="https://github.com/frederic/SVE-2016-7930">released on GitHub</a></p>
+<h1>CVSS Version 3 Metrics</h1>
+<ul>
+<li>Attack Vector (AV): Physical (P)</li>
+<li>Attack Complexity (AC): Low (L)</li>
+<li>Privileges Required (PR): None (N)</li>
+<li>User Interaction (UI): None (N)</li>
+<li><a href="https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:P/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H">Overall CVSS Score: 6.8</a></li>
+</ul>
+<h1>Solution</h1>
+<p>Samsung has released a fix via OTA.</p>
+<h1>Disclosure Timeline</h1>
+<ul>
+<li>2016-12-20 Disclosed to Samsung</li>
+<li>2017-03-07 Public disclosure in Samsung Bulletin <a href="https://security.samsungmobile.com/securityUpdate.smsb">SMR-MAR-2017</a></li>
+<li>2017-06-08 Talk at <a href="https://www.sstic.org/2017/presentation/attacking_samsung_secure_boot/">SSTIC 2017 conference</a></li>
+<li>2017-07-21 <a href="https://github.com/frederic/SVE-2016-7930">Proof-of-Concept released</a></li>
+</ul>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="/tag/vulnerability.html">vulnerability</a>
+      <a href="/tag/advisory.html">advisory</a>
+      <a href="/tag/samsung.html">samsung</a>
+      <a href="/tag/cellebrite.html">cellebrite</a>
+      <a href="/tag/bootloader.html">bootloader</a>
+      <a href="/tag/exploit.html">exploit</a>
+      <a href="/tag/firmware.html">firmware</a>
+      <a href="/tag/security.html">security</a>
+      <a href="/tag/usb.html">usb</a>
+      <a href="/tag/arm.html">arm</a>
+      <a href="/tag/odin.html">odin</a>
+    </p>
+  </div>
+
+
+
+    <div class="addthis_relatedposts_inline">
+
+
+</article>
+
+    <footer>
+<p>
+  &copy;   - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+</p>
+<p>    Powered by <a href="http://getpelican.com" target="_blank">Pelican</a> - Theme <a href="https://github.com/alexandrevicenzi/flex" target="_blank">Flex</a>
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses/by-sa/4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+         src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " fred's notes ",
+  "url" : "",
+  "image": "/resources/sitelogo.jpg",
+  "description": "Frédéric's Thoughts and Writings"
+}
+</script>
+
+</body>
+</html>

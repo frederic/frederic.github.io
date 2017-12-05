@@ -294,7 +294,40 @@ It will only be triggered when a station connects or disconnects from the router
 &lt;p&gt;Finally, we edit the file &lt;em&gt;/etc/motion/motion.conf&lt;/em&gt; to configure motion. A &lt;a href="http://htmlpreview.github.io/?https://github.com/Motion-Project/motion/blob/master/motion_guide.html"&gt;guide is available on official motion website&lt;/a&gt;.
 In addition of your own settings, I recommend to set the output storage path to an external USB drive :&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;target_dir /mnt/sda1
-&lt;/pre&gt;&lt;/div&gt;</content><category term="kernel"></category><category term="netgear"></category><category term="usb"></category><category term="v4l2"></category></entry><entry><title>Amlogic S905 SoC: bypassing the (not so) Secure Boot to dump the BootROM</title><link href="/2016/10/amlogic-s905-soc-bypassing-not-so.html" rel="alternate"></link><published>2016-10-05T00:00:00-07:00</published><updated>2016-10-05T00:00:00-07:00</updated><author><name>Frédéric</name></author><id>tag:None,2016-10-05:/2016/10/amlogic-s905-soc-bypassing-not-so.html</id><summary type="html">&lt;p&gt;The &lt;a href=
+&lt;/pre&gt;&lt;/div&gt;</content><category term="kernel"></category><category term="netgear"></category><category term="usb"></category><category term="v4l2"></category></entry><entry><title>SVE-2016-7930: Multiple buffer overflows in Samsung Galaxy bootloader</title><link href="/2017/07/sve-2016-7930-multiple-buffer-overflows-in-samsung-galaxy-bootloader.html" rel="alternate"></link><published>2017-07-23T00:00:00-07:00</published><updated>2017-07-23T00:00:00-07:00</updated><author><name>Frédéric</name></author><id>tag:None,2017-07-23:/2017/07/sve-2016-7930-multiple-buffer-overflows-in-samsung-galaxy-bootloader.html</id><summary type="html">&lt;h1&gt;Prequel&lt;/h1&gt;
+&lt;p&gt;On October 21st 2015, mobile forensics company &lt;a href="https://www.cellebrite.com/"&gt;Cellebrite&lt;/a&gt; published a video that demonstrates how their solution can dump eMMC of Samsung Galaxy devices :&lt;/p&gt;
+&lt;iframe width="560" height="315" src="https://www.youtube.com/embed/ZsGBbswJGi4?rel=0" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen&gt;&lt;/iframe&gt;
+
+&lt;p&gt;This video strongly suggests that Samsung Galaxy bootloader can be exploited to execute arbitrary code.&lt;/p&gt;
+&lt;h1&gt;Summary&lt;/h1&gt;
+&lt;p&gt;Several bugs in Samsung Galaxy bootloader allow an attacker with …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Prequel&lt;/h1&gt;
+&lt;p&gt;On October 21st 2015, mobile forensics company &lt;a href="https://www.cellebrite.com/"&gt;Cellebrite&lt;/a&gt; published a video that demonstrates how their solution can dump eMMC of Samsung Galaxy devices :&lt;/p&gt;
+&lt;iframe width="560" height="315" src="https://www.youtube.com/embed/ZsGBbswJGi4?rel=0" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen&gt;&lt;/iframe&gt;
+
+&lt;p&gt;This video strongly suggests that Samsung Galaxy bootloader can be exploited to execute arbitrary code.&lt;/p&gt;
+&lt;h1&gt;Summary&lt;/h1&gt;
+&lt;p&gt;Several bugs in Samsung Galaxy bootloader allow an attacker with physical access to execute arbitrary code. Protections like OS lock screen and reactivation lock can be defeated.&lt;/p&gt;
+&lt;p&gt;Download mode (a.k.a. ODIN) doesn't properly sanitize headers of flashed images. This can lead to integer &amp;amp; buffer overflows.&lt;/p&gt;
+&lt;p&gt;Bugs and exploitation technique are detailed in the &lt;a href="https://www.sstic.org/media/SSTIC2017/SSTIC-actes/attacking_samsung_secure_boot/SSTIC2017-Article-attacking_samsung_secure_boot-basse.pdf"&gt;paper released at SSTIC 2017 conference&lt;/a&gt;.&lt;/p&gt;
+&lt;h1&gt;Proof-of-Concept&lt;/h1&gt;
+&lt;p&gt;PoC code for Samsung Galaxy S5 has been &lt;a href="https://github.com/frederic/SVE-2016-7930"&gt;released on GitHub&lt;/a&gt;&lt;/p&gt;
+&lt;h1&gt;CVSS Version 3 Metrics&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;Attack Vector (AV): Physical (P)&lt;/li&gt;
+&lt;li&gt;Attack Complexity (AC): Low (L)&lt;/li&gt;
+&lt;li&gt;Privileges Required (PR): None (N)&lt;/li&gt;
+&lt;li&gt;User Interaction (UI): None (N)&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:P/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"&gt;Overall CVSS Score: 6.8&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;Solution&lt;/h1&gt;
+&lt;p&gt;Samsung has released a fix via OTA.&lt;/p&gt;
+&lt;h1&gt;Disclosure Timeline&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;2016-12-20 Disclosed to Samsung&lt;/li&gt;
+&lt;li&gt;2017-03-07 Public disclosure in Samsung Bulletin &lt;a href="https://security.samsungmobile.com/securityUpdate.smsb"&gt;SMR-MAR-2017&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;2017-06-08 Talk at &lt;a href="https://www.sstic.org/2017/presentation/attacking_samsung_secure_boot/"&gt;SSTIC 2017 conference&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;2017-07-21 &lt;a href="https://github.com/frederic/SVE-2016-7930"&gt;Proof-of-Concept released&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><category term="vulnerability"></category><category term="advisory"></category><category term="samsung"></category><category term="cellebrite"></category><category term="bootloader"></category><category term="exploit"></category><category term="firmware"></category><category term="security"></category><category term="usb"></category><category term="arm"></category><category term="odin"></category></entry><entry><title>Amlogic S905 SoC: bypassing the (not so) Secure Boot to dump the BootROM</title><link href="/2016/10/amlogic-s905-soc-bypassing-not-so.html" rel="alternate"></link><published>2016-10-05T00:00:00-07:00</published><updated>2016-10-05T00:00:00-07:00</updated><author><name>Frédéric</name></author><id>tag:None,2016-10-05:/2016/10/amlogic-s905-soc-bypassing-not-so.html</id><summary type="html">&lt;p&gt;The &lt;a href=
 "http://www.amlogic.com/#Products/176/index.html"&gt;Amlogic S905
 System-On-Chip&lt;/a&gt; is an ARM processor designed for video
 applications. It's widely used in Android/Kodi media boxes. The SoC
