@@ -68,7 +68,7 @@ MMMM$ ,MMMMM  MMMMM  MMMM    MMM       MMMM   MMMMM   MMMM    MMMM
 root@R7800:/# cat /proc/mtd &lt;span class="p"&gt;|&lt;/span&gt; grep kernel
 mtd5: &lt;span class="m"&gt;00220000&lt;/span&gt; &lt;span class="m"&gt;00020000&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;kernel&amp;quot;&lt;/span&gt;
 
-root@R7800:/# dd &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/dev/mtd5 &lt;span class="nv"&gt;of&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/mnt/sda1/kernel.img
+root@R7800:/# dd &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/dev/mtdblock5 &lt;span class="nv"&gt;of&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/mnt/sda1/kernel.img
 &lt;span class="m"&gt;4352&lt;/span&gt;+0 records in
 &lt;span class="m"&gt;4352&lt;/span&gt;+0 records out
 &lt;/pre&gt;&lt;/div&gt;
@@ -139,9 +139,9 @@ CONFIG_V4L_USB_DRIVERS=y
   Kernel: arch/arm/boot/zImage is ready
   UIMAGE  arch/arm/boot/uImage
 Image Name:   Linux-3.4.103
-Created:      Mon Nov &lt;span class="m"&gt;13&lt;/span&gt; &lt;span class="m"&gt;23&lt;/span&gt;:20:31 &lt;span class="m"&gt;2017&lt;/span&gt;
+Created:      Mon Jan &lt;span class="m"&gt;29&lt;/span&gt; &lt;span class="m"&gt;23&lt;/span&gt;:58:38 &lt;span class="m"&gt;2018&lt;/span&gt;
 Image Type:   ARM Linux Kernel Image &lt;span class="o"&gt;(&lt;/span&gt;uncompressed&lt;span class="o"&gt;)&lt;/span&gt;
-Data Size:    &lt;span class="m"&gt;2237008&lt;/span&gt; &lt;span class="nv"&gt;Bytes&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;2184&lt;/span&gt;.58 &lt;span class="nv"&gt;kB&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;.13 MB
+Data Size:    &lt;span class="m"&gt;2210952&lt;/span&gt; &lt;span class="nv"&gt;Bytes&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;2159&lt;/span&gt;.13 &lt;span class="nv"&gt;kB&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;.11 MB
 Load Address: &lt;span class="m"&gt;41508000&lt;/span&gt;
 Entry Point:  &lt;span class="m"&gt;41508000&lt;/span&gt;
   Image arch/arm/boot/uImage is ready
@@ -150,12 +150,13 @@ Entry Point:  &lt;span class="m"&gt;41508000&lt;/span&gt;
 
 &lt;p&gt;Output kernel image is &lt;strong&gt;arch/arm/boot/uImage&lt;/strong&gt;&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ file arch/arm/boot/uImage
-arch/arm/boot/uImage: u-boot legacy uImage, Linux-3.4.103, Linux/ARM, OS Kernel Image &lt;span class="o"&gt;(&lt;/span&gt;Not compressed&lt;span class="o"&gt;)&lt;/span&gt;, &lt;span class="m"&gt;2237008&lt;/span&gt; bytes, Tue Nov &lt;span class="m"&gt;14&lt;/span&gt; &lt;span class="m"&gt;07&lt;/span&gt;:20:31 &lt;span class="m"&gt;2017&lt;/span&gt;, Load Address: 0x41508000, Entry Point: 0x41508000, Header CRC: 0xF8A5433E, Data CRC: 0x6C79765B
+arch/arm/boot/uImage: u-boot legacy uImage, Linux-3.4.103, Linux/ARM, OS Kernel Image &lt;span class="o"&gt;(&lt;/span&gt;Not compressed&lt;span class="o"&gt;)&lt;/span&gt;, &lt;span class="m"&gt;2210952&lt;/span&gt; bytes, Tue Jan &lt;span class="m"&gt;30&lt;/span&gt; &lt;span class="m"&gt;07&lt;/span&gt;:58:38 &lt;span class="m"&gt;2018&lt;/span&gt;, Load Address: 0x41508000, Entry Point: 0x41508000, Header CRC: 0x81013485, Data CRC: 0xDEA9B00E
 &lt;/pre&gt;&lt;/div&gt;
 
 
+&lt;p&gt;In current firmware, kernel partition size is 2228224 bytes. So the new kernel image cannot be larger.&lt;/p&gt;
 &lt;p&gt;We copy that image to a USB drive and then, &lt;strong&gt;from the telnet shell&lt;/strong&gt;, we overwrite original kernel with the new image :&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;root@R7800:/# dd &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/mnt/sda1/uImage &lt;span class="nv"&gt;of&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/dev/mtd5
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;root@R7800:/# dd &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/mnt/sda1/uImage &lt;span class="nv"&gt;of&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/dev/mtdblock5
 root@R7800:/# sync
 root@R7800:/# reboot
 &lt;/pre&gt;&lt;/div&gt;
@@ -186,13 +187,20 @@ And stock firmware includes the OpenWrt package manager &lt;strong&gt;opkg&lt;/s
 
 
 &lt;p&gt;Then, we can install &lt;em&gt;motion&lt;/em&gt; &amp;amp; &lt;em&gt;libjpeg&lt;/em&gt; packages :&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;root@R7800:/# opkg install http://downloads.openwrt.org/chaos_calmer/15.05-rc3/ipq806x/generic/packages/packages/libjpeg_9a-1_ipq806x.ipk
-Downloading http://downloads.openwrt.org/chaos_calmer/15.05-rc3/ipq806x/generic/packages/packages/libjpeg_9a-1_ipq806x.ipk.
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;root@R7800:~# curl -k https://raw.githubusercontent.com/frederic/netgear-R7800-GPL/master/ipk/libjpeg_9a-1_ipq806x.ipk -o /tmp/libjpeg_9a-1_ipq806x.ipk
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+&lt;span class="m"&gt;100&lt;/span&gt; &lt;span class="m"&gt;92994&lt;/span&gt;  &lt;span class="m"&gt;100&lt;/span&gt; &lt;span class="m"&gt;92994&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;   259k      &lt;span class="m"&gt;0&lt;/span&gt; --:--:-- --:--:-- --:--:--  430k
+root@R7800:~# opkg install /tmp/libjpeg_9a-1_ipq806x.ipk 
 Installing libjpeg &lt;span class="o"&gt;(&lt;/span&gt;9a-1&lt;span class="o"&gt;)&lt;/span&gt; to root...
 Configuring libjpeg.
 
-root@R7800:/# opkg install http://downloads.openwrt.org/chaos_calmer/15.05-rc3/ipq806x/generic/packages/packages/motion_3.4.0-20141018-9479d910f2149b5558788bb86f97f26522794212-1_ipq806x.ipk
-Downloading http://downloads.openwrt.org/chaos_calmer/15.05-rc3/ipq806x/generic/packages/packages/motion_3.4.0-20141018-9479d910f2149b5558788bb86f97f26522794212-1_ipq806x.ipk.
+
+root@R7800:~# curl -k https://raw.githubusercontent.com/frederic/netgear-R7800-GPL/master/ipk/motion_3.4.0-20141018-9479d910f2149b5558788bb86f97f26522794212-1_ipq806x.ipk -o /tmp/motion_3.4.0-20141018-9479d910f2149b5558788bb86f97f26522794212-1_ipq806x.ipk
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+&lt;span class="m"&gt;100&lt;/span&gt; &lt;span class="m"&gt;94802&lt;/span&gt;  &lt;span class="m"&gt;100&lt;/span&gt; &lt;span class="m"&gt;94802&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;   297k      &lt;span class="m"&gt;0&lt;/span&gt; --:--:-- --:--:-- --:--:--  387k
+root@R7800:~# opkg install /tmp/motion_3.4.0-20141018-9479d910f2149b5558788bb86f97f26522794212-1_ipq806x.ipk
 Installing motion &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;.4.0-20141018-9479d910f2149b5558788bb86f97f26522794212-1&lt;span class="o"&gt;)&lt;/span&gt; to root...
 Configuring motion.
 &lt;/pre&gt;&lt;/div&gt;

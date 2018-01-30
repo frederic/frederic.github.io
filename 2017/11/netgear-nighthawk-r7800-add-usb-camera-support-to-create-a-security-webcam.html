@@ -166,7 +166,7 @@ MMMM$ ,MMMMM  MMMMM  MMMM    MMM       MMMM   MMMMM   MMMM    MMMM
 root@R7800:/# cat /proc/mtd <span class="p">|</span> grep kernel
 mtd5: <span class="m">00220000</span> <span class="m">00020000</span> <span class="s2">&quot;kernel&quot;</span>
 
-root@R7800:/# dd <span class="k">if</span><span class="o">=</span>/dev/mtd5 <span class="nv">of</span><span class="o">=</span>/mnt/sda1/kernel.img
+root@R7800:/# dd <span class="k">if</span><span class="o">=</span>/dev/mtdblock5 <span class="nv">of</span><span class="o">=</span>/mnt/sda1/kernel.img
 <span class="m">4352</span>+0 records in
 <span class="m">4352</span>+0 records out
 </pre></div>
@@ -237,9 +237,9 @@ CONFIG_V4L_USB_DRIVERS=y
   Kernel: arch/arm/boot/zImage is ready
   UIMAGE  arch/arm/boot/uImage
 Image Name:   Linux-3.4.103
-Created:      Mon Nov <span class="m">13</span> <span class="m">23</span>:20:31 <span class="m">2017</span>
+Created:      Mon Jan <span class="m">29</span> <span class="m">23</span>:58:38 <span class="m">2018</span>
 Image Type:   ARM Linux Kernel Image <span class="o">(</span>uncompressed<span class="o">)</span>
-Data Size:    <span class="m">2237008</span> <span class="nv">Bytes</span> <span class="o">=</span> <span class="m">2184</span>.58 <span class="nv">kB</span> <span class="o">=</span> <span class="m">2</span>.13 MB
+Data Size:    <span class="m">2210952</span> <span class="nv">Bytes</span> <span class="o">=</span> <span class="m">2159</span>.13 <span class="nv">kB</span> <span class="o">=</span> <span class="m">2</span>.11 MB
 Load Address: <span class="m">41508000</span>
 Entry Point:  <span class="m">41508000</span>
   Image arch/arm/boot/uImage is ready
@@ -248,12 +248,13 @@ Entry Point:  <span class="m">41508000</span>
 
 <p>Output kernel image is <strong>arch/arm/boot/uImage</strong></p>
 <div class="highlight"><pre><span></span>$ file arch/arm/boot/uImage
-arch/arm/boot/uImage: u-boot legacy uImage, Linux-3.4.103, Linux/ARM, OS Kernel Image <span class="o">(</span>Not compressed<span class="o">)</span>, <span class="m">2237008</span> bytes, Tue Nov <span class="m">14</span> <span class="m">07</span>:20:31 <span class="m">2017</span>, Load Address: 0x41508000, Entry Point: 0x41508000, Header CRC: 0xF8A5433E, Data CRC: 0x6C79765B
+arch/arm/boot/uImage: u-boot legacy uImage, Linux-3.4.103, Linux/ARM, OS Kernel Image <span class="o">(</span>Not compressed<span class="o">)</span>, <span class="m">2210952</span> bytes, Tue Jan <span class="m">30</span> <span class="m">07</span>:58:38 <span class="m">2018</span>, Load Address: 0x41508000, Entry Point: 0x41508000, Header CRC: 0x81013485, Data CRC: 0xDEA9B00E
 </pre></div>
 
 
+<p>In current firmware, kernel partition size is 2228224 bytes. So the new kernel image cannot be larger.</p>
 <p>We copy that image to a USB drive and then, <strong>from the telnet shell</strong>, we overwrite original kernel with the new image :</p>
-<div class="highlight"><pre><span></span>root@R7800:/# dd <span class="k">if</span><span class="o">=</span>/mnt/sda1/uImage <span class="nv">of</span><span class="o">=</span>/dev/mtd5
+<div class="highlight"><pre><span></span>root@R7800:/# dd <span class="k">if</span><span class="o">=</span>/mnt/sda1/uImage <span class="nv">of</span><span class="o">=</span>/dev/mtdblock5
 root@R7800:/# sync
 root@R7800:/# reboot
 </pre></div>
@@ -284,13 +285,20 @@ And stock firmware includes the OpenWrt package manager <strong>opkg</strong>.</
 
 
 <p>Then, we can install <em>motion</em> &amp; <em>libjpeg</em> packages :</p>
-<div class="highlight"><pre><span></span>root@R7800:/# opkg install http://downloads.openwrt.org/chaos_calmer/15.05-rc3/ipq806x/generic/packages/packages/libjpeg_9a-1_ipq806x.ipk
-Downloading http://downloads.openwrt.org/chaos_calmer/15.05-rc3/ipq806x/generic/packages/packages/libjpeg_9a-1_ipq806x.ipk.
+<div class="highlight"><pre><span></span>root@R7800:~# curl -k https://raw.githubusercontent.com/frederic/netgear-R7800-GPL/master/ipk/libjpeg_9a-1_ipq806x.ipk -o /tmp/libjpeg_9a-1_ipq806x.ipk
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+<span class="m">100</span> <span class="m">92994</span>  <span class="m">100</span> <span class="m">92994</span>    <span class="m">0</span>     <span class="m">0</span>   259k      <span class="m">0</span> --:--:-- --:--:-- --:--:--  430k
+root@R7800:~# opkg install /tmp/libjpeg_9a-1_ipq806x.ipk 
 Installing libjpeg <span class="o">(</span>9a-1<span class="o">)</span> to root...
 Configuring libjpeg.
 
-root@R7800:/# opkg install http://downloads.openwrt.org/chaos_calmer/15.05-rc3/ipq806x/generic/packages/packages/motion_3.4.0-20141018-9479d910f2149b5558788bb86f97f26522794212-1_ipq806x.ipk
-Downloading http://downloads.openwrt.org/chaos_calmer/15.05-rc3/ipq806x/generic/packages/packages/motion_3.4.0-20141018-9479d910f2149b5558788bb86f97f26522794212-1_ipq806x.ipk.
+
+root@R7800:~# curl -k https://raw.githubusercontent.com/frederic/netgear-R7800-GPL/master/ipk/motion_3.4.0-20141018-9479d910f2149b5558788bb86f97f26522794212-1_ipq806x.ipk -o /tmp/motion_3.4.0-20141018-9479d910f2149b5558788bb86f97f26522794212-1_ipq806x.ipk
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+<span class="m">100</span> <span class="m">94802</span>  <span class="m">100</span> <span class="m">94802</span>    <span class="m">0</span>     <span class="m">0</span>   297k      <span class="m">0</span> --:--:-- --:--:-- --:--:--  387k
+root@R7800:~# opkg install /tmp/motion_3.4.0-20141018-9479d910f2149b5558788bb86f97f26522794212-1_ipq806x.ipk
 Installing motion <span class="o">(</span><span class="m">3</span>.4.0-20141018-9479d910f2149b5558788bb86f97f26522794212-1<span class="o">)</span> to root...
 Configuring motion.
 </pre></div>
