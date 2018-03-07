@@ -1,5 +1,295 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>fred's notes</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2017-11-22T00:00:00-08:00</updated><entry><title>Netgear Nighthawk R7800 : add USB camera support to create a security webcam</title><link href="/2017/11/netgear-nighthawk-r7800-add-usb-camera-support-to-create-a-security-webcam.html" rel="alternate"></link><published>2017-11-22T00:00:00-08:00</published><updated>2017-11-22T00:00:00-08:00</updated><author><name>Frédéric</name></author><id>tag:None,2017-11-22:/2017/11/netgear-nighthawk-r7800-add-usb-camera-support-to-create-a-security-webcam.html</id><summary type="html">&lt;p&gt;This article explains how to customize Nighthawk X4S firmware to add a security camera feature to this always-online &amp;amp; almost-always-idle device.
+<feed xmlns="http://www.w3.org/2005/Atom"><title>fred's notes</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2018-03-07T00:00:00-08:00</updated><entry><title>Emulating Exynos 4210 BootROM in QEMU</title><link href="/2018/03/emulating-exynos-4210-bootrom-in-qemu.html" rel="alternate"></link><published>2018-03-07T00:00:00-08:00</published><updated>2018-03-07T00:00:00-08:00</updated><author><name>Frédéric</name></author><id>tag:None,2018-03-07:/2018/03/emulating-exynos-4210-bootrom-in-qemu.html</id><summary type="html">&lt;p&gt;&lt;a href="https://www.qemu.org/"&gt;QEMU&lt;/a&gt; has support for the SMDKC210 machine, an ARM board based on Exynos 4210 SoC.
+Peripherals implemented in QEMU for this machine are &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/char/exynos4210_uart.c"&gt;UART&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/sd/sdhci.c"&gt;SDHCI&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/display/exynos4210_fimd.c"&gt;FIMD&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/i2c/exynos4210_i2c.c"&gt;I2C&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/intc/exynos4210_combiner.c"&gt;Interrupt Combiner&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/intc/exynos4210_gic.c"&gt;GIC&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/misc/exynos4210_clk.c"&gt;Clock&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/misc/exynos4210_pmu.c"&gt;PMU&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/misc/exynos4210_rng.c"&gt;RNG&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/timer/exynos4210_mct.c"&gt;MCT&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/timer/exynos4210_pwm.c"&gt;PWM&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/timer/exynos4210_rtc.c"&gt;RTC&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://www.gsmarena.com/samsung_i9100_galaxy_s_ii-3621.php"&gt;Samsung Galaxy S2&lt;/a&gt; phone is also based on Exynos 4210, so it should be …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="https://www.qemu.org/"&gt;QEMU&lt;/a&gt; has support for the SMDKC210 machine, an ARM board based on Exynos 4210 SoC.
+Peripherals implemented in QEMU for this machine are &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/char/exynos4210_uart.c"&gt;UART&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/sd/sdhci.c"&gt;SDHCI&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/display/exynos4210_fimd.c"&gt;FIMD&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/i2c/exynos4210_i2c.c"&gt;I2C&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/intc/exynos4210_combiner.c"&gt;Interrupt Combiner&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/intc/exynos4210_gic.c"&gt;GIC&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/misc/exynos4210_clk.c"&gt;Clock&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/misc/exynos4210_pmu.c"&gt;PMU&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/misc/exynos4210_rng.c"&gt;RNG&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/timer/exynos4210_mct.c"&gt;MCT&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/timer/exynos4210_pwm.c"&gt;PWM&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/timer/exynos4210_rtc.c"&gt;RTC&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://www.gsmarena.com/samsung_i9100_galaxy_s_ii-3621.php"&gt;Samsung Galaxy S2&lt;/a&gt; phone is also based on Exynos 4210, so it should be &lt;strong&gt;&lt;em&gt;relatively&lt;/em&gt;&lt;/strong&gt; easy to emulate its BootROM in QEMU.&lt;/p&gt;
+&lt;p&gt;This article describes how to extract BootROM (and associated fuses) from Galaxy S2 phone, implement additional required peripherals in QEMU (like the hardware cryptographic engine), and debug inevitable issues. Source code has been published on &lt;a href="https://github.com/frederic/qemu-exynos-bootrom"&gt;GitHub&lt;/a&gt;. We'll also take advantage of the dynamic debugging capability offered by QEMU to have a quick look at secure boot implementation.&lt;/p&gt;
+&lt;h1&gt;Documentation&lt;/h1&gt;
+&lt;p&gt;&lt;img alt="Exynos 4 Dual 45nm" src="/blog/qemu-exynos4210/exynos_4210_features.jpg" width="700px"&gt;&lt;/p&gt;
+&lt;p&gt;Samsung has released &lt;a href="http://www.samsung.com/global/business/semiconductor/file/product/Exynos_4_Dual_45nm_User_Manaul_Public_REV1.00-0.pdf"&gt;a (partial) datasheet&lt;/a&gt;.
+It includes the following memory map :&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Memory Map" src="/blog/qemu-exynos4210/exynos_4210_memmap.png"&gt;&lt;/p&gt;
+&lt;p&gt;Another significant ressource is the &lt;a href="https://github.com/pngcui/uboot-2017.07-iTop4412"&gt;U-Boot source code&lt;/a&gt; for development boards (like &lt;a href="http://www.hardkernel.com/main/products/prdt_info.php?g_code=G133999328931"&gt;ODROID X&lt;/a&gt;) based on same processor. It contains interesting technical information on hardware peripherals (like addresses, registers, values).&lt;/p&gt;
+&lt;p&gt;Finally, hacker &lt;a href="https://forum.xda-developers.com/showthread.php?t=1986887"&gt;community&lt;/a&gt; has &lt;a href="https://forum.xda-developers.com/showthread.php?t=1274999"&gt;contributed&lt;/a&gt; a &lt;a href="https://forum.xda-developers.com/showthread.php?t=1313588"&gt;lot&lt;/a&gt; over the past years.&lt;/p&gt;
+&lt;h1&gt;Dump all the things&lt;/h1&gt;
+&lt;p&gt;First of all, we have to extract the BootROM we want to emulate from the Exynos 4210 SoC. We will also extract fuses data and first bootloader (from flash memory) as they are required to complete execution of BootROM.&lt;/p&gt;
+&lt;p&gt;We use a Galaxy S2 phone, with ADB access and root privileges thanks to &lt;a href="https://github.com/timwr/CVE-2013-6282"&gt;CVE-2013-6282 exploit&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;Dump bootloader&lt;/h2&gt;
+&lt;p&gt;The bootloader stored on flash memory is loaded, authenticated (eventually), and executed by BootROM.
+Accessible through the &lt;strong&gt;mmcblk0boot0&lt;/strong&gt; device file, we dump it using builtin &lt;strong&gt;dd&lt;/strong&gt; command :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# dd if=/dev/block/mmcblk0boot0 of=./mmc_boot.img seek=1 bs=512&lt;/span&gt;
+&lt;span class="m"&gt;1024&lt;/span&gt;+0 records in
+&lt;span class="m"&gt;1024&lt;/span&gt;+0 records out
+&lt;span class="m"&gt;524288&lt;/span&gt; bytes transferred in &lt;span class="m"&gt;0&lt;/span&gt;.091 secs &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="m"&gt;5761406&lt;/span&gt; bytes/sec&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We generate an entropy graph of dumped data using &lt;a href="https://github.com/ReFirmLabs/binwalk"&gt;binwalk tool&lt;/a&gt; :&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Entropy of bootloader image" src="/blog/qemu-exynos4210/exynos_4210_bootloader_entropy.png"&gt;&lt;/p&gt;
+&lt;p&gt;The first part with high entropy (almost E=1) is the encrypted FWBL1 image, the next stage to execute after BootROM.&lt;/p&gt;
+&lt;h2&gt;Dump BootROM&lt;/h2&gt;
+&lt;p&gt;Memory map indicates that BootROM, also called iROM, is mapped at address &lt;strong&gt;0x0000_0000&lt;/strong&gt;.
+On this device, stock Android kernel is compiled with &lt;strong&gt;&lt;em&gt;/dev/mem&lt;/em&gt;&lt;/strong&gt; support, so we can directly use the simple &lt;a href="https://github.com/Vee7-Cyanogenmod13/device_lge_l7II/tree/cm-13.0/viewmem"&gt;viewmem tool&lt;/a&gt; to dump BootROM (yeah, chipset from 2011).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# ./viewmem 0x00000000 0x10000 &amp;gt; ./bootrom.bin       &lt;/span&gt;
+&lt;span class="o"&gt;[&lt;/span&gt;INFO&lt;span class="o"&gt;]&lt;/span&gt; Reading &lt;span class="m"&gt;65536&lt;/span&gt; bytes at 0x0...
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Dump fuses&lt;/h2&gt;
+&lt;p&gt;Fuses a.k.a. One-Time Programmable (OTP) memory usually contain important information for security, like boot settings, cryptographic keys or hashes.
+According to datasheet, fuses are in the &lt;strong&gt;SECKEY&lt;/strong&gt; area at address &lt;strong&gt;0x10100000&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;However in this case, &lt;a href="https://github.com/Vee7-Cyanogenmod13/device_lge_l7II/tree/cm-13.0/viewmem"&gt;viewmem tool&lt;/a&gt; fails to read data directly.
+The cause of this issue is explained in &lt;a href="https://redmine.replicant.us/projects/replicant/wiki/NexusSI902xBootloader"&gt;another research&lt;/a&gt; for a similar processor.
+We learn that accessing &lt;strong&gt;SECKEY&lt;/strong&gt; requires to enable the specific hardware clock &lt;strong&gt;CLK_SECKEY&lt;/strong&gt; (bit 12 of &lt;strong&gt;CLK_GATE_IP_PERIR&lt;/strong&gt; register).&lt;/p&gt;
+&lt;p&gt;The solution is to build a modified kernel to enable that clock at boot.&lt;/p&gt;
+&lt;p&gt;Samsung has released the &lt;a href="http://opensource.samsung.com/reception/receptionSub.do?method=sub&amp;amp;sub=F&amp;amp;searchValue=sph-d710"&gt;kernel source code&lt;/a&gt;, however initramfs is missing to generate a fully fonctional kernel image. So we dump the original kernel partition (like we did for bootloader partition) and &lt;a href="https://github.com/davidmroth/Extract-Kernel-Initramfs"&gt;extract&lt;/a&gt; initramfs archive. We can then append extracted initramfs to our custom kernel by setting &lt;strong&gt;&lt;em&gt;CONFIG_INITRAMFS_DIRECTORY&lt;/em&gt;&lt;/strong&gt; option in kernel configuration.&lt;/p&gt;
+&lt;p&gt;We apply the following kernel patch to enable &lt;strong&gt;CLK_SECKEY&lt;/strong&gt; clock at boot :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gd"&gt;--- a/arch/arm/mach-exynos/clock-exynos4.c  2013-02-21 05:23:03.000000000 -0800&lt;/span&gt;
+&lt;span class="gi"&gt;+++ b/arch/arm/mach-exynos/clock-exynos4.c  2018-02-25 00:11:03.817693249 -0800&lt;/span&gt;
+&lt;span class="gu"&gt;@@ -1352,11 +1352,11 @@&lt;/span&gt;
+
+ static struct clk exynos4_init_clocks[] = {
+    {
+&lt;span class="gd"&gt;-#ifndef CONFIG_CPU_EXYNOS4210&lt;/span&gt;
+        .name       = &amp;quot;seckey&amp;quot;,
+        .enable     = exynos4_clk_ip_perir_ctrl,
+        .ctrlbit    = (1 &amp;lt;&amp;lt; 12),
+    }, {
+&lt;span class="gi"&gt;+#ifndef CONFIG_CPU_EXYNOS4210&lt;/span&gt;
+        .name       = &amp;quot;tzpc&amp;quot;,
+        .devname    = &amp;quot;exnos4-tzpc.5&amp;quot;,
+        .enable     = exynos4_clk_ip_perir_ctrl,
+&lt;span class="gu"&gt;@@ -2386,6 +2386,17 @@&lt;/span&gt;
+
+    for (ptr = 0; ptr &amp;lt; ARRAY_SIZE(exynos4_clksrcs); ptr++)
+        s3c_set_clksrc(&amp;amp;exynos4_clksrcs[ptr], true);
+&lt;span class="gi"&gt;+&lt;/span&gt;
+&lt;span class="gi"&gt;+   printk(KERN_INFO &amp;quot;%s: Looking for seckey clock...\n&amp;quot;, __func__);&lt;/span&gt;
+&lt;span class="gi"&gt;+   for (ptr = 0; ptr &amp;lt; ARRAY_SIZE(exynos4_init_clocks); ptr++) {&lt;/span&gt;
+&lt;span class="gi"&gt;+       if (exynos4_init_clocks[ptr].name == NULL)&lt;/span&gt;
+&lt;span class="gi"&gt;+           break;&lt;/span&gt;
+&lt;span class="gi"&gt;+&lt;/span&gt;
+&lt;span class="gi"&gt;+       if (strcmp(&amp;quot;seckey&amp;quot;, exynos4_init_clocks[ptr].name) == 0) {&lt;/span&gt;
+&lt;span class="gi"&gt;+           printk(KERN_INFO &amp;quot;%s: Enabling seckey clock\n&amp;quot;, __func__);&lt;/span&gt;
+&lt;span class="gi"&gt;+           clk_enable(&amp;amp;exynos4_init_clocks[ptr]);&lt;/span&gt;
+&lt;span class="gi"&gt;+       }&lt;/span&gt;
+&lt;span class="gi"&gt;+   }&lt;/span&gt;
+ }
+
+ static struct clk *exynos4_clks[] __initdata = {
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;After flashing and booting this custom kernel on Galasy S2 device, we can dump fuses data with &lt;a href="https://github.com/Vee7-Cyanogenmod13/device_lge_l7II/tree/cm-13.0/viewmem"&gt;viewmem tool&lt;/a&gt;, like we did for BootROM :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# ./viewmem 0x10100000 0x100 &amp;gt; ./fuses.bin           &lt;/span&gt;
+&lt;span class="o"&gt;[&lt;/span&gt;INFO&lt;span class="o"&gt;]&lt;/span&gt; Reading &lt;span class="m"&gt;256&lt;/span&gt; bytes at 0x10100000...
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h1&gt;Debugging&lt;/h1&gt;
+&lt;p&gt;We have the BootROM, fuses data, and the first bootloader from flash memory.
+However, we should not expect it to run properly on the first try.&lt;/p&gt;
+&lt;p&gt;The following QEMU features were used to debug issues and develop new QEMU peripherals :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://git.qemu.org/?p=qemu.git;a=blob_plain;f=docs/devel/tracing.txt;hb=HEAD"&gt;Trace events&lt;/a&gt; : output debug log when specific instructions are hit.&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://wiki.qemu.org/Documentation/Debugging"&gt;GDB stub&lt;/a&gt; : attach your favorite debugger i.e. GDB or IDA.&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://en.wikibooks.org/wiki/QEMU/Monitor"&gt;Monitor console&lt;/a&gt; : interact with QEMU while guest is running, for example to enable specific trace events.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Most issues are related to peripherals and will cause QEMU to hang (e.g. infinite loop due to polling of non-implemented hardware register).&lt;/p&gt;
+&lt;h1&gt;QEMU changes&lt;/h1&gt;
+&lt;p&gt;Despite the number of peripherals implemented for this SoC, some are still missing to complete execution of BootROM with success.
+Following sections describe the main changes made in &lt;a href="https://github.com/frederic/qemu-exynos-bootrom"&gt;QEMU source tree&lt;/a&gt; for this project. New peripherals are heavily based on existing ones in upstream QEMU project.&lt;/p&gt;
+&lt;h2&gt;Add BootROM loading support&lt;/h2&gt;
+&lt;p&gt;For this machine, QEMU is supposed to run U-Boot bootloader or Linux kernel directly. By default, only a &lt;a href="https://github.com/qemu/qemu/blob/master/hw/arm/exynos4210.c#L128"&gt;small &amp;amp; minimal bootloader&lt;/a&gt; is loaded in secondary CPUs, which is not relevant for this project.&lt;/p&gt;
+&lt;p&gt;In order to load BootROM in memory before starting the machine, we take advantage of the existing BIOS loading feature in QEMU.&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/frederic/qemu-exynos-bootrom/commit/23ce5e32774a2ae834e3ed99dd2d26a1be5a2d8a"&gt;With this change&lt;/a&gt;, BootROM image file can now be loaded in memory thanks to &lt;strong&gt;-bios&lt;/strong&gt; parameter. It will be executed directly when emulated machine is reset.&lt;/p&gt;
+&lt;h2&gt;One-Time Programmable (OTP) memory emulation&lt;/h2&gt;
+&lt;p&gt;One-Time Programmable (OTP) memory is a MMIO peripheral used to store device-specific data. Read operations can be performed with simple load instructions, but write operations (or fusing) are usually more complex.&lt;/p&gt;
+&lt;p&gt;For this project, OTP peripheral is &lt;a href="https://github.com/frederic/qemu-exynos-bootrom/commit/70c8b2088c6e24d7863609a2368e3591859a114d"&gt;implemented as a simple read-only memory&lt;/a&gt;, initialized with fuses data dumped from Galaxy S2 device. Write operations are not supported.&lt;/p&gt;
+&lt;p&gt;When BootROM is executed, QEMU debug log provides detailed information on OTP data accessed.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;First OTP access is a read operation on area 0x18-0x2C. Based on static analysis, BootROM checks these fuses are provisioned (not null) :&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_otp_read&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;66&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;Read&lt;/span&gt; &lt;span class="n"&gt;OTP&lt;/span&gt; &lt;span class="mh"&gt;@0x18&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x4&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_otp_read&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;66&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;Read&lt;/span&gt; &lt;span class="n"&gt;OTP&lt;/span&gt; &lt;span class="mh"&gt;@0x1c&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x4&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_otp_read&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;66&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;Read&lt;/span&gt; &lt;span class="n"&gt;OTP&lt;/span&gt; &lt;span class="mh"&gt;@0x20&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x4&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_otp_read&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;66&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;Read&lt;/span&gt; &lt;span class="n"&gt;OTP&lt;/span&gt; &lt;span class="mh"&gt;@0x24&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x4&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_otp_read&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;66&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;Read&lt;/span&gt; &lt;span class="n"&gt;OTP&lt;/span&gt; &lt;span class="mh"&gt;@0x28&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x4&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;Same area 0x18-0x2C (20 bytes) is read a second time to derive HMAC-SHA1 key (to authenticate next bootloader) :&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_otp_read&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;66&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;Read&lt;/span&gt; &lt;span class="n"&gt;OTP&lt;/span&gt; &lt;span class="mh"&gt;@0x18&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_otp_read&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;66&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;Read&lt;/span&gt; &lt;span class="n"&gt;OTP&lt;/span&gt; &lt;span class="mh"&gt;@0x19&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;[...]&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_otp_read&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;66&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;Read&lt;/span&gt; &lt;span class="n"&gt;OTP&lt;/span&gt; &lt;span class="mh"&gt;@0x2a&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_otp_read&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;66&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;Read&lt;/span&gt; &lt;span class="n"&gt;OTP&lt;/span&gt; &lt;span class="mh"&gt;@0x2b&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;The area is read a third time, but only first 16 bytes, to derive AES-CBC-128 key (to decrypt next bootloader) :&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_otp_read&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;66&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;Read&lt;/span&gt; &lt;span class="n"&gt;OTP&lt;/span&gt; &lt;span class="mh"&gt;@0x18&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_otp_read&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;66&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;Read&lt;/span&gt; &lt;span class="n"&gt;OTP&lt;/span&gt; &lt;span class="mh"&gt;@0x19&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;[...]&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_otp_read&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;66&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;Read&lt;/span&gt; &lt;span class="n"&gt;OTP&lt;/span&gt; &lt;span class="mh"&gt;@0x26&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_otp_read&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;66&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;Read&lt;/span&gt; &lt;span class="n"&gt;OTP&lt;/span&gt; &lt;span class="mh"&gt;@0x27&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mh"&gt;0x1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Advanced Crypto Engine (ACE) emulation&lt;/h2&gt;
+&lt;p&gt;Advanced Crypto Engine (ACE) peripheral performs hardware-accelerated cryptographic operations. ACE interface, composed of many Special Function Registers (SFR), is way more complex than the OTP one.
+Fortunately, these SFR are &lt;a href="https://github.com/exynos4-sdk/uboot/blob/master/arch/arm/include/asm/arch-exynos/ace_sfr.h"&gt;documented in U-Boot source code&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Again, &lt;a href="https://github.com/frederic/qemu-exynos-bootrom/commit/4deef8737da3a683bc858e91eba5a588a2879b0a"&gt;our implementation&lt;/a&gt; is limited to features actually used by BootROM : only AES-CBC-128 operations are supported.&lt;/p&gt;
+&lt;p&gt;When BootROM is executed, QEMU debug log details how ACE peripheral is used :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Set AES key, IV, and other parameters (&lt;strong&gt;ACE_AES_CONTROL&lt;/strong&gt; register) :&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_ace_write&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;338&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;ACE_AES_CONTROL&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mh"&gt;0x0200&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="mh"&gt;0x0e8b&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_ace_write&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;338&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;ACE_AES_KEY5&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mh"&gt;0x0290&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="mh"&gt;0xebc4ad63&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_ace_write&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;338&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;ACE_AES_KEY6&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mh"&gt;0x0294&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="mh"&gt;0x27239f1a&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_ace_write&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;338&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;ACE_AES_KEY7&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mh"&gt;0x0298&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="mh"&gt;0x230ce305&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_ace_write&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;338&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;ACE_AES_KEY8&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mh"&gt;0x029c&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="mh"&gt;0xcaad75d2&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_ace_write&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;338&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;ACE_AES_IV1&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mh"&gt;0x0230&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="mh"&gt;0xee1c2939&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_ace_write&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;338&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;ACE_AES_IV2&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mh"&gt;0x0234&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="mh"&gt;0x6be93160&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_ace_write&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;338&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;ACE_AES_IV3&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mh"&gt;0x0238&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="mh"&gt;0xd8bbf993&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_ace_write&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;338&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;ACE_AES_IV4&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mh"&gt;0x023c&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="mh"&gt;0x29b98fe8&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_ace_read&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;315&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;ACE_FC_INTPEND&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mh"&gt;0x000c&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="mh"&gt;0x0000&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_ace_FCINTPEND&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;227&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;QEMU&lt;/span&gt; &lt;span class="nl"&gt;ACE&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;FCINTPEND&lt;/span&gt; &lt;span class="n"&gt;triggered&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;Set input &amp;amp; output buffer addresses (0x2021410), set buffer size (0x1bf0), and poll decryption process status (&lt;strong&gt;ACE_FC_INTPEND&lt;/strong&gt; register):&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_ace_write&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;338&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;ACE_FC_BRDMAS&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mh"&gt;0x0020&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="mh"&gt;0x2021410&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_ace_write&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;338&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;ACE_FC_BTDMAS&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mh"&gt;0x0030&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="mh"&gt;0x2021410&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_ace_write&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;338&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;ACE_FC_BTDMAL&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mh"&gt;0x0034&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="mh"&gt;0x1bf0&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_ace_write&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;338&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;ACE_FC_BRDMAL&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mh"&gt;0x0024&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="mh"&gt;0x1bf0&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_ace_read&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;315&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;ACE_FC_INTPEND&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mh"&gt;0x000c&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="mh"&gt;0x0000&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_ace_FCINTPEND&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;227&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;QEMU&lt;/span&gt; &lt;span class="nl"&gt;ACE&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;FCINTPEND&lt;/span&gt; &lt;span class="n"&gt;triggered&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_ace_FCINTPEND&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;235&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;QEMU&lt;/span&gt; &lt;span class="nl"&gt;ACE&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;AES_control&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mh"&gt;0xe8b&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;FCBRDMAS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mh"&gt;0x2021410&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;FCBRDMAS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mh"&gt;0x1bf0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;FCBRDMAS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mh"&gt;0x2021410&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;FCBRDMAS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mh"&gt;0x1bf0&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nl"&gt;exynos4210_ace_write&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;338&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;   &lt;span class="n"&gt;ACE_FC_INTPEND&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mh"&gt;0x000c&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="mh"&gt;0x0004&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The log shows that 0x1bf0 bytes of data at address 0x2021410 are decrypted (&lt;strong&gt;ACE_AES_CONTROL[0]&lt;/strong&gt; bit) using AES-CBC mode (&lt;strong&gt;ACE_AES_CONTROL[2:1]&lt;/strong&gt; bits).&lt;/p&gt;
+&lt;h2&gt;Minor fixes in SD/MMC Host controller&lt;/h2&gt;
+&lt;p&gt;SD controller emulation is already fully supported by QEMU, however few minor differences causes BootROM to hang.&lt;/p&gt;
+&lt;p&gt;First issue occurs when BootROM sends initialization command ACMD41 (SD_APP_OP_COND) multiple times. QEMU SD-card emulator only replies to the first attempt. &lt;a href="https://github.com/frederic/qemu-exynos-bootrom/commit/6f045949ee2fdec6248a8e438a38c212c2896927"&gt;Our patch&lt;/a&gt; ensures that SD-card always replies, even when SD-card state is already ready.&lt;/p&gt;
+&lt;p&gt;Second issue is the lack of support for &lt;strong&gt;&lt;em&gt;SD Clock Enable&lt;/em&gt;&lt;/strong&gt; register in &lt;a href="https://www.sdcard.org/jp/developers/overview/host_controller/simple_spec/Simplified_SD_Host_Controller_Spec.pdf"&gt;Clock Control Register&lt;/a&gt;.
+&lt;a href="https://github.com/frederic/qemu-exynos-bootrom/commit/9be5c9f2253dbc04ee690365f9e81eb1fbc00ee0"&gt;The patch&lt;/a&gt; implements it like defined in the &lt;a href="https://lists.gnu.org/archive/html/qemu-devel/2011-12/msg01271.html"&gt;original contribution&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Thanks to these changes, BootROM can perform SD operations. QEMU debug log shows that 0x2000 bytes are read at offset 0x200 :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;SD&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sd_blk_read&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x00000200&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;len&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;512&lt;/span&gt;
+&lt;span class="n"&gt;SD&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sd_blk_read&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x00000400&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;len&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;512&lt;/span&gt;
+&lt;span class="n"&gt;SD&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sd_blk_read&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x00000600&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;len&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;512&lt;/span&gt;
+&lt;span class="n"&gt;SD&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sd_blk_read&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x00000800&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;len&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;512&lt;/span&gt;
+&lt;span class="n"&gt;SD&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sd_blk_read&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x00000a00&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;len&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;512&lt;/span&gt;
+&lt;span class="n"&gt;SD&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sd_blk_read&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x00000c00&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;len&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;512&lt;/span&gt;
+&lt;span class="n"&gt;SD&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sd_blk_read&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x00000e00&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;len&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;512&lt;/span&gt;
+&lt;span class="n"&gt;SD&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sd_blk_read&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x00001000&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;len&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;512&lt;/span&gt;
+&lt;span class="n"&gt;SD&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sd_blk_read&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x00001200&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;len&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;512&lt;/span&gt;
+&lt;span class="n"&gt;SD&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sd_blk_read&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x00001400&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;len&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;512&lt;/span&gt;
+&lt;span class="n"&gt;SD&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sd_blk_read&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x00001600&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;len&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;512&lt;/span&gt;
+&lt;span class="n"&gt;SD&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sd_blk_read&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x00001800&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;len&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;512&lt;/span&gt;
+&lt;span class="n"&gt;SD&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sd_blk_read&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x00001a00&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;len&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;512&lt;/span&gt;
+&lt;span class="n"&gt;SD&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sd_blk_read&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x00001c00&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;len&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;512&lt;/span&gt;
+&lt;span class="n"&gt;SD&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sd_blk_read&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x00001e00&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;len&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;512&lt;/span&gt;
+&lt;span class="n"&gt;SD&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sd_blk_read&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x00002000&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;len&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;512&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;These read operations match with encrypted FWBL1 image in bootloader partition previously dumped.&lt;/p&gt;
+&lt;h1&gt;Executing BootROM in QEMU&lt;/h1&gt;
+&lt;p&gt;We compile our modified &lt;a href="https://github.com/frederic/qemu-exynos-bootrom"&gt;QEMU&lt;/a&gt; and run :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ qemu-system-arm -machine smdkc210 -cpu cortex-a9 -s -S -bios ./bootrom.bin  -sd ./mmc_boot.img
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;-machine : emulated machine&lt;/li&gt;
+&lt;li&gt;-s : Shorthand for -gdb tcp::1234&lt;/li&gt;
+&lt;li&gt;-S : Do not start CPU at startup&lt;/li&gt;
+&lt;li&gt;-bios : BootROM image file&lt;/li&gt;
+&lt;li&gt;-sd : SD-card image file (equivalent to internal eMMC memory). We specify the path of bootloader dumped previously.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;From static analysis, we know that main BootROM function ends by jumping to IRAM at address &lt;strong&gt;0x02021410&lt;/strong&gt;. We can also notice that AES decryption took place at the same address.
+We attach GDB and set a breakpoint to this address :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;Breakpoint&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mh"&gt;0x02021410&lt;/span&gt; &lt;span class="n"&gt;in&lt;/span&gt; &lt;span class="o"&gt;??&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;gdb&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;layout&lt;/span&gt; &lt;span class="k"&gt;asm&lt;/span&gt;
+&lt;span class="n"&gt;B&lt;/span&gt;&lt;span class="o"&gt;+&amp;gt;&lt;/span&gt; &lt;span class="mh"&gt;0x2021410&lt;/span&gt;       &lt;span class="n"&gt;b&lt;/span&gt;      &lt;span class="mh"&gt;0x2021434&lt;/span&gt;
+    &lt;span class="mh"&gt;0x2021414&lt;/span&gt;       &lt;span class="n"&gt;b&lt;/span&gt;      &lt;span class="mh"&gt;0x2021414&lt;/span&gt;
+    &lt;span class="mh"&gt;0x2021418&lt;/span&gt;       &lt;span class="n"&gt;b&lt;/span&gt;      &lt;span class="mh"&gt;0x2021418&lt;/span&gt;
+    &lt;span class="mh"&gt;0x202141c&lt;/span&gt;       &lt;span class="n"&gt;b&lt;/span&gt;      &lt;span class="mh"&gt;0x202141c&lt;/span&gt;
+    &lt;span class="mh"&gt;0x2021420&lt;/span&gt;       &lt;span class="n"&gt;b&lt;/span&gt;      &lt;span class="mh"&gt;0x2021420&lt;/span&gt;
+    &lt;span class="mh"&gt;0x2021424&lt;/span&gt;       &lt;span class="n"&gt;b&lt;/span&gt;      &lt;span class="mh"&gt;0x2021424&lt;/span&gt;
+    &lt;span class="mh"&gt;0x2021428&lt;/span&gt;       &lt;span class="n"&gt;b&lt;/span&gt;      &lt;span class="mh"&gt;0x2021428&lt;/span&gt;
+    &lt;span class="mh"&gt;0x202142c&lt;/span&gt;       &lt;span class="n"&gt;b&lt;/span&gt;      &lt;span class="mh"&gt;0x202142c&lt;/span&gt;
+    &lt;span class="mh"&gt;0x2021430&lt;/span&gt;       &lt;span class="n"&gt;b&lt;/span&gt;      &lt;span class="mh"&gt;0x2021430&lt;/span&gt;
+    &lt;span class="mh"&gt;0x2021434&lt;/span&gt;       &lt;span class="n"&gt;mrc&lt;/span&gt;    &lt;span class="mi"&gt;15&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;r0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;cr1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;cr0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;[...]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;GDB breaks at the exception vector table of decrypted FWBL1.&lt;/p&gt;
+&lt;p&gt;After resuming execution, QEMU debug log shows that FWBL1 reads 0x4000 bytes from address 0x2200 :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;SD&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sd_blk_read&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x00002200&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;len&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;512&lt;/span&gt;
+&lt;span class="n"&gt;SD&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sd_blk_read&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x00002400&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;len&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;512&lt;/span&gt;
+&lt;span class="o"&gt;[...]&lt;/span&gt;
+&lt;span class="n"&gt;SD&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sd_blk_read&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x00005e00&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;len&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;512&lt;/span&gt;
+&lt;span class="n"&gt;SD&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sd_blk_read&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x00006000&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;len&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;512&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;But that's another story since BootROM execution is already over.&lt;/p&gt;
+&lt;h1&gt;Secure boot analysis&lt;/h1&gt;
+&lt;p&gt;Secure boot process aims to assert the authenticity of all software components in boot chain.
+The first component in the chain is called root of trust, and in our case it's the BootROM. It loads, authenticates and decrypts the next component called FWBL1, stored in flash memory.&lt;/p&gt;
+&lt;p&gt;The footer of FWBL1 contains metadata structures that BootROM parses to perform authentication.
+Fortunately, these structures are defined in &lt;a href="https://github.com/medicalwei/u-boot-odroidxu-hyp/blob/master/arch/arm/cpu/armv7/exynos/uboot_sb21.h"&gt;U-Boot source tree&lt;/a&gt; :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="cp"&gt;#define     SB20_MAX_SIGN_LEN       (2048/8)&lt;/span&gt;
+&lt;span class="k"&gt;typedef&lt;/span&gt; &lt;span class="k"&gt;struct&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;SB20_RSAPubKey&lt;/span&gt;      &lt;span class="n"&gt;stage2PubKey&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="kt"&gt;int&lt;/span&gt;         &lt;span class="n"&gt;code_SignedDataLen&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="kt"&gt;unsigned&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt;       &lt;span class="n"&gt;code_SignedData&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;SB20_MAX_SIGN_LEN&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+    &lt;span class="n"&gt;SB20_PubKeyInfo&lt;/span&gt;     &lt;span class="n"&gt;pubKeyInfo&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="kt"&gt;unsigned&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt;       &lt;span class="n"&gt;func_ptr_BaseAddr&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;128&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+    &lt;span class="kt"&gt;unsigned&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt;       &lt;span class="n"&gt;reservedData&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;80&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="n"&gt;SB20_CONTEXT&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Field &lt;strong&gt;code_SignedData&lt;/strong&gt; is the RSA-2048 signature of payload (FWBL1 code).&lt;/p&gt;
+&lt;p&gt;Then, &lt;strong&gt;pubKeyInfo&lt;/strong&gt; structure contains information required to verify this signature :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="cp"&gt;#define SB20_HMAC_SHA1_LEN          20&lt;/span&gt;
+&lt;span class="k"&gt;typedef&lt;/span&gt; &lt;span class="k"&gt;struct&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;SB20_RSAPubKey&lt;/span&gt;      &lt;span class="n"&gt;rsaPubKey&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="kt"&gt;unsigned&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt;       &lt;span class="n"&gt;signedData&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;SB20_HMAC_SHA1_LEN&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="n"&gt;SB20_PubKeyInfo&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;rsaPubKey&lt;/strong&gt; structure is the RSA public key, composed of modulus N and public exponent E.
+&lt;strong&gt;signedData&lt;/strong&gt; is a HMAC of this key to ensure it hasn't been modified.&lt;/p&gt;
+&lt;p&gt;So the authentication scenario of FWBL1 by BootROM is :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;verify HMAC of &lt;strong&gt;rsaPubKey&lt;/strong&gt; : &lt;strong&gt;signedData&lt;/strong&gt; == HMAC(&lt;strong&gt;Key&lt;/strong&gt;, &lt;strong&gt;rsaPubKey&lt;/strong&gt;)&lt;/li&gt;
+&lt;li&gt;verify &lt;strong&gt;code_SignedData&lt;/strong&gt; signature using &lt;strong&gt;rsaPubKey&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Verifying HMAC value &lt;strong&gt;signedData&lt;/strong&gt; requires the same secret &lt;strong&gt;Key&lt;/strong&gt; that was used to generate it. However, static analysis reveals that &lt;strong&gt;Key&lt;/strong&gt; is not directly stored in device : it's in fact derived at runtime with a XOR operation applied to OTP value &lt;strong&gt;&lt;em&gt;OTP_key&lt;/em&gt;&lt;/strong&gt; and the HMAC &lt;strong&gt;signedData&lt;/strong&gt; itself :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Key&lt;/strong&gt; = &lt;strong&gt;signedData&lt;/strong&gt; ⊕ &lt;strong&gt;&lt;em&gt;OTP_key&lt;/em&gt;&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Since &lt;strong&gt;&lt;em&gt;OTP_key&lt;/em&gt;&lt;/strong&gt; is in read-only OTP memory, attacker cannot replace &lt;strong&gt;rsaPubKey&lt;/strong&gt; to forge a new signature, otherwise derivated &lt;strong&gt;Key&lt;/strong&gt; would be different and HMAC verification would fail.&lt;/p&gt;
+&lt;p&gt;Finally, authenticated payload is decrypted using AES-CBC-128, with same &lt;strong&gt;Key&lt;/strong&gt; as the HMAC one (first 16 bytes only). IV is the SHA1 of &lt;strong&gt;rsaPubKey&lt;/strong&gt; (first 16 bytes).&lt;/p&gt;
+&lt;h1&gt;Conclusion&lt;/h1&gt;
+&lt;p&gt;QEMU is able to run Exynos 4210 BootROM with &lt;strong&gt;&lt;em&gt;relatively&lt;/em&gt;&lt;/strong&gt; &lt;a href="https://github.com/frederic/qemu-exynos-bootrom"&gt;small code changes&lt;/a&gt; (~600 LoC). This project allows to debug BootROM dynamically with GDB. It has been helpful for analyzing secure boot mechanism that loads and authenticates the next stage from flash memory.&lt;/p&gt;</content><category term="arm"></category><category term="exynos"></category><category term="samsung"></category><category term="bootrom"></category><category term="qemu"></category><category term="emulation"></category><category term="bootloader"></category><category term="secureboot"></category></entry><entry><title>Netgear Nighthawk R7800 : add USB camera support to create a security webcam</title><link href="/2017/11/netgear-nighthawk-r7800-add-usb-camera-support-to-create-a-security-webcam.html" rel="alternate"></link><published>2017-11-22T00:00:00-08:00</published><updated>2017-11-22T00:00:00-08:00</updated><author><name>Frédéric</name></author><id>tag:None,2017-11-22:/2017/11/netgear-nighthawk-r7800-add-usb-camera-support-to-create-a-security-webcam.html</id><summary type="html">&lt;p&gt;This article explains how to customize Nighthawk X4S firmware to add a security camera feature to this always-online &amp;amp; almost-always-idle device.
 Alternative firmwares like &lt;a href="https://openwrt.org/"&gt;OpenWRT&lt;/a&gt; or &lt;a href="https://lede-project.org/"&gt;LEDE&lt;/a&gt; exist, but they don't fully support all stock features yet. So instead this approach is based on modified stock firmware.&lt;/p&gt;
 &lt;p&gt;&lt;img alt="Netgear Nighthawk X4S" src="/blog/r7800-custom/x4s.jpg"&gt;
 &lt;img alt="Serious webcam" src="/blog/r7800-custom/webcam.jpg"&gt;&lt;/p&gt;

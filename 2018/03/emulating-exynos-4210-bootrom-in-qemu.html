@@ -1,0 +1,454 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="/theme/stylesheet/style.min.css">
+
+  <link rel="stylesheet" type="text/css" href="/theme/pygments/github.min.css">
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/font-awesome.min.css">
+
+
+    <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="fred's notes Atom">
+
+
+    <link rel="shortcut icon" href="/resources/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/resources/favicon.ico" type="image/x-icon">
+
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+
+<meta name="author" content="Frédéric" />
+<meta name="description" content="QEMU has support for the SMDKC210 machine, an ARM board based on Exynos 4210 SoC. Peripherals implemented in QEMU for this machine are UART, SDHCI, FIMD, I2C, Interrupt Combiner, GIC, Clock, PMU, RNG, MCT, PWM, RTC. Samsung Galaxy S2 phone is also based on Exynos 4210, so it should be …" />
+<meta name="keywords" content="arm, exynos, samsung, bootrom, qemu, emulation, bootloader, secureboot">
+
+<meta property="og:site_name" content="fred's notes"/>
+<meta property="og:title" content="Emulating Exynos 4210 BootROM in QEMU"/>
+<meta property="og:description" content="QEMU has support for the SMDKC210 machine, an ARM board based on Exynos 4210 SoC. Peripherals implemented in QEMU for this machine are UART, SDHCI, FIMD, I2C, Interrupt Combiner, GIC, Clock, PMU, RNG, MCT, PWM, RTC. Samsung Galaxy S2 phone is also based on Exynos 4210, so it should be …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="/2018/03/emulating-exynos-4210-bootrom-in-qemu.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2018-03-07 00:00:00-08:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="/author/frederic.html">
+<meta property="article:section" content="Article"/>
+<meta property="article:tag" content="arm"/>
+<meta property="article:tag" content="exynos"/>
+<meta property="article:tag" content="samsung"/>
+<meta property="article:tag" content="bootrom"/>
+<meta property="article:tag" content="qemu"/>
+<meta property="article:tag" content="emulation"/>
+<meta property="article:tag" content="bootloader"/>
+<meta property="article:tag" content="secureboot"/>
+<meta property="og:image" content="/resources/sitelogo.jpg">
+
+  <title>fred's notes &ndash; Emulating Exynos 4210 BootROM in QEMU</title>
+
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="/">
+        <img src="/resources/sitelogo.jpg" alt="fred's notes" title="fred's notes">
+      </a>
+      <h1><a href="/">fred's notes</a></h1>
+
+<p>Security & Stuff</p>
+      <nav>
+        <ul class="list">
+          <li><a href="/category/advisory.html">Advisory</a></li>
+          <li><a href="/category/article.html">Article</a></li>
+          <li><a href="/category/tool.html">Tool</a></li>
+          <li><a href="/pages/contact.html#contact">Contact</a></li>
+
+        </ul>
+      </nav>
+
+      <ul class="social">
+        <li><a class="sc-github" href="https://github.com/frederic" target="_blank"><i class="fa fa-github"></i></a></li>
+        <li><a class="sc-linkedin" href="https://www.linkedin.com/in/fredericbasse" target="_blank"><i class="fa fa-linkedin"></i></a></li>
+        <li><a class="sc-rss" href="/feeds/all.atom.xml" target="_blank"><i class="fa fa-rss"></i></a></li>
+      </ul>
+    </div>
+
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="/">    Home
+</a>
+
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+
+      <a href="/feeds/all.atom.xml">    Atom
+</a>
+
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="emulating-exynos-4210-bootrom-in-qemu">Emulating Exynos 4210 BootROM in QEMU</h1>
+    <p>
+          Posted on Wed 07 March 2018 in <a href="/category/article.html">Article</a>
+
+
+    </p>
+  </header>
+
+
+  <div>
+    <p><a href="https://www.qemu.org/">QEMU</a> has support for the SMDKC210 machine, an ARM board based on Exynos 4210 SoC.
+Peripherals implemented in QEMU for this machine are <a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/char/exynos4210_uart.c">UART</a>, <a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/sd/sdhci.c">SDHCI</a>, <a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/display/exynos4210_fimd.c">FIMD</a>, <a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/i2c/exynos4210_i2c.c">I2C</a>, <a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/intc/exynos4210_combiner.c">Interrupt Combiner</a>, <a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/intc/exynos4210_gic.c">GIC</a>, <a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/misc/exynos4210_clk.c">Clock</a>, <a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/misc/exynos4210_pmu.c">PMU</a>, <a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/misc/exynos4210_rng.c">RNG</a>, <a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/timer/exynos4210_mct.c">MCT</a>, <a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/timer/exynos4210_pwm.c">PWM</a>, <a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/timer/exynos4210_rtc.c">RTC</a>.</p>
+<p><a href="https://www.gsmarena.com/samsung_i9100_galaxy_s_ii-3621.php">Samsung Galaxy S2</a> phone is also based on Exynos 4210, so it should be <strong><em>relatively</em></strong> easy to emulate its BootROM in QEMU.</p>
+<p>This article describes how to extract BootROM (and associated fuses) from Galaxy S2 phone, implement additional required peripherals in QEMU (like the hardware cryptographic engine), and debug inevitable issues. Source code has been published on <a href="https://github.com/frederic/qemu-exynos-bootrom">GitHub</a>. We'll also take advantage of the dynamic debugging capability offered by QEMU to have a quick look at secure boot implementation.</p>
+<h1>Documentation</h1>
+<p><img alt="Exynos 4 Dual 45nm" src="/blog/qemu-exynos4210/exynos_4210_features.jpg" width="700px"></p>
+<p>Samsung has released <a href="http://www.samsung.com/global/business/semiconductor/file/product/Exynos_4_Dual_45nm_User_Manaul_Public_REV1.00-0.pdf">a (partial) datasheet</a>.
+It includes the following memory map :</p>
+<p><img alt="Memory Map" src="/blog/qemu-exynos4210/exynos_4210_memmap.png"></p>
+<p>Another significant ressource is the <a href="https://github.com/pngcui/uboot-2017.07-iTop4412">U-Boot source code</a> for development boards (like <a href="http://www.hardkernel.com/main/products/prdt_info.php?g_code=G133999328931">ODROID X</a>) based on same processor. It contains interesting technical information on hardware peripherals (like addresses, registers, values).</p>
+<p>Finally, hacker <a href="https://forum.xda-developers.com/showthread.php?t=1986887">community</a> has <a href="https://forum.xda-developers.com/showthread.php?t=1274999">contributed</a> a <a href="https://forum.xda-developers.com/showthread.php?t=1313588">lot</a> over the past years.</p>
+<h1>Dump all the things</h1>
+<p>First of all, we have to extract the BootROM we want to emulate from the Exynos 4210 SoC. We will also extract fuses data and first bootloader (from flash memory) as they are required to complete execution of BootROM.</p>
+<p>We use a Galaxy S2 phone, with ADB access and root privileges thanks to <a href="https://github.com/timwr/CVE-2013-6282">CVE-2013-6282 exploit</a>.</p>
+<h2>Dump bootloader</h2>
+<p>The bootloader stored on flash memory is loaded, authenticated (eventually), and executed by BootROM.
+Accessible through the <strong>mmcblk0boot0</strong> device file, we dump it using builtin <strong>dd</strong> command :</p>
+<div class="highlight"><pre><span></span><span class="c1"># dd if=/dev/block/mmcblk0boot0 of=./mmc_boot.img seek=1 bs=512</span>
+<span class="m">1024</span>+0 records in
+<span class="m">1024</span>+0 records out
+<span class="m">524288</span> bytes transferred in <span class="m">0</span>.091 secs <span class="o">(</span><span class="m">5761406</span> bytes/sec<span class="o">)</span>
+</pre></div>
+
+
+<p>We generate an entropy graph of dumped data using <a href="https://github.com/ReFirmLabs/binwalk">binwalk tool</a> :</p>
+<p><img alt="Entropy of bootloader image" src="/blog/qemu-exynos4210/exynos_4210_bootloader_entropy.png"></p>
+<p>The first part with high entropy (almost E=1) is the encrypted FWBL1 image, the next stage to execute after BootROM.</p>
+<h2>Dump BootROM</h2>
+<p>Memory map indicates that BootROM, also called iROM, is mapped at address <strong>0x0000_0000</strong>.
+On this device, stock Android kernel is compiled with <strong><em>/dev/mem</em></strong> support, so we can directly use the simple <a href="https://github.com/Vee7-Cyanogenmod13/device_lge_l7II/tree/cm-13.0/viewmem">viewmem tool</a> to dump BootROM (yeah, chipset from 2011).</p>
+<div class="highlight"><pre><span></span><span class="c1"># ./viewmem 0x00000000 0x10000 &gt; ./bootrom.bin       </span>
+<span class="o">[</span>INFO<span class="o">]</span> Reading <span class="m">65536</span> bytes at 0x0...
+</pre></div>
+
+
+<h2>Dump fuses</h2>
+<p>Fuses a.k.a. One-Time Programmable (OTP) memory usually contain important information for security, like boot settings, cryptographic keys or hashes.
+According to datasheet, fuses are in the <strong>SECKEY</strong> area at address <strong>0x10100000</strong>.</p>
+<p>However in this case, <a href="https://github.com/Vee7-Cyanogenmod13/device_lge_l7II/tree/cm-13.0/viewmem">viewmem tool</a> fails to read data directly.
+The cause of this issue is explained in <a href="https://redmine.replicant.us/projects/replicant/wiki/NexusSI902xBootloader">another research</a> for a similar processor.
+We learn that accessing <strong>SECKEY</strong> requires to enable the specific hardware clock <strong>CLK_SECKEY</strong> (bit 12 of <strong>CLK_GATE_IP_PERIR</strong> register).</p>
+<p>The solution is to build a modified kernel to enable that clock at boot.</p>
+<p>Samsung has released the <a href="http://opensource.samsung.com/reception/receptionSub.do?method=sub&amp;sub=F&amp;searchValue=sph-d710">kernel source code</a>, however initramfs is missing to generate a fully fonctional kernel image. So we dump the original kernel partition (like we did for bootloader partition) and <a href="https://github.com/davidmroth/Extract-Kernel-Initramfs">extract</a> initramfs archive. We can then append extracted initramfs to our custom kernel by setting <strong><em>CONFIG_INITRAMFS_DIRECTORY</em></strong> option in kernel configuration.</p>
+<p>We apply the following kernel patch to enable <strong>CLK_SECKEY</strong> clock at boot :</p>
+<div class="highlight"><pre><span></span><span class="gd">--- a/arch/arm/mach-exynos/clock-exynos4.c  2013-02-21 05:23:03.000000000 -0800</span>
+<span class="gi">+++ b/arch/arm/mach-exynos/clock-exynos4.c  2018-02-25 00:11:03.817693249 -0800</span>
+<span class="gu">@@ -1352,11 +1352,11 @@</span>
+
+ static struct clk exynos4_init_clocks[] = {
+    {
+<span class="gd">-#ifndef CONFIG_CPU_EXYNOS4210</span>
+        .name       = &quot;seckey&quot;,
+        .enable     = exynos4_clk_ip_perir_ctrl,
+        .ctrlbit    = (1 &lt;&lt; 12),
+    }, {
+<span class="gi">+#ifndef CONFIG_CPU_EXYNOS4210</span>
+        .name       = &quot;tzpc&quot;,
+        .devname    = &quot;exnos4-tzpc.5&quot;,
+        .enable     = exynos4_clk_ip_perir_ctrl,
+<span class="gu">@@ -2386,6 +2386,17 @@</span>
+
+    for (ptr = 0; ptr &lt; ARRAY_SIZE(exynos4_clksrcs); ptr++)
+        s3c_set_clksrc(&amp;exynos4_clksrcs[ptr], true);
+<span class="gi">+</span>
+<span class="gi">+   printk(KERN_INFO &quot;%s: Looking for seckey clock...\n&quot;, __func__);</span>
+<span class="gi">+   for (ptr = 0; ptr &lt; ARRAY_SIZE(exynos4_init_clocks); ptr++) {</span>
+<span class="gi">+       if (exynos4_init_clocks[ptr].name == NULL)</span>
+<span class="gi">+           break;</span>
+<span class="gi">+</span>
+<span class="gi">+       if (strcmp(&quot;seckey&quot;, exynos4_init_clocks[ptr].name) == 0) {</span>
+<span class="gi">+           printk(KERN_INFO &quot;%s: Enabling seckey clock\n&quot;, __func__);</span>
+<span class="gi">+           clk_enable(&amp;exynos4_init_clocks[ptr]);</span>
+<span class="gi">+       }</span>
+<span class="gi">+   }</span>
+ }
+
+ static struct clk *exynos4_clks[] __initdata = {
+</pre></div>
+
+
+<p>After flashing and booting this custom kernel on Galasy S2 device, we can dump fuses data with <a href="https://github.com/Vee7-Cyanogenmod13/device_lge_l7II/tree/cm-13.0/viewmem">viewmem tool</a>, like we did for BootROM :</p>
+<div class="highlight"><pre><span></span><span class="c1"># ./viewmem 0x10100000 0x100 &gt; ./fuses.bin           </span>
+<span class="o">[</span>INFO<span class="o">]</span> Reading <span class="m">256</span> bytes at 0x10100000...
+</pre></div>
+
+
+<h1>Debugging</h1>
+<p>We have the BootROM, fuses data, and the first bootloader from flash memory.
+However, we should not expect it to run properly on the first try.</p>
+<p>The following QEMU features were used to debug issues and develop new QEMU peripherals :</p>
+<ul>
+<li><a href="https://git.qemu.org/?p=qemu.git;a=blob_plain;f=docs/devel/tracing.txt;hb=HEAD">Trace events</a> : output debug log when specific instructions are hit.</li>
+<li><a href="https://wiki.qemu.org/Documentation/Debugging">GDB stub</a> : attach your favorite debugger i.e. GDB or IDA.</li>
+<li><a href="https://en.wikibooks.org/wiki/QEMU/Monitor">Monitor console</a> : interact with QEMU while guest is running, for example to enable specific trace events.</li>
+</ul>
+<p>Most issues are related to peripherals and will cause QEMU to hang (e.g. infinite loop due to polling of non-implemented hardware register).</p>
+<h1>QEMU changes</h1>
+<p>Despite the number of peripherals implemented for this SoC, some are still missing to complete execution of BootROM with success.
+Following sections describe the main changes made in <a href="https://github.com/frederic/qemu-exynos-bootrom">QEMU source tree</a> for this project. New peripherals are heavily based on existing ones in upstream QEMU project.</p>
+<h2>Add BootROM loading support</h2>
+<p>For this machine, QEMU is supposed to run U-Boot bootloader or Linux kernel directly. By default, only a <a href="https://github.com/qemu/qemu/blob/master/hw/arm/exynos4210.c#L128">small &amp; minimal bootloader</a> is loaded in secondary CPUs, which is not relevant for this project.</p>
+<p>In order to load BootROM in memory before starting the machine, we take advantage of the existing BIOS loading feature in QEMU.</p>
+<p><a href="https://github.com/frederic/qemu-exynos-bootrom/commit/23ce5e32774a2ae834e3ed99dd2d26a1be5a2d8a">With this change</a>, BootROM image file can now be loaded in memory thanks to <strong>-bios</strong> parameter. It will be executed directly when emulated machine is reset.</p>
+<h2>One-Time Programmable (OTP) memory emulation</h2>
+<p>One-Time Programmable (OTP) memory is a MMIO peripheral used to store device-specific data. Read operations can be performed with simple load instructions, but write operations (or fusing) are usually more complex.</p>
+<p>For this project, OTP peripheral is <a href="https://github.com/frederic/qemu-exynos-bootrom/commit/70c8b2088c6e24d7863609a2368e3591859a114d">implemented as a simple read-only memory</a>, initialized with fuses data dumped from Galaxy S2 device. Write operations are not supported.</p>
+<p>When BootROM is executed, QEMU debug log provides detailed information on OTP data accessed.</p>
+<ul>
+<li>First OTP access is a read operation on area 0x18-0x2C. Based on static analysis, BootROM checks these fuses are provisioned (not null) :</li>
+</ul>
+<div class="highlight"><pre><span></span>  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x18</span> <span class="p">(</span><span class="mh">0x4</span><span class="p">)</span>
+  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x1c</span> <span class="p">(</span><span class="mh">0x4</span><span class="p">)</span>
+  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x20</span> <span class="p">(</span><span class="mh">0x4</span><span class="p">)</span>
+  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x24</span> <span class="p">(</span><span class="mh">0x4</span><span class="p">)</span>
+  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x28</span> <span class="p">(</span><span class="mh">0x4</span><span class="p">)</span>
+</pre></div>
+
+
+<ul>
+<li>Same area 0x18-0x2C (20 bytes) is read a second time to derive HMAC-SHA1 key (to authenticate next bootloader) :</li>
+</ul>
+<div class="highlight"><pre><span></span>  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x18</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span>
+  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x19</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span>
+<span class="p">[...]</span>
+  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x2a</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span>
+  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x2b</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span>
+</pre></div>
+
+
+<ul>
+<li>The area is read a third time, but only first 16 bytes, to derive AES-CBC-128 key (to decrypt next bootloader) :</li>
+</ul>
+<div class="highlight"><pre><span></span>  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x18</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span>
+  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x19</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span>
+<span class="p">[...]</span>
+  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x26</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span>
+  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x27</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span>
+</pre></div>
+
+
+<h2>Advanced Crypto Engine (ACE) emulation</h2>
+<p>Advanced Crypto Engine (ACE) peripheral performs hardware-accelerated cryptographic operations. ACE interface, composed of many Special Function Registers (SFR), is way more complex than the OTP one.
+Fortunately, these SFR are <a href="https://github.com/exynos4-sdk/uboot/blob/master/arch/arm/include/asm/arch-exynos/ace_sfr.h">documented in U-Boot source code</a>.</p>
+<p>Again, <a href="https://github.com/frederic/qemu-exynos-bootrom/commit/4deef8737da3a683bc858e91eba5a588a2879b0a">our implementation</a> is limited to features actually used by BootROM : only AES-CBC-128 operations are supported.</p>
+<p>When BootROM is executed, QEMU debug log details how ACE peripheral is used :</p>
+<ul>
+<li>Set AES key, IV, and other parameters (<strong>ACE_AES_CONTROL</strong> register) :</li>
+</ul>
+<div class="highlight"><pre><span></span>  <span class="p">[</span><span class="nl">exynos4210_ace_write</span><span class="p">:</span><span class="mi">338</span><span class="p">]</span>   <span class="n">ACE_AES_CONTROL</span> <span class="o">&lt;</span><span class="mh">0x0200</span><span class="o">&gt;</span> <span class="o">&lt;-</span> <span class="mh">0x0e8b</span>
+  <span class="p">[</span><span class="nl">exynos4210_ace_write</span><span class="p">:</span><span class="mi">338</span><span class="p">]</span>   <span class="n">ACE_AES_KEY5</span> <span class="o">&lt;</span><span class="mh">0x0290</span><span class="o">&gt;</span> <span class="o">&lt;-</span> <span class="mh">0xebc4ad63</span>
+  <span class="p">[</span><span class="nl">exynos4210_ace_write</span><span class="p">:</span><span class="mi">338</span><span class="p">]</span>   <span class="n">ACE_AES_KEY6</span> <span class="o">&lt;</span><span class="mh">0x0294</span><span class="o">&gt;</span> <span class="o">&lt;-</span> <span class="mh">0x27239f1a</span>
+  <span class="p">[</span><span class="nl">exynos4210_ace_write</span><span class="p">:</span><span class="mi">338</span><span class="p">]</span>   <span class="n">ACE_AES_KEY7</span> <span class="o">&lt;</span><span class="mh">0x0298</span><span class="o">&gt;</span> <span class="o">&lt;-</span> <span class="mh">0x230ce305</span>
+  <span class="p">[</span><span class="nl">exynos4210_ace_write</span><span class="p">:</span><span class="mi">338</span><span class="p">]</span>   <span class="n">ACE_AES_KEY8</span> <span class="o">&lt;</span><span class="mh">0x029c</span><span class="o">&gt;</span> <span class="o">&lt;-</span> <span class="mh">0xcaad75d2</span>
+  <span class="p">[</span><span class="nl">exynos4210_ace_write</span><span class="p">:</span><span class="mi">338</span><span class="p">]</span>   <span class="n">ACE_AES_IV1</span> <span class="o">&lt;</span><span class="mh">0x0230</span><span class="o">&gt;</span> <span class="o">&lt;-</span> <span class="mh">0xee1c2939</span>
+  <span class="p">[</span><span class="nl">exynos4210_ace_write</span><span class="p">:</span><span class="mi">338</span><span class="p">]</span>   <span class="n">ACE_AES_IV2</span> <span class="o">&lt;</span><span class="mh">0x0234</span><span class="o">&gt;</span> <span class="o">&lt;-</span> <span class="mh">0x6be93160</span>
+  <span class="p">[</span><span class="nl">exynos4210_ace_write</span><span class="p">:</span><span class="mi">338</span><span class="p">]</span>   <span class="n">ACE_AES_IV3</span> <span class="o">&lt;</span><span class="mh">0x0238</span><span class="o">&gt;</span> <span class="o">&lt;-</span> <span class="mh">0xd8bbf993</span>
+  <span class="p">[</span><span class="nl">exynos4210_ace_write</span><span class="p">:</span><span class="mi">338</span><span class="p">]</span>   <span class="n">ACE_AES_IV4</span> <span class="o">&lt;</span><span class="mh">0x023c</span><span class="o">&gt;</span> <span class="o">&lt;-</span> <span class="mh">0x29b98fe8</span>
+  <span class="p">[</span><span class="nl">exynos4210_ace_read</span><span class="p">:</span><span class="mi">315</span><span class="p">]</span>   <span class="n">ACE_FC_INTPEND</span> <span class="p">[</span><span class="mh">0x000c</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="mh">0x0000</span>
+  <span class="p">[</span><span class="nl">exynos4210_ace_FCINTPEND</span><span class="p">:</span><span class="mi">227</span><span class="p">]</span>   <span class="n">QEMU</span> <span class="nl">ACE</span><span class="p">:</span> <span class="n">FCINTPEND</span> <span class="n">triggered</span>
+</pre></div>
+
+
+<ul>
+<li>Set input &amp; output buffer addresses (0x2021410), set buffer size (0x1bf0), and poll decryption process status (<strong>ACE_FC_INTPEND</strong> register):</li>
+</ul>
+<div class="highlight"><pre><span></span>  <span class="p">[</span><span class="nl">exynos4210_ace_write</span><span class="p">:</span><span class="mi">338</span><span class="p">]</span>   <span class="n">ACE_FC_BRDMAS</span> <span class="o">&lt;</span><span class="mh">0x0020</span><span class="o">&gt;</span> <span class="o">&lt;-</span> <span class="mh">0x2021410</span>
+  <span class="p">[</span><span class="nl">exynos4210_ace_write</span><span class="p">:</span><span class="mi">338</span><span class="p">]</span>   <span class="n">ACE_FC_BTDMAS</span> <span class="o">&lt;</span><span class="mh">0x0030</span><span class="o">&gt;</span> <span class="o">&lt;-</span> <span class="mh">0x2021410</span>
+  <span class="p">[</span><span class="nl">exynos4210_ace_write</span><span class="p">:</span><span class="mi">338</span><span class="p">]</span>   <span class="n">ACE_FC_BTDMAL</span> <span class="o">&lt;</span><span class="mh">0x0034</span><span class="o">&gt;</span> <span class="o">&lt;-</span> <span class="mh">0x1bf0</span>
+  <span class="p">[</span><span class="nl">exynos4210_ace_write</span><span class="p">:</span><span class="mi">338</span><span class="p">]</span>   <span class="n">ACE_FC_BRDMAL</span> <span class="o">&lt;</span><span class="mh">0x0024</span><span class="o">&gt;</span> <span class="o">&lt;-</span> <span class="mh">0x1bf0</span>
+  <span class="p">[</span><span class="nl">exynos4210_ace_read</span><span class="p">:</span><span class="mi">315</span><span class="p">]</span>   <span class="n">ACE_FC_INTPEND</span> <span class="p">[</span><span class="mh">0x000c</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="mh">0x0000</span>
+  <span class="p">[</span><span class="nl">exynos4210_ace_FCINTPEND</span><span class="p">:</span><span class="mi">227</span><span class="p">]</span>   <span class="n">QEMU</span> <span class="nl">ACE</span><span class="p">:</span> <span class="n">FCINTPEND</span> <span class="n">triggered</span>
+  <span class="p">[</span><span class="nl">exynos4210_ace_FCINTPEND</span><span class="p">:</span><span class="mi">235</span><span class="p">]</span>   <span class="n">QEMU</span> <span class="nl">ACE</span><span class="p">:</span> <span class="n">AES_control</span><span class="o">=</span><span class="mh">0xe8b</span><span class="p">,</span> <span class="n">FCBRDMAS</span><span class="o">=</span><span class="mh">0x2021410</span><span class="p">,</span> <span class="n">FCBRDMAS</span><span class="o">=</span><span class="mh">0x1bf0</span><span class="p">,</span> <span class="n">FCBRDMAS</span><span class="o">=</span><span class="mh">0x2021410</span><span class="p">,</span> <span class="n">FCBRDMAS</span><span class="o">=</span><span class="mh">0x1bf0</span>
+  <span class="p">[</span><span class="nl">exynos4210_ace_write</span><span class="p">:</span><span class="mi">338</span><span class="p">]</span>   <span class="n">ACE_FC_INTPEND</span> <span class="o">&lt;</span><span class="mh">0x000c</span><span class="o">&gt;</span> <span class="o">&lt;-</span> <span class="mh">0x0004</span>
+</pre></div>
+
+
+<p>The log shows that 0x1bf0 bytes of data at address 0x2021410 are decrypted (<strong>ACE_AES_CONTROL[0]</strong> bit) using AES-CBC mode (<strong>ACE_AES_CONTROL[2:1]</strong> bits).</p>
+<h2>Minor fixes in SD/MMC Host controller</h2>
+<p>SD controller emulation is already fully supported by QEMU, however few minor differences causes BootROM to hang.</p>
+<p>First issue occurs when BootROM sends initialization command ACMD41 (SD_APP_OP_COND) multiple times. QEMU SD-card emulator only replies to the first attempt. <a href="https://github.com/frederic/qemu-exynos-bootrom/commit/6f045949ee2fdec6248a8e438a38c212c2896927">Our patch</a> ensures that SD-card always replies, even when SD-card state is already ready.</p>
+<p>Second issue is the lack of support for <strong><em>SD Clock Enable</em></strong> register in <a href="https://www.sdcard.org/jp/developers/overview/host_controller/simple_spec/Simplified_SD_Host_Controller_Spec.pdf">Clock Control Register</a>.
+<a href="https://github.com/frederic/qemu-exynos-bootrom/commit/9be5c9f2253dbc04ee690365f9e81eb1fbc00ee0">The patch</a> implements it like defined in the <a href="https://lists.gnu.org/archive/html/qemu-devel/2011-12/msg01271.html">original contribution</a>.</p>
+<p>Thanks to these changes, BootROM can perform SD operations. QEMU debug log shows that 0x2000 bytes are read at offset 0x200 :</p>
+<div class="highlight"><pre><span></span><span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00000200</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00000400</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00000600</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00000800</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00000a00</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00000c00</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00000e00</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00001000</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00001200</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00001400</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00001600</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00001800</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00001a00</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00001c00</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00001e00</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00002000</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
+</pre></div>
+
+
+<p>These read operations match with encrypted FWBL1 image in bootloader partition previously dumped.</p>
+<h1>Executing BootROM in QEMU</h1>
+<p>We compile our modified <a href="https://github.com/frederic/qemu-exynos-bootrom">QEMU</a> and run :</p>
+<div class="highlight"><pre><span></span>$ qemu-system-arm -machine smdkc210 -cpu cortex-a9 -s -S -bios ./bootrom.bin  -sd ./mmc_boot.img
+</pre></div>
+
+
+<ul>
+<li>-machine : emulated machine</li>
+<li>-s : Shorthand for -gdb tcp::1234</li>
+<li>-S : Do not start CPU at startup</li>
+<li>-bios : BootROM image file</li>
+<li>-sd : SD-card image file (equivalent to internal eMMC memory). We specify the path of bootloader dumped previously.</li>
+</ul>
+<p>From static analysis, we know that main BootROM function ends by jumping to IRAM at address <strong>0x02021410</strong>. We can also notice that AES decryption took place at the same address.
+We attach GDB and set a breakpoint to this address :</p>
+<div class="highlight"><pre><span></span><span class="n">Breakpoint</span> <span class="mi">2</span><span class="p">,</span> <span class="mh">0x02021410</span> <span class="n">in</span> <span class="o">??</span> <span class="p">()</span>
+<span class="p">(</span><span class="n">gdb</span><span class="p">)</span> <span class="n">layout</span> <span class="k">asm</span>
+<span class="n">B</span><span class="o">+&gt;</span> <span class="mh">0x2021410</span>       <span class="n">b</span>      <span class="mh">0x2021434</span>
+    <span class="mh">0x2021414</span>       <span class="n">b</span>      <span class="mh">0x2021414</span>
+    <span class="mh">0x2021418</span>       <span class="n">b</span>      <span class="mh">0x2021418</span>
+    <span class="mh">0x202141c</span>       <span class="n">b</span>      <span class="mh">0x202141c</span>
+    <span class="mh">0x2021420</span>       <span class="n">b</span>      <span class="mh">0x2021420</span>
+    <span class="mh">0x2021424</span>       <span class="n">b</span>      <span class="mh">0x2021424</span>
+    <span class="mh">0x2021428</span>       <span class="n">b</span>      <span class="mh">0x2021428</span>
+    <span class="mh">0x202142c</span>       <span class="n">b</span>      <span class="mh">0x202142c</span>
+    <span class="mh">0x2021430</span>       <span class="n">b</span>      <span class="mh">0x2021430</span>
+    <span class="mh">0x2021434</span>       <span class="n">mrc</span>    <span class="mi">15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">r0</span><span class="p">,</span> <span class="n">cr1</span><span class="p">,</span> <span class="n">cr0</span><span class="p">,</span> <span class="p">{</span><span class="mi">0</span><span class="p">}</span>
+<span class="p">[...]</span>
+</pre></div>
+
+
+<p>GDB breaks at the exception vector table of decrypted FWBL1.</p>
+<p>After resuming execution, QEMU debug log shows that FWBL1 reads 0x4000 bytes from address 0x2200 :</p>
+<div class="highlight"><pre><span></span><span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00002200</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00002400</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="o">[...]</span>
+<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00005e00</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00006000</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
+</pre></div>
+
+
+<p>But that's another story since BootROM execution is already over.</p>
+<h1>Secure boot analysis</h1>
+<p>Secure boot process aims to assert the authenticity of all software components in boot chain.
+The first component in the chain is called root of trust, and in our case it's the BootROM. It loads, authenticates and decrypts the next component called FWBL1, stored in flash memory.</p>
+<p>The footer of FWBL1 contains metadata structures that BootROM parses to perform authentication.
+Fortunately, these structures are defined in <a href="https://github.com/medicalwei/u-boot-odroidxu-hyp/blob/master/arch/arm/cpu/armv7/exynos/uboot_sb21.h">U-Boot source tree</a> :</p>
+<div class="highlight"><pre><span></span><span class="cp">#define     SB20_MAX_SIGN_LEN       (2048/8)</span>
+<span class="k">typedef</span> <span class="k">struct</span>
+<span class="p">{</span>
+    <span class="n">SB20_RSAPubKey</span>      <span class="n">stage2PubKey</span><span class="p">;</span>
+    <span class="kt">int</span>         <span class="n">code_SignedDataLen</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">char</span>       <span class="n">code_SignedData</span><span class="p">[</span><span class="n">SB20_MAX_SIGN_LEN</span><span class="p">];</span>
+    <span class="n">SB20_PubKeyInfo</span>     <span class="n">pubKeyInfo</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">char</span>       <span class="n">func_ptr_BaseAddr</span><span class="p">[</span><span class="mi">128</span><span class="p">];</span>
+    <span class="kt">unsigned</span> <span class="kt">char</span>       <span class="n">reservedData</span><span class="p">[</span><span class="mi">80</span><span class="p">];</span>
+<span class="p">}</span> <span class="n">SB20_CONTEXT</span><span class="p">;</span>
+</pre></div>
+
+
+<p>Field <strong>code_SignedData</strong> is the RSA-2048 signature of payload (FWBL1 code).</p>
+<p>Then, <strong>pubKeyInfo</strong> structure contains information required to verify this signature :</p>
+<div class="highlight"><pre><span></span><span class="cp">#define SB20_HMAC_SHA1_LEN          20</span>
+<span class="k">typedef</span> <span class="k">struct</span>
+<span class="p">{</span>
+    <span class="n">SB20_RSAPubKey</span>      <span class="n">rsaPubKey</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">char</span>       <span class="n">signedData</span><span class="p">[</span><span class="n">SB20_HMAC_SHA1_LEN</span><span class="p">];</span>
+<span class="p">}</span> <span class="n">SB20_PubKeyInfo</span><span class="p">;</span>
+</pre></div>
+
+
+<p><strong>rsaPubKey</strong> structure is the RSA public key, composed of modulus N and public exponent E.
+<strong>signedData</strong> is a HMAC of this key to ensure it hasn't been modified.</p>
+<p>So the authentication scenario of FWBL1 by BootROM is :</p>
+<ul>
+<li>verify HMAC of <strong>rsaPubKey</strong> : <strong>signedData</strong> == HMAC(<strong>Key</strong>, <strong>rsaPubKey</strong>)</li>
+<li>verify <strong>code_SignedData</strong> signature using <strong>rsaPubKey</strong></li>
+</ul>
+<p>Verifying HMAC value <strong>signedData</strong> requires the same secret <strong>Key</strong> that was used to generate it. However, static analysis reveals that <strong>Key</strong> is not directly stored in device : it's in fact derived at runtime with a XOR operation applied to OTP value <strong><em>OTP_key</em></strong> and the HMAC <strong>signedData</strong> itself :</p>
+<ul>
+<li><strong>Key</strong> = <strong>signedData</strong> ⊕ <strong><em>OTP_key</em></strong></li>
+</ul>
+<p>Since <strong><em>OTP_key</em></strong> is in read-only OTP memory, attacker cannot replace <strong>rsaPubKey</strong> to forge a new signature, otherwise derivated <strong>Key</strong> would be different and HMAC verification would fail.</p>
+<p>Finally, authenticated payload is decrypted using AES-CBC-128, with same <strong>Key</strong> as the HMAC one (first 16 bytes only). IV is the SHA1 of <strong>rsaPubKey</strong> (first 16 bytes).</p>
+<h1>Conclusion</h1>
+<p>QEMU is able to run Exynos 4210 BootROM with <strong><em>relatively</em></strong> <a href="https://github.com/frederic/qemu-exynos-bootrom">small code changes</a> (~600 LoC). This project allows to debug BootROM dynamically with GDB. It has been helpful for analyzing secure boot mechanism that loads and authenticates the next stage from flash memory.</p>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="/tag/arm.html">arm</a>
+      <a href="/tag/exynos.html">exynos</a>
+      <a href="/tag/samsung.html">samsung</a>
+      <a href="/tag/bootrom.html">bootrom</a>
+      <a href="/tag/qemu.html">qemu</a>
+      <a href="/tag/emulation.html">emulation</a>
+      <a href="/tag/bootloader.html">bootloader</a>
+      <a href="/tag/secureboot.html">secureboot</a>
+    </p>
+  </div>
+
+
+
+    <div class="addthis_relatedposts_inline">
+
+
+</article>
+
+    <footer>
+<p>
+  &copy;   - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+</p>
+<p>    Powered by <a href="http://getpelican.com" target="_blank">Pelican</a> - Theme <a href="https://github.com/alexandrevicenzi/flex" target="_blank">Flex</a>
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses/by-sa/4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+         src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " fred's notes ",
+  "url" : "",
+  "image": "/resources/sitelogo.jpg",
+  "description": "Frédéric's Thoughts and Writings"
+}
+</script>
+
+</body>
+</html>
