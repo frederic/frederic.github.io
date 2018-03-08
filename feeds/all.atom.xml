@@ -236,7 +236,7 @@ We attach GDB and set a breakpoint to this address :&lt;/p&gt;
 
 
 &lt;p&gt;GDB breaks at the exception vector table of decrypted FWBL1.&lt;/p&gt;
-&lt;p&gt;After resuming execution, QEMU debug log shows that FWBL1 reads 0x4000 bytes from address 0x2200 :&lt;/p&gt;
+&lt;p&gt;After resuming execution, QEMU debug log shows that FWBL1 reads 0x4000 bytes from flash memory at address 0x2200 :&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;SD&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sd_blk_read&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x00002200&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;len&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;512&lt;/span&gt;
 &lt;span class="n"&gt;SD&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sd_blk_read&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x00002400&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;len&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;512&lt;/span&gt;
 &lt;span class="o"&gt;[...]&lt;/span&gt;
