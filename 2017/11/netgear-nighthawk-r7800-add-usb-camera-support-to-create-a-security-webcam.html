@@ -4,13 +4,13 @@
 <head>
   <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
 
-    <link rel="stylesheet" type="text/css" href="/theme/stylesheet/style.min.css">
+    <link rel="stylesheet" type="text/css" href="https://www.fredericb.info/theme/stylesheet/style.min.css">
 
-  <link rel="stylesheet" type="text/css" href="/theme/pygments/github.min.css">
-  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="https://www.fredericb.info/theme/pygments/github.min.css">
+  <link rel="stylesheet" type="text/css" href="https://www.fredericb.info/theme/font-awesome/css/font-awesome.min.css">
 
 
-    <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="fred's notes Atom">
+    <link href="https://www.fredericb.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="fred's notes Atom">
 
 
     <link rel="shortcut icon" href="/resources/favicon.ico" type="image/x-icon">
@@ -32,11 +32,11 @@
 <meta property="og:title" content="Netgear Nighthawk R7800 : add USB camera support to create a security webcam"/>
 <meta property="og:description" content="This article explains how to customize Nighthawk X4S firmware to add a security camera feature to this always-online &amp; almost-always-idle device. Alternative firmwares like OpenWRT or LEDE exist, but they don&#39;t fully support all stock features yet. So instead this approach is based on modified stock firmware. Main steps are: Customize …"/>
 <meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="/2017/11/netgear-nighthawk-r7800-add-usb-camera-support-to-create-a-security-webcam.html"/>
+<meta property="og:url" content="https://www.fredericb.info/2017/11/netgear-nighthawk-r7800-add-usb-camera-support-to-create-a-security-webcam.html"/>
 <meta property="og:type" content="article"/>
 <meta property="article:published_time" content="2017-11-22 00:00:00-08:00"/>
 <meta property="article:modified_time" content=""/>
-<meta property="article:author" content="/author/frederic.html">
+<meta property="article:author" content="https://www.fredericb.info/author/frederic.html">
 <meta property="article:section" content="Article"/>
 <meta property="article:tag" content="kernel"/>
 <meta property="article:tag" content="netgear"/>
@@ -58,10 +58,10 @@
 <p>Security & Stuff</p>
       <nav>
         <ul class="list">
-          <li><a href="/category/advisory.html">Advisory</a></li>
-          <li><a href="/category/article.html">Article</a></li>
-          <li><a href="/category/tool.html">Tool</a></li>
-          <li><a href="/pages/contact.html#contact">Contact</a></li>
+          <li><a href="https://www.fredericb.info/category/advisory.html">Advisory</a></li>
+          <li><a href="https://www.fredericb.info/category/article.html">Article</a></li>
+          <li><a href="https://www.fredericb.info/category/tool.html">Tool</a></li>
+          <li><a href="https://www.fredericb.info/pages/contact.html#contact">Contact</a></li>
 
         </ul>
       </nav>
@@ -78,14 +78,14 @@
   <main>
 
     <nav>
-      <a href="/">    Home
+      <a href="https://www.fredericb.info/">    Home
 </a>
 
       <a href="/archives.html">Archives</a>
       <a href="/categories.html">Categories</a>
       <a href="/tags.html">Tags</a>
 
-      <a href="/feeds/all.atom.xml">    Atom
+      <a href="https://www.fredericb.info/feeds/all.atom.xml">    Atom
 </a>
 
     </nav>
@@ -95,7 +95,7 @@
       
     <h1 id="netgear-nighthawk-r7800-add-usb-camera-support-to-create-a-security-webcam">Netgear Nighthawk R7800 : add USB camera support to create a security webcam</h1>
     <p>
-          Posted on Wed 22 November 2017 in <a href="/category/article.html">Article</a>
+          Posted on Wed 22 November 2017 in <a href="https://www.fredericb.info/category/article.html">Article</a>
 
 
     </p>
@@ -105,8 +105,8 @@
   <div>
     <p>This article explains how to customize Nighthawk X4S firmware to add a security camera feature to this always-online &amp; almost-always-idle device.
 Alternative firmwares like <a href="https://openwrt.org/">OpenWRT</a> or <a href="https://lede-project.org/">LEDE</a> exist, but they don't fully support all stock features yet. So instead this approach is based on modified stock firmware.</p>
-<p><img alt="Netgear Nighthawk X4S" src="/blog/r7800-custom/x4s.jpg">
-<img alt="Serious webcam" src="/blog/r7800-custom/webcam.jpg"></p>
+<p><img alt="Netgear Nighthawk X4S" src="https://www.fredericb.info/blog/r7800-custom/x4s.jpg">
+<img alt="Serious webcam" src="https://www.fredericb.info/blog/r7800-custom/webcam.jpg"></p>
 <p>Main steps are:</p>
 <ul>
 <li>Customize kernel to add USB video support (uvc, v4l2)</li>
@@ -123,7 +123,7 @@ Alternative firmwares like <a href="https://openwrt.org/">OpenWRT</a> or <a href
 </ul>
 <h1>Root that firmware</h1>
 <p>I first thought that this step would be a pain, but then reminded the device manufacturer name. By grepping 'telnet' in the <a href="https://www.netgear.com/support/product/r7800.aspx#download">firmware binary</a>, we discover the existence of a debug page <em>/debug.htm</em> , with telnet option:</p>
-<p><img alt="R7800 debug webpage" src="/blog/r7800-custom/r7800_debug_page.png" width="852px"></p>
+<p><img alt="R7800 debug webpage" src="https://www.fredericb.info/blog/r7800-custom/r7800_debug_page.png" width="852px"></p>
 <p>Telnet access is protected with the same password as WebUI, and gives a root shell.</p>
 <h1>Backup all the things</h1>
 <p>Thanks to telnet access, we backup the original kernel partition on an external USB drive :</p>
@@ -404,10 +404,10 @@ In addition of your own settings, I recommend to set the output storage path to 
   </div>
   <div class="tag-cloud">
     <p>
-      <a href="/tag/kernel.html">kernel</a>
-      <a href="/tag/netgear.html">netgear</a>
-      <a href="/tag/usb.html">usb</a>
-      <a href="/tag/v4l2.html">v4l2</a>
+      <a href="https://www.fredericb.info/tag/kernel.html">kernel</a>
+      <a href="https://www.fredericb.info/tag/netgear.html">netgear</a>
+      <a href="https://www.fredericb.info/tag/usb.html">usb</a>
+      <a href="https://www.fredericb.info/tag/v4l2.html">v4l2</a>
     </p>
   </div>
 
@@ -445,7 +445,7 @@ In addition of your own settings, I recommend to set the output storage path to 
   "@context" : "http://schema.org",
   "@type" : "Blog",
   "name": " fred's notes ",
-  "url" : "",
+  "url" : "https://www.fredericb.info",
   "image": "/resources/sitelogo.jpg",
   "description": "Frédéric's Thoughts and Writings"
 }
