@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>fred's notes</title><link href="https://www.fredericb.info/" rel="alternate"></link><link href="https://www.fredericb.info/feeds/all.atom.xml" rel="self"></link><id>https://www.fredericb.info/</id><updated>2018-03-07T00:00:00-08:00</updated><entry><title>Emulating Exynos 4210 BootROM in QEMU</title><link href="https://www.fredericb.info/2018/03/emulating-exynos-4210-bootrom-in-qemu.html" rel="alternate"></link><published>2018-03-07T00:00:00-08:00</published><updated>2018-03-07T00:00:00-08:00</updated><author><name>Frédéric</name></author><id>tag:www.fredericb.info,2018-03-07:/2018/03/emulating-exynos-4210-bootrom-in-qemu.html</id><summary type="html">&lt;p&gt;&lt;a href="https://www.qemu.org/"&gt;QEMU&lt;/a&gt; has support for the SMDKC210 machine, an ARM board based on Exynos 4210 SoC.
+<feed xmlns="http://www.w3.org/2005/Atom"><title>fred's notes</title><link href="https://fredericb.info/" rel="alternate"></link><link href="https://fredericb.info/feeds/all.atom.xml" rel="self"></link><id>https://fredericb.info/</id><updated>2018-03-07T00:00:00-08:00</updated><entry><title>Emulating Exynos 4210 BootROM in QEMU</title><link href="https://fredericb.info/2018/03/emulating-exynos-4210-bootrom-in-qemu.html" rel="alternate"></link><published>2018-03-07T00:00:00-08:00</published><updated>2018-03-07T00:00:00-08:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2018-03-07:/2018/03/emulating-exynos-4210-bootrom-in-qemu.html</id><summary type="html">&lt;p&gt;&lt;a href="https://www.qemu.org/"&gt;QEMU&lt;/a&gt; has support for the SMDKC210 machine, an ARM board based on Exynos 4210 SoC.
 Peripherals implemented in QEMU for this machine are &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/char/exynos4210_uart.c"&gt;UART&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/sd/sdhci.c"&gt;SDHCI&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/display/exynos4210_fimd.c"&gt;FIMD&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/i2c/exynos4210_i2c.c"&gt;I2C&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/intc/exynos4210_combiner.c"&gt;Interrupt Combiner&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/intc/exynos4210_gic.c"&gt;GIC&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/misc/exynos4210_clk.c"&gt;Clock&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/misc/exynos4210_pmu.c"&gt;PMU&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/misc/exynos4210_rng.c"&gt;RNG&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/timer/exynos4210_mct.c"&gt;MCT&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/timer/exynos4210_pwm.c"&gt;PWM&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/timer/exynos4210_rtc.c"&gt;RTC&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;&lt;a href="https://www.gsmarena.com/samsung_i9100_galaxy_s_ii-3621.php"&gt;Samsung Galaxy S2&lt;/a&gt; phone is also based on Exynos 4210, so it should be …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="https://www.qemu.org/"&gt;QEMU&lt;/a&gt; has support for the SMDKC210 machine, an ARM board based on Exynos 4210 SoC.
 Peripherals implemented in QEMU for this machine are &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/char/exynos4210_uart.c"&gt;UART&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/sd/sdhci.c"&gt;SDHCI&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/display/exynos4210_fimd.c"&gt;FIMD&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/i2c/exynos4210_i2c.c"&gt;I2C&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/intc/exynos4210_combiner.c"&gt;Interrupt Combiner&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/intc/exynos4210_gic.c"&gt;GIC&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/misc/exynos4210_clk.c"&gt;Clock&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/misc/exynos4210_pmu.c"&gt;PMU&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/misc/exynos4210_rng.c"&gt;RNG&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/timer/exynos4210_mct.c"&gt;MCT&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/timer/exynos4210_pwm.c"&gt;PWM&lt;/a&gt;, &lt;a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/timer/exynos4210_rtc.c"&gt;RTC&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;&lt;a href="https://www.gsmarena.com/samsung_i9100_galaxy_s_ii-3621.php"&gt;Samsung Galaxy S2&lt;/a&gt; phone is also based on Exynos 4210, so it should be &lt;strong&gt;&lt;em&gt;relatively&lt;/em&gt;&lt;/strong&gt; easy to emulate its BootROM in QEMU.&lt;/p&gt;
 &lt;p&gt;This article describes how to extract BootROM (and associated fuses) from Galaxy S2 phone, implement additional required peripherals in QEMU (like the hardware cryptographic engine), and debug inevitable issues. Source code has been published on &lt;a href="https://github.com/frederic/qemu-exynos-bootrom"&gt;GitHub&lt;/a&gt;. We'll also take advantage of the dynamic debugging capability offered by QEMU to have a quick look at secure boot implementation.&lt;/p&gt;
 &lt;h1&gt;Documentation&lt;/h1&gt;
-&lt;p&gt;&lt;img alt="Exynos 4 Dual 45nm" src="https://www.fredericb.info/blog/qemu-exynos4210/exynos_4210_features.jpg" width="700px"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Exynos 4 Dual 45nm" src="https://fredericb.info/blog/qemu-exynos4210/exynos_4210_features.jpg" width="700px"&gt;&lt;/p&gt;
 &lt;p&gt;Samsung has released &lt;a href="http://www.samsung.com/global/business/semiconductor/file/product/Exynos_4_Dual_45nm_User_Manaul_Public_REV1.00-0.pdf"&gt;a (partial) datasheet&lt;/a&gt;.
 It includes the following memory map :&lt;/p&gt;
-&lt;p&gt;&lt;img alt="Memory Map" src="https://www.fredericb.info/blog/qemu-exynos4210/exynos_4210_memmap.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Memory Map" src="https://fredericb.info/blog/qemu-exynos4210/exynos_4210_memmap.png"&gt;&lt;/p&gt;
 &lt;p&gt;Another significant ressource is the &lt;a href="https://github.com/pngcui/uboot-2017.07-iTop4412"&gt;U-Boot source code&lt;/a&gt; for development boards (like &lt;a href="http://www.hardkernel.com/main/products/prdt_info.php?g_code=G133999328931"&gt;ODROID X&lt;/a&gt;) based on same processor. It contains interesting technical information on hardware peripherals (like addresses, registers, values).&lt;/p&gt;
 &lt;p&gt;Finally, hacker &lt;a href="https://forum.xda-developers.com/showthread.php?t=1986887"&gt;community&lt;/a&gt; has &lt;a href="https://forum.xda-developers.com/showthread.php?t=1274999"&gt;contributed&lt;/a&gt; a &lt;a href="https://forum.xda-developers.com/showthread.php?t=1313588"&gt;lot&lt;/a&gt; over the past years.&lt;/p&gt;
 &lt;h1&gt;Dump all the things&lt;/h1&gt;
@@ -26,7 +26,7 @@ Accessible through the &lt;strong&gt;mmcblk0boot0&lt;/strong&gt; device file, we
 
 
 &lt;p&gt;We generate an entropy graph of dumped data using &lt;a href="https://github.com/ReFirmLabs/binwalk"&gt;binwalk tool&lt;/a&gt; :&lt;/p&gt;
-&lt;p&gt;&lt;img alt="Entropy of bootloader image" src="https://www.fredericb.info/blog/qemu-exynos4210/exynos_4210_bootloader_entropy.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Entropy of bootloader image" src="https://fredericb.info/blog/qemu-exynos4210/exynos_4210_bootloader_entropy.png"&gt;&lt;/p&gt;
 &lt;p&gt;The first part with high entropy (almost E=1) is the encrypted FWBL1 image, the next stage to execute after BootROM.&lt;/p&gt;
 &lt;h2&gt;Dump BootROM&lt;/h2&gt;
 &lt;p&gt;Memory map indicates that BootROM, also called iROM, is mapped at address &lt;strong&gt;0x0000_0000&lt;/strong&gt;.
@@ -289,16 +289,16 @@ Fortunately, these structures are defined in &lt;a href="https://github.com/medi
 &lt;p&gt;Since &lt;strong&gt;&lt;em&gt;OTP_key&lt;/em&gt;&lt;/strong&gt; is in read-only OTP memory, attacker cannot replace &lt;strong&gt;rsaPubKey&lt;/strong&gt; to forge a new signature, otherwise derivated &lt;strong&gt;Key&lt;/strong&gt; would be different and HMAC verification would fail.&lt;/p&gt;
 &lt;p&gt;Finally, authenticated payload is decrypted using AES-CBC-128, with same &lt;strong&gt;Key&lt;/strong&gt; as the HMAC one (first 16 bytes only). IV is the SHA1 of &lt;strong&gt;rsaPubKey&lt;/strong&gt; (first 16 bytes).&lt;/p&gt;
 &lt;h1&gt;Conclusion&lt;/h1&gt;
-&lt;p&gt;QEMU is able to run Exynos 4210 BootROM with &lt;strong&gt;&lt;em&gt;relatively&lt;/em&gt;&lt;/strong&gt; &lt;a href="https://github.com/frederic/qemu-exynos-bootrom"&gt;small code changes&lt;/a&gt; (~600 LoC). This project allows to debug BootROM dynamically with GDB. It has been helpful for analyzing secure boot mechanism that loads and authenticates the next stage from flash memory.&lt;/p&gt;</content><category term="arm"></category><category term="exynos"></category><category term="samsung"></category><category term="bootrom"></category><category term="qemu"></category><category term="emulation"></category><category term="bootloader"></category><category term="secureboot"></category></entry><entry><title>Netgear Nighthawk R7800 : add USB camera support to create a security webcam</title><link href="https://www.fredericb.info/2017/11/netgear-nighthawk-r7800-add-usb-camera-support-to-create-a-security-webcam.html" rel="alternate"></link><published>2017-11-22T00:00:00-08:00</published><updated>2017-11-22T00:00:00-08:00</updated><author><name>Frédéric</name></author><id>tag:www.fredericb.info,2017-11-22:/2017/11/netgear-nighthawk-r7800-add-usb-camera-support-to-create-a-security-webcam.html</id><summary type="html">&lt;p&gt;This article explains how to customize Nighthawk X4S firmware to add a security camera feature to this always-online &amp;amp; almost-always-idle device.
+&lt;p&gt;QEMU is able to run Exynos 4210 BootROM with &lt;strong&gt;&lt;em&gt;relatively&lt;/em&gt;&lt;/strong&gt; &lt;a href="https://github.com/frederic/qemu-exynos-bootrom"&gt;small code changes&lt;/a&gt; (~600 LoC). This project allows to debug BootROM dynamically with GDB. It has been helpful for analyzing secure boot mechanism that loads and authenticates the next stage from flash memory.&lt;/p&gt;</content><category term="arm"></category><category term="exynos"></category><category term="samsung"></category><category term="bootrom"></category><category term="qemu"></category><category term="emulation"></category><category term="bootloader"></category><category term="secureboot"></category></entry><entry><title>Netgear Nighthawk R7800 : add USB camera support to create a security webcam</title><link href="https://fredericb.info/2017/11/netgear-nighthawk-r7800-add-usb-camera-support-to-create-a-security-webcam.html" rel="alternate"></link><published>2017-11-22T00:00:00-08:00</published><updated>2017-11-22T00:00:00-08:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2017-11-22:/2017/11/netgear-nighthawk-r7800-add-usb-camera-support-to-create-a-security-webcam.html</id><summary type="html">&lt;p&gt;This article explains how to customize Nighthawk X4S firmware to add a security camera feature to this always-online &amp;amp; almost-always-idle device.
 Alternative firmwares like &lt;a href="https://openwrt.org/"&gt;OpenWRT&lt;/a&gt; or &lt;a href="https://lede-project.org/"&gt;LEDE&lt;/a&gt; exist, but they don't fully support all stock features yet. So instead this approach is based on modified stock firmware.&lt;/p&gt;
-&lt;p&gt;&lt;img alt="Netgear Nighthawk X4S" src="https://www.fredericb.info/blog/r7800-custom/x4s.jpg"&gt;
-&lt;img alt="Serious webcam" src="https://www.fredericb.info/blog/r7800-custom/webcam.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Netgear Nighthawk X4S" src="https://fredericb.info/blog/r7800-custom/x4s.jpg"&gt;
+&lt;img alt="Serious webcam" src="https://fredericb.info/blog/r7800-custom/webcam.jpg"&gt;&lt;/p&gt;
 &lt;p&gt;Main steps are:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Customize …&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;p&gt;This article explains how to customize Nighthawk X4S firmware to add a security camera feature to this always-online &amp;amp; almost-always-idle device.
 Alternative firmwares like &lt;a href="https://openwrt.org/"&gt;OpenWRT&lt;/a&gt; or &lt;a href="https://lede-project.org/"&gt;LEDE&lt;/a&gt; exist, but they don't fully support all stock features yet. So instead this approach is based on modified stock firmware.&lt;/p&gt;
-&lt;p&gt;&lt;img alt="Netgear Nighthawk X4S" src="https://www.fredericb.info/blog/r7800-custom/x4s.jpg"&gt;
-&lt;img alt="Serious webcam" src="https://www.fredericb.info/blog/r7800-custom/webcam.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Netgear Nighthawk X4S" src="https://fredericb.info/blog/r7800-custom/x4s.jpg"&gt;
+&lt;img alt="Serious webcam" src="https://fredericb.info/blog/r7800-custom/webcam.jpg"&gt;&lt;/p&gt;
 &lt;p&gt;Main steps are:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Customize kernel to add USB video support (uvc, v4l2)&lt;/li&gt;
@@ -315,7 +315,7 @@ Alternative firmwares like &lt;a href="https://openwrt.org/"&gt;OpenWRT&lt;/a&gt
 &lt;/ul&gt;
 &lt;h1&gt;Root that firmware&lt;/h1&gt;
 &lt;p&gt;I first thought that this step would be a pain, but then reminded the device manufacturer name. By grepping 'telnet' in the &lt;a href="https://www.netgear.com/support/product/r7800.aspx#download"&gt;firmware binary&lt;/a&gt;, we discover the existence of a debug page &lt;em&gt;/debug.htm&lt;/em&gt; , with telnet option:&lt;/p&gt;
-&lt;p&gt;&lt;img alt="R7800 debug webpage" src="https://www.fredericb.info/blog/r7800-custom/r7800_debug_page.png" width="852px"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="R7800 debug webpage" src="https://fredericb.info/blog/r7800-custom/r7800_debug_page.png" width="852px"&gt;&lt;/p&gt;
 &lt;p&gt;Telnet access is protected with the same password as WebUI, and gives a root shell.&lt;/p&gt;
 &lt;h1&gt;Backup all the things&lt;/h1&gt;
 &lt;p&gt;Thanks to telnet access, we backup the original kernel partition on an external USB drive :&lt;/p&gt;
@@ -592,7 +592,7 @@ It will only be triggered when a station connects or disconnects from the router
 &lt;p&gt;Finally, we edit the file &lt;em&gt;/etc/motion/motion.conf&lt;/em&gt; to configure motion. A &lt;a href="http://htmlpreview.github.io/?https://github.com/Motion-Project/motion/blob/master/motion_guide.html"&gt;guide is available on official motion website&lt;/a&gt;.
 In addition of your own settings, I recommend to set the output storage path to an external USB drive :&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;target_dir /mnt/sda1
-&lt;/pre&gt;&lt;/div&gt;</content><category term="kernel"></category><category term="netgear"></category><category term="usb"></category><category term="v4l2"></category></entry><entry><title>SVE-2016-7930: Multiple buffer overflows in Samsung Galaxy bootloader</title><link href="https://www.fredericb.info/2017/07/sve-2016-7930-multiple-buffer-overflows-in-samsung-galaxy-bootloader.html" rel="alternate"></link><published>2017-07-23T00:00:00-07:00</published><updated>2017-07-23T00:00:00-07:00</updated><author><name>Frédéric</name></author><id>tag:www.fredericb.info,2017-07-23:/2017/07/sve-2016-7930-multiple-buffer-overflows-in-samsung-galaxy-bootloader.html</id><summary type="html">&lt;h1&gt;Prequel&lt;/h1&gt;
+&lt;/pre&gt;&lt;/div&gt;</content><category term="kernel"></category><category term="netgear"></category><category term="usb"></category><category term="v4l2"></category></entry><entry><title>SVE-2016-7930: Multiple buffer overflows in Samsung Galaxy bootloader</title><link href="https://fredericb.info/2017/07/sve-2016-7930-multiple-buffer-overflows-in-samsung-galaxy-bootloader.html" rel="alternate"></link><published>2017-07-23T00:00:00-07:00</published><updated>2017-07-23T00:00:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2017-07-23:/2017/07/sve-2016-7930-multiple-buffer-overflows-in-samsung-galaxy-bootloader.html</id><summary type="html">&lt;h1&gt;Prequel&lt;/h1&gt;
 &lt;p&gt;On October 21st 2015, mobile forensics company &lt;a href="https://www.cellebrite.com/"&gt;Cellebrite&lt;/a&gt; published a video that demonstrates how their solution can dump eMMC of Samsung Galaxy devices :&lt;/p&gt;
 &lt;iframe width="560" height="315" src="https://www.youtube.com/embed/ZsGBbswJGi4?rel=0" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen&gt;&lt;/iframe&gt;
 
@@ -625,7 +625,7 @@ In addition of your own settings, I recommend to set the output storage path to 
 &lt;li&gt;2017-03-07 Public disclosure in Samsung Bulletin &lt;a href="https://security.samsungmobile.com/securityUpdate.smsb"&gt;SMR-MAR-2017&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;2017-06-08 Talk at &lt;a href="https://www.sstic.org/2017/presentation/attacking_samsung_secure_boot/"&gt;SSTIC 2017 conference&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;2017-07-21 &lt;a href="https://github.com/frederic/SVE-2016-7930"&gt;Proof-of-Concept released&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><category term="vulnerability"></category><category term="advisory"></category><category term="samsung"></category><category term="cellebrite"></category><category term="bootloader"></category><category term="exploit"></category><category term="firmware"></category><category term="security"></category><category term="usb"></category><category term="arm"></category><category term="odin"></category></entry><entry><title>Amlogic S905 SoC: bypassing the (not so) Secure Boot to dump the BootROM</title><link href="https://www.fredericb.info/2016/10/amlogic-s905-soc-bypassing-not-so.html" rel="alternate"></link><published>2016-10-05T00:00:00-07:00</published><updated>2016-10-05T00:00:00-07:00</updated><author><name>Frédéric</name></author><id>tag:www.fredericb.info,2016-10-05:/2016/10/amlogic-s905-soc-bypassing-not-so.html</id><summary type="html">&lt;p&gt;The &lt;a href=
+&lt;/ul&gt;</content><category term="vulnerability"></category><category term="advisory"></category><category term="samsung"></category><category term="cellebrite"></category><category term="bootloader"></category><category term="exploit"></category><category term="firmware"></category><category term="security"></category><category term="usb"></category><category term="arm"></category><category term="odin"></category></entry><entry><title>Amlogic S905 SoC: bypassing the (not so) Secure Boot to dump the BootROM</title><link href="https://fredericb.info/2016/10/amlogic-s905-soc-bypassing-not-so.html" rel="alternate"></link><published>2016-10-05T00:00:00-07:00</published><updated>2016-10-05T00:00:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2016-10-05:/2016/10/amlogic-s905-soc-bypassing-not-so.html</id><summary type="html">&lt;p&gt;The &lt;a href=
 "http://www.amlogic.com/#Products/176/index.html"&gt;Amlogic S905
 System-On-Chip&lt;/a&gt; is an ARM processor designed for video
 applications. It's widely used in Android/Kodi media boxes. The SoC
@@ -639,7 +639,7 @@ features :&lt;br&gt;
 &lt;tbody&gt;
 &lt;tr&gt;
 &lt;td style="text-align: center;"&gt;
-&lt;img alt="S905 block diagram" src="https://www.fredericb.info/blog/amlogic-sb/S905_arch.png"&gt;
+&lt;img alt="S905 block diagram" src="https://fredericb.info/blog/amlogic-sb/S905_arch.png"&gt;
 &lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -663,7 +663,7 @@ features :&lt;br&gt;
 &lt;tbody&gt;
 &lt;tr&gt;
 &lt;td style="text-align: center;"&gt;
-&lt;img alt="S905 block diagram" src="https://www.fredericb.info/blog/amlogic-sb/S905_arch.png"&gt;
+&lt;img alt="S905 block diagram" src="https://fredericb.info/blog/amlogic-sb/S905_arch.png"&gt;
 &lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -715,7 +715,7 @@ since there is a port header with labels for the pinout:&lt;br&gt;
 &lt;tbody&gt;
 &lt;tr&gt;
 &lt;td style="text-align: center;"&gt;
-&lt;img alt="UART" src="https://www.fredericb.info/blog/amlogic-sb/uart_header.jpg"&gt;
+&lt;img alt="UART" src="https://fredericb.info/blog/amlogic-sb/uart_header.jpg"&gt;
 &lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -810,7 +810,7 @@ Firmware (ATF)&lt;/a&gt; reference implementation.&lt;/div&gt;
 &lt;tbody&gt;
 &lt;tr&gt;
 &lt;td style="text-align: center;"&gt;
-&lt;img alt="ARM Trusted Firmware Design" src="https://www.fredericb.info/blog/amlogic-sb/securebootflow.png"&gt;
+&lt;img alt="ARM Trusted Firmware Design" src="https://fredericb.info/blog/amlogic-sb/securebootflow.png"&gt;
 &lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -867,7 +867,7 @@ from Normal World:&lt;br&gt;
 &lt;tbody&gt;
 &lt;tr&gt;
 &lt;td style="text-align: center;"&gt;
-&lt;img alt="" src="https://www.fredericb.info/blog/amlogic-sb/rt_svc_descs.png"&gt;
+&lt;img alt="" src="https://fredericb.info/blog/amlogic-sb/rt_svc_descs.png"&gt;
 &lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -886,7 +886,7 @@ several custom functions developed by Amlogic:&lt;br&gt;
 &lt;tbody&gt;
 &lt;tr&gt;
 &lt;td style="text-align: center;"&gt;
-&lt;img alt="" src="https://www.fredericb.info/blog/amlogic-sb/sip_svc_plat_ops.png"&gt;
+&lt;img alt="" src="https://fredericb.info/blog/amlogic-sb/sip_svc_plat_ops.png"&gt;
 &lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -907,7 +907,7 @@ strictly restrict access to specific memory ranges:&lt;br&gt;
 &lt;tbody&gt;
 &lt;tr&gt;
 &lt;td style="text-align: center;"&gt;
-&lt;img alt="" src="https://www.fredericb.info/blog/amlogic-sb/hdcp22_sec_read_reg.png"&gt;
+&lt;img alt="" src="https://fredericb.info/blog/amlogic-sb/hdcp22_sec_read_reg.png"&gt;
 &lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -1057,7 +1057,7 @@ thus obtain full access to secure memory.&lt;br&gt;
 &lt;tbody&gt;
 &lt;tr&gt;
 &lt;td style="text-align: center;"&gt;
-&lt;img alt="" src="https://www.fredericb.info/blog/amlogic-sb/bl31-hdcp22_sec_read_reg-asm-custom.png"&gt;
+&lt;img alt="" src="https://fredericb.info/blog/amlogic-sb/bl31-hdcp22_sec_read_reg-asm-custom.png"&gt;
 &lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -1078,7 +1078,7 @@ By default, the following memory regions are mapped:&lt;br&gt;
 &lt;tbody&gt;
 &lt;tr&gt;
 &lt;td style="text-align: center;"&gt;
-&lt;img alt="" src="https://www.fredericb.info/blog/amlogic-sb/plat_gxb_mmap.png"&gt;
+&lt;img alt="" src="https://fredericb.info/blog/amlogic-sb/plat_gxb_mmap.png"&gt;
 &lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -1095,7 +1095,7 @@ We extend the size of one of them to cover the BootROM region:&lt;br&gt;
 &lt;tbody&gt;
 &lt;tr&gt;
 &lt;td style="text-align: center;"&gt;
-&lt;img alt="" src="https://www.fredericb.info/blog/amlogic-sb/bl31-plat_gxb_mmap-custom.png"&gt;
+&lt;img alt="" src="https://fredericb.info/blog/amlogic-sb/bl31-plat_gxb_mmap-custom.png"&gt;
 &lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -1245,7 +1245,7 @@ direct contact."&lt;br&gt;
 2016-09-05 : Bug report shared with Amlogic&lt;br&gt;
 2016-09-13 : Status update requested&lt;br&gt;
 2016-09-25 : Status update requested&lt;br&gt;
-2016-10-05 : Public disclosure&lt;/div&gt;&lt;/p&gt;</content><category term="vulnerability"></category><category term="amlogic"></category><category term="arm"></category><category term="security"></category><category term="firmware"></category><category term="trustzone"></category><category term="bootrom"></category><category term="bug"></category></entry><entry><title>PowerLine (PLC) support in OpenWrt for D-Link DHP-1565</title><link href="https://www.fredericb.info/2016/02/powerline-plc-support-in-openwrt-for-d.html" rel="alternate"></link><published>2016-02-20T13:55:00-08:00</published><updated>2016-02-20T13:55:00-08:00</updated><author><name>Frédéric</name></author><id>tag:www.fredericb.info,2016-02-20:/2016/02/powerline-plc-support-in-openwrt-for-d.html</id><summary type="html">&lt;p&gt;D-Link 1565 is one of the few routers which integrates a PLC (Power
+2016-10-05 : Public disclosure&lt;/div&gt;&lt;/p&gt;</content><category term="vulnerability"></category><category term="amlogic"></category><category term="arm"></category><category term="security"></category><category term="firmware"></category><category term="trustzone"></category><category term="bootrom"></category><category term="bug"></category></entry><entry><title>PowerLine (PLC) support in OpenWrt for D-Link DHP-1565</title><link href="https://fredericb.info/2016/02/powerline-plc-support-in-openwrt-for-d.html" rel="alternate"></link><published>2016-02-20T13:55:00-08:00</published><updated>2016-02-20T13:55:00-08:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2016-02-20:/2016/02/powerline-plc-support-in-openwrt-for-d.html</id><summary type="html">&lt;p&gt;D-Link 1565 is one of the few routers which integrates a PLC (Power
 line Communication) chipset (in this case QCA AR7400).
 Unfortunately, OpenWrt does not provide support for this feature
 yet.&lt;br&gt;
@@ -1268,7 +1268,7 @@ source code&lt;/a&gt;&amp;nbsp;released for this device, especially function
 we notice the port 6 of internal switch AR8327 &amp;nbsp;is related to
 PLC:&lt;br&gt;
 &lt;div class="separator" style="clear: both; text-align: center;"&gt;
-&lt;img alt="" src="https://www.fredericb.info/blog/dhp-1665-plc/athsdk_port6config.png"&gt;
+&lt;img alt="" src="https://fredericb.info/blog/dhp-1665-plc/athsdk_port6config.png"&gt;
 &lt;/div&gt;
 &lt;br&gt;
 This port 6 is configured as a RGMII interface to communicate with
@@ -1409,7 +1409,7 @@ service_triggers&lt;span class="o"&gt;()&lt;/span&gt;
 
 &lt;div&gt;Et voilà !&lt;/div&gt;
 
-&lt;/div&gt;</content><category term="PLC"></category><category term="dhp-1565"></category><category term="AR7400"></category><category term="openwrt"></category></entry><entry><title>Analysis of Nexus 5 Monitor mode</title><link href="https://www.fredericb.info/2014/12/analysis-of-nexus-5-monitor-mode.html" rel="alternate"></link><published>2014-12-25T13:28:00-08:00</published><updated>2014-12-25T13:28:00-08:00</updated><author><name>Frédéric</name></author><id>tag:www.fredericb.info,2014-12-25:/2014/12/analysis-of-nexus-5-monitor-mode.html</id><summary type="html">&lt;p&gt;This article will first describe how to locate the Monitor mode
+&lt;/div&gt;</content><category term="PLC"></category><category term="dhp-1565"></category><category term="AR7400"></category><category term="openwrt"></category></entry><entry><title>Analysis of Nexus 5 Monitor mode</title><link href="https://fredericb.info/2014/12/analysis-of-nexus-5-monitor-mode.html" rel="alternate"></link><published>2014-12-25T13:28:00-08:00</published><updated>2014-12-25T13:28:00-08:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2014-12-25:/2014/12/analysis-of-nexus-5-monitor-mode.html</id><summary type="html">&lt;p&gt;This article will first describe how to locate the Monitor mode
 code in Nexus 5 firmware (&lt;a href=
 "https://dl.google.com/dl/android/aosp/hammerhead-ktu84p-factory-35ea0277.tgz"&gt;hammerhead-ktu84p-factory-35ea0277&lt;/a&gt;,
 bootloader-hammerhead-hhz11k : c32f8bec310c659c1296739b00c6a8ac).
@@ -1683,7 +1683,7 @@ ARM Ref.&lt;/a&gt; (B1-1167) :&lt;br&gt;
 &lt;tbody&gt;
 &lt;tr&gt;
 &lt;td style="text-align: center;"&gt;
-&lt;img alt="" src="https://www.fredericb.info/blog/nexus5-monitor/ref_vec_table.png"&gt;
+&lt;img alt="" src="https://fredericb.info/blog/nexus5-monitor/ref_vec_table.png"&gt;
 &lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -2295,7 +2295,7 @@ an external ELF can be loaded and executed in TrustZone with a
 dedicated Secure memory space.
 However, this analysis is not complete since IRQ &amp;amp; FIQ handlers
 have not been studied.&lt;/p&gt;
-&lt;p&gt;--&lt;em&gt;I would like to thank Adrien &amp;amp; Diane for their help!&lt;/em&gt;&lt;/p&gt;</content><category term="arm"></category><category term="security"></category><category term="qualcomm"></category><category term="firmware"></category><category term="android"></category><category term="nexus"></category><category term="trustzone"></category></entry><entry><title>[QPSIIR-80] Qualcomm TrustZone Integer Signedness bug</title><link href="https://www.fredericb.info/2014/12/qpsiir-80-qualcomm-trustzone-integer.html" rel="alternate"></link><published>2014-12-18T02:05:00-08:00</published><updated>2014-12-18T02:05:00-08:00</updated><author><name>Frédéric</name></author><id>tag:www.fredericb.info,2014-12-18:/2014/12/qpsiir-80-qualcomm-trustzone-integer.html</id><summary type="html">&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;--&lt;em&gt;I would like to thank Adrien &amp;amp; Diane for their help!&lt;/em&gt;&lt;/p&gt;</content><category term="arm"></category><category term="security"></category><category term="qualcomm"></category><category term="firmware"></category><category term="android"></category><category term="nexus"></category><category term="trustzone"></category></entry><entry><title>[QPSIIR-80] Qualcomm TrustZone Integer Signedness bug</title><link href="https://fredericb.info/2014/12/qpsiir-80-qualcomm-trustzone-integer.html" rel="alternate"></link><published>2014-12-18T02:05:00-08:00</published><updated>2014-12-18T02:05:00-08:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2014-12-18:/2014/12/qpsiir-80-qualcomm-trustzone-integer.html</id><summary type="html">&lt;h2&gt;Summary&lt;/h2&gt;
 
 &lt;div style="text-align: justify;"&gt;Qualcomm TrustZone is prone to an
 integer signedness bug that may allow to write NULL words to barely
@@ -2460,7 +2460,7 @@ triggered.&lt;/div&gt;
 &lt;span style="white-space: pre;"&gt;&lt;a href=
 "https://www.qualcomm.com/connect/contact/security/product-security/hall-of-fame"&gt;
 https://www.qualcomm.com/connect/contact/security/product-security/hall-of-fame&lt;/a&gt;&lt;/span&gt;&lt;br&gt;&lt;/p&gt;
-&lt;hr&gt;</content><category term="vulnerability"></category><category term="advisory"></category><category term="arm"></category><category term="security"></category><category term="qualcomm"></category><category term="android"></category><category term="trustzone"></category></entry><entry><title>Exploitation of Philips Smart TV</title><link href="https://www.fredericb.info/2014/11/exploitation-of-philips-smart-tv.html" rel="alternate"></link><published>2014-11-13T13:29:00-08:00</published><updated>2014-11-13T13:29:00-08:00</updated><author><name>Frédéric</name></author><id>tag:www.fredericb.info,2014-11-13:/2014/11/exploitation-of-philips-smart-tv.html</id><summary type="html">&lt;p&gt;&lt;em&gt;This post is a translated summary of the article published for &lt;a href=
+&lt;hr&gt;</content><category term="vulnerability"></category><category term="advisory"></category><category term="arm"></category><category term="security"></category><category term="qualcomm"></category><category term="android"></category><category term="trustzone"></category></entry><entry><title>Exploitation of Philips Smart TV</title><link href="https://fredericb.info/2014/11/exploitation-of-philips-smart-tv.html" rel="alternate"></link><published>2014-11-13T13:29:00-08:00</published><updated>2014-11-13T13:29:00-08:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2014-11-13:/2014/11/exploitation-of-philips-smart-tv.html</id><summary type="html">&lt;p&gt;&lt;em&gt;This post is a translated summary of the article published for &lt;a href=
 "https://www.sstic.org/2014/presentation/securite_des_ordivisions/"&gt;
 my talk at SSTIC 2014 conference (french)&lt;/a&gt;.&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;My Philips Smart TV is a Linux box standing there in my living room : that's a sufficient reason
@@ -2481,7 +2481,7 @@ discovered a serial port on the back panel of the TV set.&lt;/div&gt;
 &lt;tbody&gt;
 &lt;tr &gt;
 &lt;td class="tr-caption" style="text-align: center;"&gt;
-&lt;img alt="" src="https://www.fredericb.info/blog/smarttv/uart.jpg" width="256px"&gt;
+&lt;img alt="" src="https://fredericb.info/blog/smarttv/uart.jpg" width="256px"&gt;
 &lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -2705,10 +2705,10 @@ We can notice that :&lt;br&gt;
 &lt;li&gt;stack is not randomized&lt;/li&gt;
 &lt;/ul&gt;
 We can also extract &lt;strike&gt;private&lt;/strike&gt; public [0] RSA key to
-decrypt firmware updates with &lt;a href="https://www.fredericb.info/2014/05/pflupg-tool-unpack-philips-smarttv.html"&gt;pflupg-tool&lt;/a&gt;.&lt;/p&gt;
+decrypt firmware updates with &lt;a href="https://fredericb.info/2014/05/pflupg-tool-unpack-philips-smarttv.html"&gt;pflupg-tool&lt;/a&gt;.&lt;/p&gt;
 &lt;hr&gt;
 &lt;p&gt;[0] Edit 2014/11/14 : Thanks andreashappe for pointing out this
-mistake.&lt;/p&gt;</content><category term="mips"></category><category term="smarttv"></category><category term="libupnp"></category><category term="philips"></category><category term="exploit"></category></entry><entry><title>pflupg-tool : unpack Philips SmartTV firmware</title><link href="https://www.fredericb.info/2014/05/pflupg-tool-unpack-philips-smarttv.html" rel="alternate"></link><published>2014-05-16T07:28:00-07:00</published><updated>2014-05-16T07:28:00-07:00</updated><author><name>Frédéric</name></author><id>tag:www.fredericb.info,2014-05-16:/2014/05/pflupg-tool-unpack-philips-smarttv.html</id><summary type="html">&lt;p&gt;&lt;a href="https://github.com/frederic/pflupg-tool"&gt;pflupg-tool&lt;/a&gt; is an
+mistake.&lt;/p&gt;</content><category term="mips"></category><category term="smarttv"></category><category term="libupnp"></category><category term="philips"></category><category term="exploit"></category></entry><entry><title>pflupg-tool : unpack Philips SmartTV firmware</title><link href="https://fredericb.info/2014/05/pflupg-tool-unpack-philips-smarttv.html" rel="alternate"></link><published>2014-05-16T07:28:00-07:00</published><updated>2014-05-16T07:28:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2014-05-16:/2014/05/pflupg-tool-unpack-philips-smarttv.html</id><summary type="html">&lt;p&gt;&lt;a href="https://github.com/frederic/pflupg-tool"&gt;pflupg-tool&lt;/a&gt; is an
 unpacking tool for Philips SmartTV firmware (Fusion platform). If
 your firmware is encrypted, you have to provide the corresponding
 public key (public exponent&amp;nbsp;+ modulus).&lt;br&gt;
@@ -2741,7 +2741,7 @@ You can add public keys in pflupg.h file:&lt;br&gt;&lt;/p&gt;
 &lt;p&gt;Source code can be found on &lt;a href=
 "https://github.com/frederic/pflupg-tool"&gt;GitHub&lt;/a&gt;. You'll need
 &lt;a href="https://www.gnu.org/software/libgcrypt/"&gt;Libgcrypt
-library&lt;/a&gt;&amp;nbsp;to compile it.&lt;/p&gt;</content><category term="mips"></category><category term="smarttv"></category><category term="firmware"></category><category term="philips"></category></entry><entry><title>[CVE-2014-2978] DirectFB remote out-of-bounds write vulnerability</title><link href="https://www.fredericb.info/2014/05/cve-2014-2978-directfb-remote-out-of.html" rel="alternate"></link><published>2014-05-15T16:09:00-07:00</published><updated>2014-05-15T16:09:00-07:00</updated><author><name>Frédéric</name></author><id>tag:www.fredericb.info,2014-05-15:/2014/05/cve-2014-2978-directfb-remote-out-of.html</id><summary type="html">&lt;h2&gt;Summary&lt;/h2&gt;
+library&lt;/a&gt;&amp;nbsp;to compile it.&lt;/p&gt;</content><category term="mips"></category><category term="smarttv"></category><category term="firmware"></category><category term="philips"></category></entry><entry><title>[CVE-2014-2978] DirectFB remote out-of-bounds write vulnerability</title><link href="https://fredericb.info/2014/05/cve-2014-2978-directfb-remote-out-of.html" rel="alternate"></link><published>2014-05-15T16:09:00-07:00</published><updated>2014-05-15T16:09:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2014-05-15:/2014/05/cve-2014-2978-directfb-remote-out-of.html</id><summary type="html">&lt;h2&gt;Summary&lt;/h2&gt;
 
 &lt;p&gt;DirectFB is prone to an out-of-bound write vulnerability since version
 1.4.4.&lt;/p&gt;
@@ -2782,7 +2782,7 @@ An attacker can choose to overflow in the heap or the stack.&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;http://www.directfb.org/&lt;/li&gt;
 &lt;li&gt;http://mail.directfb.org/pipermail/directfb-dev/2014-March/006805.html&lt;/li&gt;
-&lt;/ul&gt;</content><category term="vulnerability"></category><category term="advisory"></category></entry><entry><title>[CVE-2014-2977] DirectFB integer signedness vulnerability</title><link href="https://www.fredericb.info/2014/05/cve-2014-2977-directfb-integer.html" rel="alternate"></link><published>2014-05-15T16:05:00-07:00</published><updated>2014-05-15T16:05:00-07:00</updated><author><name>Frédéric</name></author><id>tag:www.fredericb.info,2014-05-15:/2014/05/cve-2014-2977-directfb-integer.html</id><summary type="html">&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;/ul&gt;</content><category term="vulnerability"></category><category term="advisory"></category></entry><entry><title>[CVE-2014-2977] DirectFB integer signedness vulnerability</title><link href="https://fredericb.info/2014/05/cve-2014-2977-directfb-integer.html" rel="alternate"></link><published>2014-05-15T16:05:00-07:00</published><updated>2014-05-15T16:05:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2014-05-15:/2014/05/cve-2014-2977-directfb-integer.html</id><summary type="html">&lt;h2&gt;Summary&lt;/h2&gt;
 
 &lt;p&gt;DirectFB is prone to an integer signedness vulnerability since
 version 1.4.13.&lt;/p&gt;
@@ -2824,13 +2824,13 @@ This integer coercion error may lead to a stack overflow.&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;http://www.directfb.org/&lt;/li&gt;
 &lt;li&gt;http://mail.directfb.org/pipermail/directfb-dev/2014-March/006805.html&lt;/li&gt;
-&lt;/ul&gt;</content><category term="vulnerability"></category><category term="advisory"></category></entry><entry><title>dfb-wireshark-dissector : DirectFB Voodoo protocol dissector for Wireshark</title><link href="https://www.fredericb.info/2014/05/dfb-wireshark-dissector-directfb-voodoo.html" rel="alternate"></link><published>2014-05-15T15:48:00-07:00</published><updated>2014-05-15T15:48:00-07:00</updated><author><name>Frédéric</name></author><id>tag:www.fredericb.info,2014-05-15:/2014/05/dfb-wireshark-dissector-directfb-voodoo.html</id><summary type="html">&lt;p&gt;&lt;a href="http://directfb.org/index.php?path=Platform/Voodoo"&gt;Voodoo&lt;/a&gt;&amp;nbsp;is the network layer of &lt;a href="http://directfb.org/"&gt;DirectFB&lt;/a&gt;. &lt;a href="https://github.com/frederic/dfb-wireshark-dissector"&gt;dfb-wireshark-dissector&lt;/a&gt; is a Wireshark plugin to dissect this protocol.&lt;br /&gt;Main features are :&lt;br /&gt;&lt;br /&gt;&lt;ul&gt;&lt;li&gt;Both packet &amp;amp; raw modes are supported ;&lt;/li&gt;&lt;li&gt;FLZ decompression ;&lt;/li&gt;&lt;li&gt;Instance ID resolution.&lt;/li&gt;&lt;/ul&gt;&lt;br /&gt;Source code can be found on &lt;a href="https://github.com/frederic/dfb-wireshark-dissector"&gt;Github&lt;/a&gt;.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://directfb.org/index.php?path=Platform/Voodoo"&gt;Voodoo&lt;/a&gt;&amp;nbsp;is the network layer of &lt;a href="http://directfb.org/"&gt;DirectFB&lt;/a&gt;. &lt;a href="https://github.com/frederic/dfb-wireshark-dissector"&gt;dfb-wireshark-dissector&lt;/a&gt; is a Wireshark plugin to dissect this protocol.&lt;br /&gt;Main features are :&lt;br /&gt;&lt;br /&gt;&lt;ul&gt;&lt;li&gt;Both packet &amp;amp; raw modes are supported ;&lt;/li&gt;&lt;li&gt;FLZ decompression ;&lt;/li&gt;&lt;li&gt;Instance ID resolution.&lt;/li&gt;&lt;/ul&gt;&lt;br /&gt;Source code can be found on &lt;a href="https://github.com/frederic/dfb-wireshark-dissector"&gt;Github&lt;/a&gt;.&lt;/p&gt;</content><category term="tool"></category><category term="wireshark"></category><category term="directfb"></category></entry><entry><title>Axis Camera M1011 Remote Code Execution Exploit</title><link href="https://www.fredericb.info/2013/07/axis-camera-m1011-remote-code-execution.html" rel="alternate"></link><published>2013-07-31T08:22:00-07:00</published><updated>2013-07-31T08:22:00-07:00</updated><author><name>Frédéric</name></author><id>tag:www.fredericb.info,2013-07-31:/2013/07/axis-camera-m1011-remote-code-execution.html</id><summary type="html">&lt;p&gt;In January 2013, &lt;a href="https://community.rapid7.com/community/infosec/blog/2013/01/29/security-flaws-in-universal-plug-and-play-unplug-dont-play"&gt;Rapid7 published&lt;/a&gt; a &lt;a href="https://community.rapid7.com/docs/DOC-2150"&gt;great paper&lt;/a&gt; describing several vulnerabilities in the most common UPnP libraries.
+&lt;/ul&gt;</content><category term="vulnerability"></category><category term="advisory"></category></entry><entry><title>dfb-wireshark-dissector : DirectFB Voodoo protocol dissector for Wireshark</title><link href="https://fredericb.info/2014/05/dfb-wireshark-dissector-directfb-voodoo.html" rel="alternate"></link><published>2014-05-15T15:48:00-07:00</published><updated>2014-05-15T15:48:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2014-05-15:/2014/05/dfb-wireshark-dissector-directfb-voodoo.html</id><summary type="html">&lt;p&gt;&lt;a href="http://directfb.org/index.php?path=Platform/Voodoo"&gt;Voodoo&lt;/a&gt;&amp;nbsp;is the network layer of &lt;a href="http://directfb.org/"&gt;DirectFB&lt;/a&gt;. &lt;a href="https://github.com/frederic/dfb-wireshark-dissector"&gt;dfb-wireshark-dissector&lt;/a&gt; is a Wireshark plugin to dissect this protocol.&lt;br /&gt;Main features are :&lt;br /&gt;&lt;br /&gt;&lt;ul&gt;&lt;li&gt;Both packet &amp;amp; raw modes are supported ;&lt;/li&gt;&lt;li&gt;FLZ decompression ;&lt;/li&gt;&lt;li&gt;Instance ID resolution.&lt;/li&gt;&lt;/ul&gt;&lt;br /&gt;Source code can be found on &lt;a href="https://github.com/frederic/dfb-wireshark-dissector"&gt;Github&lt;/a&gt;.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://directfb.org/index.php?path=Platform/Voodoo"&gt;Voodoo&lt;/a&gt;&amp;nbsp;is the network layer of &lt;a href="http://directfb.org/"&gt;DirectFB&lt;/a&gt;. &lt;a href="https://github.com/frederic/dfb-wireshark-dissector"&gt;dfb-wireshark-dissector&lt;/a&gt; is a Wireshark plugin to dissect this protocol.&lt;br /&gt;Main features are :&lt;br /&gt;&lt;br /&gt;&lt;ul&gt;&lt;li&gt;Both packet &amp;amp; raw modes are supported ;&lt;/li&gt;&lt;li&gt;FLZ decompression ;&lt;/li&gt;&lt;li&gt;Instance ID resolution.&lt;/li&gt;&lt;/ul&gt;&lt;br /&gt;Source code can be found on &lt;a href="https://github.com/frederic/dfb-wireshark-dissector"&gt;Github&lt;/a&gt;.&lt;/p&gt;</content><category term="tool"></category><category term="wireshark"></category><category term="directfb"></category></entry><entry><title>Axis Camera M1011 Remote Code Execution Exploit</title><link href="https://fredericb.info/2013/07/axis-camera-m1011-remote-code-execution.html" rel="alternate"></link><published>2013-07-31T08:22:00-07:00</published><updated>2013-07-31T08:22:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2013-07-31:/2013/07/axis-camera-m1011-remote-code-execution.html</id><summary type="html">&lt;p&gt;In January 2013, &lt;a href="https://community.rapid7.com/community/infosec/blog/2013/01/29/security-flaws-in-universal-plug-and-play-unplug-dont-play"&gt;Rapid7 published&lt;/a&gt; a &lt;a href="https://community.rapid7.com/docs/DOC-2150"&gt;great paper&lt;/a&gt; describing several vulnerabilities in the most common UPnP libraries.
 Six months later, many devices based on these libraries have not been updated and are still exposed.&lt;/p&gt;
 &lt;p&gt;For example, the Axis M1011 camera contains a vulnerable version of libupnp, which can lead to …&lt;/p&gt;</summary><content type="html">&lt;p&gt;In January 2013, &lt;a href="https://community.rapid7.com/community/infosec/blog/2013/01/29/security-flaws-in-universal-plug-and-play-unplug-dont-play"&gt;Rapid7 published&lt;/a&gt; a &lt;a href="https://community.rapid7.com/docs/DOC-2150"&gt;great paper&lt;/a&gt; describing several vulnerabilities in the most common UPnP libraries.
 Six months later, many devices based on these libraries have not been updated and are still exposed.&lt;/p&gt;
 &lt;p&gt;For example, the Axis M1011 camera contains a vulnerable version of libupnp, which can lead to arbitrary remote code execution without authentication.&lt;/p&gt;
 &lt;p&gt;You can find the corresponding &lt;a href="https://github.com/frederic/metasploit-framework/blob/master/modules/exploits/multi/upnp/libupnp_ssdp_overflow.rb"&gt;metasploit module on my Github&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;To check whether your devices are vulnerable to known UPnP attacks, you can use &lt;a href="https://www.rapid7.com/resources/free-security-software-downloads/universal-plug-and-play-jan-2013.jsp"&gt;ScanNow&lt;/a&gt; tool by Rapid7.&lt;/p&gt;</content><category term="vulnerability"></category><category term="advisory"></category></entry><entry><title>Huawei Mobile Hostpot remote root code execution by SMS (user-triggered)</title><link href="https://www.fredericb.info/2013/07/huawei-mobile-hostpot-remote-root-code.html" rel="alternate"></link><published>2013-07-15T03:59:00-07:00</published><updated>2013-07-15T03:59:00-07:00</updated><author><name>Frédéric</name></author><id>tag:www.fredericb.info,2013-07-15:/2013/07/huawei-mobile-hostpot-remote-root-code.html</id><summary type="html">&lt;p&gt;Huawei E587 3G Mobile Hotspot, version 11.203.27, is prone to two vulnerabilities
+&lt;p&gt;To check whether your devices are vulnerable to known UPnP attacks, you can use &lt;a href="https://www.rapid7.com/resources/free-security-software-downloads/universal-plug-and-play-jan-2013.jsp"&gt;ScanNow&lt;/a&gt; tool by Rapid7.&lt;/p&gt;</content><category term="vulnerability"></category><category term="advisory"></category></entry><entry><title>Huawei Mobile Hostpot remote root code execution by SMS (user-triggered)</title><link href="https://fredericb.info/2013/07/huawei-mobile-hostpot-remote-root-code.html" rel="alternate"></link><published>2013-07-15T03:59:00-07:00</published><updated>2013-07-15T03:59:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2013-07-15:/2013/07/huawei-mobile-hostpot-remote-root-code.html</id><summary type="html">&lt;p&gt;Huawei E587 3G Mobile Hotspot, version 11.203.27, is prone to two vulnerabilities
 in WebUI; an XSS and a command injection.&lt;br&gt;
 The combination of both allows an attacker (with a little help from
 the victim) to&amp;nbsp;remotely&amp;nbsp;execute code on the device with
@@ -2866,7 +2866,7 @@ privileges.&lt;br&gt;&lt;/p&gt;
 &amp;lt;request&amp;gt; node in order to respect the 7 chars limit for each
 child nodes.&lt;br&gt;
 &lt;br&gt;
-Now, you may try to combine them.&lt;/p&gt;</content><category term="vulnerability"></category><category term="advisory"></category><category term="xss"></category><category term="CVE-2013-2612"></category><category term="huawei"></category></entry><entry><title>[CVE-2013-2612] Huawei E587 3G Mobile Hotspot Command Injection</title><link href="https://www.fredericb.info/2013/07/cve-2013-2612-huawei-e587-3g-mobile.html" rel="alternate"></link><published>2013-07-15T03:58:00-07:00</published><updated>2013-07-15T03:58:00-07:00</updated><author><name>Frédéric</name></author><id>tag:www.fredericb.info,2013-07-15:/2013/07/cve-2013-2612-huawei-e587-3g-mobile.html</id><summary type="html">&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;-----BEGIN PGP SIGNED MESSAGE-----
+Now, you may try to combine them.&lt;/p&gt;</content><category term="vulnerability"></category><category term="advisory"></category><category term="xss"></category><category term="CVE-2013-2612"></category><category term="huawei"></category></entry><entry><title>[CVE-2013-2612] Huawei E587 3G Mobile Hotspot Command Injection</title><link href="https://fredericb.info/2013/07/cve-2013-2612-huawei-e587-3g-mobile.html" rel="alternate"></link><published>2013-07-15T03:58:00-07:00</published><updated>2013-07-15T03:58:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2013-07-15:/2013/07/cve-2013-2612-huawei-e587-3g-mobile.html</id><summary type="html">&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;-----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
 [CVE-2013-2612] Huawei E587 3G Mobile Hotspot Command Injection
@@ -2923,7 +2923,7 @@ EgLYxE4uv00ojqHCl9QsD7oa+mR52Jur3QZ/IdCbJJZgmEKmwNJvJ8rb6RvTMcae
 6WyZO6cZpgxQqvogemXKOy2MmnNkWlkK0P9OmmDpBQBI66WnyBUxXNFxEr/HFKo=
 =6yIl
 -----END PGP SIGNATURE-----
-&lt;/pre&gt;&lt;/div&gt;</content><category term="vulnerability"></category><category term="advisory"></category><category term="CVE-2013-2612"></category><category term="huawei"></category></entry><entry><title>[CVE-2013-2560] Foscam &lt;= 11.37.2.48 path traversal vulnerability</title><link href="https://www.fredericb.info/2013/03/cve-2013-2560-foscam-1137248-path.html.html" rel="alternate"></link><published>2013-03-17T14:39:00-07:00</published><updated>2013-03-17T14:39:00-07:00</updated><author><name>Frédéric</name></author><id>tag:www.fredericb.info,2013-03-17:/2013/03/cve-2013-2560-foscam-1137248-path.html.html</id><summary type="html">&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;/pre&gt;&lt;/div&gt;</content><category term="vulnerability"></category><category term="advisory"></category><category term="CVE-2013-2612"></category><category term="huawei"></category></entry><entry><title>[CVE-2013-2560] Foscam &lt;= 11.37.2.48 path traversal vulnerability</title><link href="https://fredericb.info/2013/03/cve-2013-2560-foscam-1137248-path.html.html" rel="alternate"></link><published>2013-03-17T14:39:00-07:00</published><updated>2013-03-17T14:39:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2013-03-17:/2013/03/cve-2013-2560-foscam-1137248-path.html.html</id><summary type="html">&lt;h2&gt;Summary&lt;/h2&gt;
 
 &lt;p&gt;Foscam firmware &amp;lt;= 11.37.2.48 is prone to a path traversal
 vulnerability in the embedded web interface.&lt;/p&gt;
@@ -2971,7 +2971,7 @@ steal web &amp;amp; wifi credentials.&lt;/p&gt;
 &lt;li&gt;http://wiki.openipcam.com/&lt;/li&gt;
 &lt;/ul&gt;
 &lt;hr&gt;
-&lt;p&gt;Arnaud Calmejane - Frederic Basse&lt;/p&gt;</content><category term="vulnerability"></category><category term="advisory"></category><category term="foscam"></category></entry><entry><title>[CVE-2012-6426] LemonLDAP-NG SAML XML Signature Wrapping</title><link href="https://www.fredericb.info/2013/03/cve-2012-6426-lemonldap-ng-saml-xml.html" rel="alternate"></link><published>2013-03-17T14:31:00-07:00</published><updated>2013-03-17T14:31:00-07:00</updated><author><name>Frédéric</name></author><id>tag:www.fredericb.info,2013-03-17:/2013/03/cve-2012-6426-lemonldap-ng-saml-xml.html</id><summary type="html">&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;Arnaud Calmejane - Frederic Basse&lt;/p&gt;</content><category term="vulnerability"></category><category term="advisory"></category><category term="foscam"></category></entry><entry><title>[CVE-2012-6426] LemonLDAP-NG SAML XML Signature Wrapping</title><link href="https://fredericb.info/2013/03/cve-2012-6426-lemonldap-ng-saml-xml.html" rel="alternate"></link><published>2013-03-17T14:31:00-07:00</published><updated>2013-03-17T14:31:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2013-03-17:/2013/03/cve-2012-6426-lemonldap-ng-saml-xml.html</id><summary type="html">&lt;h2&gt;Summary&lt;/h2&gt;
 
 &lt;p&gt;LemonLDAP-NG &amp;lt;=1.2.2 is prone to a security vulnerability involving
 XML signature wrapping in authentication process.&lt;/p&gt;

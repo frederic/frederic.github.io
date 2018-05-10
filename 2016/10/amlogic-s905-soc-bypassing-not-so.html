@@ -4,13 +4,13 @@
 <head>
   <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
 
-    <link rel="stylesheet" type="text/css" href="https://www.fredericb.info/theme/stylesheet/style.min.css">
+    <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/stylesheet/style.min.css">
 
-  <link rel="stylesheet" type="text/css" href="https://www.fredericb.info/theme/pygments/github.min.css">
-  <link rel="stylesheet" type="text/css" href="https://www.fredericb.info/theme/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/pygments/github.min.css">
+  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/font-awesome/css/font-awesome.min.css">
 
 
-    <link href="https://www.fredericb.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="fred's notes Atom">
+    <link href="https://fredericb.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="fred's notes Atom">
 
 
     <link rel="shortcut icon" href="/resources/favicon.ico" type="image/x-icon">
@@ -32,11 +32,11 @@
 <meta property="og:title" content="Amlogic S905 SoC: bypassing the (not so) Secure Boot to dump the BootROM"/>
 <meta property="og:description" content="The Amlogic S905 System-On-Chip is an ARM processor designed for video applications. It&#39;s widely used in Android/Kodi media boxes. The SoC implements the TrustZone security extensions to run a Trusted Execution Environment (TEE) that enables DRM &amp; other security features : Amlogic S905 System Block Diagram The SoC contains a Secure …"/>
 <meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="https://www.fredericb.info/2016/10/amlogic-s905-soc-bypassing-not-so.html"/>
+<meta property="og:url" content="https://fredericb.info/2016/10/amlogic-s905-soc-bypassing-not-so.html"/>
 <meta property="og:type" content="article"/>
 <meta property="article:published_time" content="2016-10-05 00:00:00.001000-07:00"/>
 <meta property="article:modified_time" content=""/>
-<meta property="article:author" content="https://www.fredericb.info/author/frederic.html">
+<meta property="article:author" content="https://fredericb.info/author/frederic.html">
 <meta property="article:section" content="Article"/>
 <meta property="article:tag" content="vulnerability"/>
 <meta property="article:tag" content="amlogic"/>
@@ -62,10 +62,10 @@
 <p>Security & Stuff</p>
       <nav>
         <ul class="list">
-          <li><a href="https://www.fredericb.info/category/advisory.html">Advisory</a></li>
-          <li><a href="https://www.fredericb.info/category/article.html">Article</a></li>
-          <li><a href="https://www.fredericb.info/category/tool.html">Tool</a></li>
-          <li><a href="https://www.fredericb.info/pages/contact.html#contact">Contact</a></li>
+          <li><a href="https://fredericb.info/category/advisory.html">Advisory</a></li>
+          <li><a href="https://fredericb.info/category/article.html">Article</a></li>
+          <li><a href="https://fredericb.info/category/tool.html">Tool</a></li>
+          <li><a href="https://fredericb.info/pages/contact.html#contact">Contact</a></li>
 
         </ul>
       </nav>
@@ -82,14 +82,14 @@
   <main>
 
     <nav>
-      <a href="https://www.fredericb.info/">    Home
+      <a href="https://fredericb.info/">    Home
 </a>
 
       <a href="/archives.html">Archives</a>
       <a href="/categories.html">Categories</a>
       <a href="/tags.html">Tags</a>
 
-      <a href="https://www.fredericb.info/feeds/all.atom.xml">    Atom
+      <a href="https://fredericb.info/feeds/all.atom.xml">    Atom
 </a>
 
     </nav>
@@ -99,7 +99,7 @@
       
     <h1 id="amlogic-s905-soc-bypassing-not-so">Amlogic S905 SoC: bypassing the (not so) Secure Boot to dump the BootROM</h1>
     <p>
-          Posted on Wed 05 October 2016 in <a href="https://www.fredericb.info/category/article.html">Article</a>
+          Posted on Wed 05 October 2016 in <a href="https://fredericb.info/category/article.html">Article</a>
 
 
     </p>
@@ -121,7 +121,7 @@ features :<br>
 <tbody>
 <tr>
 <td style="text-align: center;">
-<img alt="S905 block diagram" src="https://www.fredericb.info/blog/amlogic-sb/S905_arch.png">
+<img alt="S905 block diagram" src="https://fredericb.info/blog/amlogic-sb/S905_arch.png">
 </td>
 </tr>
 <tr>
@@ -173,7 +173,7 @@ since there is a port header with labels for the pinout:<br>
 <tbody>
 <tr>
 <td style="text-align: center;">
-<img alt="UART" src="https://www.fredericb.info/blog/amlogic-sb/uart_header.jpg">
+<img alt="UART" src="https://fredericb.info/blog/amlogic-sb/uart_header.jpg">
 </td>
 </tr>
 <tr>
@@ -268,7 +268,7 @@ Firmware (ATF)</a> reference implementation.</div>
 <tbody>
 <tr>
 <td style="text-align: center;">
-<img alt="ARM Trusted Firmware Design" src="https://www.fredericb.info/blog/amlogic-sb/securebootflow.png">
+<img alt="ARM Trusted Firmware Design" src="https://fredericb.info/blog/amlogic-sb/securebootflow.png">
 </td>
 </tr>
 <tr>
@@ -325,7 +325,7 @@ from Normal World:<br>
 <tbody>
 <tr>
 <td style="text-align: center;">
-<img alt="" src="https://www.fredericb.info/blog/amlogic-sb/rt_svc_descs.png">
+<img alt="" src="https://fredericb.info/blog/amlogic-sb/rt_svc_descs.png">
 </td>
 </tr>
 <tr>
@@ -344,7 +344,7 @@ several custom functions developed by Amlogic:<br>
 <tbody>
 <tr>
 <td style="text-align: center;">
-<img alt="" src="https://www.fredericb.info/blog/amlogic-sb/sip_svc_plat_ops.png">
+<img alt="" src="https://fredericb.info/blog/amlogic-sb/sip_svc_plat_ops.png">
 </td>
 </tr>
 <tr>
@@ -365,7 +365,7 @@ strictly restrict access to specific memory ranges:<br>
 <tbody>
 <tr>
 <td style="text-align: center;">
-<img alt="" src="https://www.fredericb.info/blog/amlogic-sb/hdcp22_sec_read_reg.png">
+<img alt="" src="https://fredericb.info/blog/amlogic-sb/hdcp22_sec_read_reg.png">
 </td>
 </tr>
 <tr>
@@ -515,7 +515,7 @@ thus obtain full access to secure memory.<br>
 <tbody>
 <tr>
 <td style="text-align: center;">
-<img alt="" src="https://www.fredericb.info/blog/amlogic-sb/bl31-hdcp22_sec_read_reg-asm-custom.png">
+<img alt="" src="https://fredericb.info/blog/amlogic-sb/bl31-hdcp22_sec_read_reg-asm-custom.png">
 </td>
 </tr>
 <tr>
@@ -536,7 +536,7 @@ By default, the following memory regions are mapped:<br>
 <tbody>
 <tr>
 <td style="text-align: center;">
-<img alt="" src="https://www.fredericb.info/blog/amlogic-sb/plat_gxb_mmap.png">
+<img alt="" src="https://fredericb.info/blog/amlogic-sb/plat_gxb_mmap.png">
 </td>
 </tr>
 <tr>
@@ -553,7 +553,7 @@ We extend the size of one of them to cover the BootROM region:<br>
 <tbody>
 <tr>
 <td style="text-align: center;">
-<img alt="" src="https://www.fredericb.info/blog/amlogic-sb/bl31-plat_gxb_mmap-custom.png">
+<img alt="" src="https://fredericb.info/blog/amlogic-sb/bl31-plat_gxb_mmap-custom.png">
 </td>
 </tr>
 <tr>
@@ -707,14 +707,14 @@ direct contact."<br>
   </div>
   <div class="tag-cloud">
     <p>
-      <a href="https://www.fredericb.info/tag/vulnerability.html">vulnerability</a>
-      <a href="https://www.fredericb.info/tag/amlogic.html">amlogic</a>
-      <a href="https://www.fredericb.info/tag/arm.html">arm</a>
-      <a href="https://www.fredericb.info/tag/security.html">security</a>
-      <a href="https://www.fredericb.info/tag/firmware.html">firmware</a>
-      <a href="https://www.fredericb.info/tag/trustzone.html">trustzone</a>
-      <a href="https://www.fredericb.info/tag/bootrom.html">bootrom</a>
-      <a href="https://www.fredericb.info/tag/bug.html">bug</a>
+      <a href="https://fredericb.info/tag/vulnerability.html">vulnerability</a>
+      <a href="https://fredericb.info/tag/amlogic.html">amlogic</a>
+      <a href="https://fredericb.info/tag/arm.html">arm</a>
+      <a href="https://fredericb.info/tag/security.html">security</a>
+      <a href="https://fredericb.info/tag/firmware.html">firmware</a>
+      <a href="https://fredericb.info/tag/trustzone.html">trustzone</a>
+      <a href="https://fredericb.info/tag/bootrom.html">bootrom</a>
+      <a href="https://fredericb.info/tag/bug.html">bug</a>
     </p>
   </div>
 
@@ -752,7 +752,7 @@ direct contact."<br>
   "@context" : "http://schema.org",
   "@type" : "Blog",
   "name": " fred's notes ",
-  "url" : "https://www.fredericb.info",
+  "url" : "https://fredericb.info",
   "image": "/resources/sitelogo.jpg",
   "description": "Frédéric's Thoughts and Writings"
 }

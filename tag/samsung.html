@@ -4,13 +4,13 @@
 <head>
   <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
 
-    <link rel="stylesheet" type="text/css" href="https://www.fredericb.info/theme/stylesheet/style.min.css">
+    <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/stylesheet/style.min.css">
 
-  <link rel="stylesheet" type="text/css" href="https://www.fredericb.info/theme/pygments/github.min.css">
-  <link rel="stylesheet" type="text/css" href="https://www.fredericb.info/theme/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/pygments/github.min.css">
+  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/font-awesome/css/font-awesome.min.css">
 
 
-    <link href="https://www.fredericb.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="fred's notes Atom">
+    <link href="https://fredericb.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="fred's notes Atom">
 
 
     <link rel="shortcut icon" href="/resources/favicon.ico" type="image/x-icon">
@@ -31,7 +31,7 @@
 <meta property="og:title" content="fred's notes"/>
 <meta property="og:description" content="Frédéric's Thoughts and Writings"/>
 <meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="https://www.fredericb.info"/>
+<meta property="og:url" content="https://fredericb.info"/>
 <meta property="og:image" content="/resources/sitelogo.jpg">
 
   <title>fred's notes &ndash;     Tag samsung
@@ -49,10 +49,10 @@
 <p>Security & Stuff</p>
       <nav>
         <ul class="list">
-          <li><a href="https://www.fredericb.info/category/advisory.html">Advisory</a></li>
-          <li><a href="https://www.fredericb.info/category/article.html">Article</a></li>
-          <li><a href="https://www.fredericb.info/category/tool.html">Tool</a></li>
-          <li><a href="https://www.fredericb.info/pages/contact.html#contact">Contact</a></li>
+          <li><a href="https://fredericb.info/category/advisory.html">Advisory</a></li>
+          <li><a href="https://fredericb.info/category/article.html">Article</a></li>
+          <li><a href="https://fredericb.info/category/tool.html">Tool</a></li>
+          <li><a href="https://fredericb.info/pages/contact.html#contact">Contact</a></li>
 
         </ul>
       </nav>
@@ -69,14 +69,14 @@
   <main>
 
     <nav>
-      <a href="https://www.fredericb.info/">    Home
+      <a href="https://fredericb.info/">    Home
 </a>
 
       <a href="/archives.html">Archives</a>
       <a href="/categories.html">Categories</a>
       <a href="/tags.html">Tags</a>
 
-      <a href="https://www.fredericb.info/feeds/all.atom.xml">    Atom
+      <a href="https://fredericb.info/feeds/all.atom.xml">    Atom
 </a>
 
     </nav>
@@ -85,14 +85,14 @@
 
 <article>
   <header>
-    <h2><a href="https://www.fredericb.info/2018/03/emulating-exynos-4210-bootrom-in-qemu.html#emulating-exynos-4210-bootrom-in-qemu">Emulating Exynos 4210 BootROM in QEMU</a></h2>
+    <h2><a href="https://fredericb.info/2018/03/emulating-exynos-4210-bootrom-in-qemu.html#emulating-exynos-4210-bootrom-in-qemu">Emulating Exynos 4210 BootROM in QEMU</a></h2>
     <p>
-          Posted on Wed 07 March 2018 in <a href="https://www.fredericb.info/category/article.html">Article</a>
+          Posted on Wed 07 March 2018 in <a href="https://fredericb.info/category/article.html">Article</a>
 
 
           &#8226;     Tagged with
 
-              <a href="https://www.fredericb.info/tag/arm.html">arm</a>,              <a href="https://www.fredericb.info/tag/exynos.html">exynos</a>,              <a href="https://www.fredericb.info/tag/samsung.html">samsung</a>,              <a href="https://www.fredericb.info/tag/bootrom.html">bootrom</a>,              <a href="https://www.fredericb.info/tag/qemu.html">qemu</a>,              <a href="https://www.fredericb.info/tag/emulation.html">emulation</a>,              <a href="https://www.fredericb.info/tag/bootloader.html">bootloader</a>,              <a href="https://www.fredericb.info/tag/secureboot.html">secureboot</a>
+              <a href="https://fredericb.info/tag/arm.html">arm</a>,              <a href="https://fredericb.info/tag/exynos.html">exynos</a>,              <a href="https://fredericb.info/tag/samsung.html">samsung</a>,              <a href="https://fredericb.info/tag/bootrom.html">bootrom</a>,              <a href="https://fredericb.info/tag/qemu.html">qemu</a>,              <a href="https://fredericb.info/tag/emulation.html">emulation</a>,              <a href="https://fredericb.info/tag/bootloader.html">bootloader</a>,              <a href="https://fredericb.info/tag/secureboot.html">secureboot</a>
     </p>
   </header>
   <div>
@@ -100,21 +100,21 @@
 Peripherals implemented in QEMU for this machine are <a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/char/exynos4210_uart.c">UART</a>, <a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/sd/sdhci.c">SDHCI</a>, <a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/display/exynos4210_fimd.c">FIMD</a>, <a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/i2c/exynos4210_i2c.c">I2C</a>, <a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/intc/exynos4210_combiner.c">Interrupt Combiner</a>, <a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/intc/exynos4210_gic.c">GIC</a>, <a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/misc/exynos4210_clk.c">Clock</a>, <a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/misc/exynos4210_pmu.c">PMU</a>, <a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/misc/exynos4210_rng.c">RNG</a>, <a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/timer/exynos4210_mct.c">MCT</a>, <a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/timer/exynos4210_pwm.c">PWM</a>, <a href="https://git.qemu.org/?p=qemu.git;a=blob;f=hw/timer/exynos4210_rtc.c">RTC</a>.</p>
 <p><a href="https://www.gsmarena.com/samsung_i9100_galaxy_s_ii-3621.php">Samsung Galaxy S2</a> phone is also based on Exynos 4210, so it should be …</p>
       <br>
-      <a class="btn" href="https://www.fredericb.info/2018/03/emulating-exynos-4210-bootrom-in-qemu.html#emulating-exynos-4210-bootrom-in-qemu">    Continue reading
+      <a class="btn" href="https://fredericb.info/2018/03/emulating-exynos-4210-bootrom-in-qemu.html#emulating-exynos-4210-bootrom-in-qemu">    Continue reading
 </a>
   </div>
   <hr />
 </article>
 <article>
   <header>
-    <h2><a href="https://www.fredericb.info/2017/07/sve-2016-7930-multiple-buffer-overflows-in-samsung-galaxy-bootloader.html#sve-2016-7930-multiple-buffer-overflows-in-samsung-galaxy-bootloader">SVE-2016-7930: Multiple buffer overflows in Samsung Galaxy bootloader</a></h2>
+    <h2><a href="https://fredericb.info/2017/07/sve-2016-7930-multiple-buffer-overflows-in-samsung-galaxy-bootloader.html#sve-2016-7930-multiple-buffer-overflows-in-samsung-galaxy-bootloader">SVE-2016-7930: Multiple buffer overflows in Samsung Galaxy bootloader</a></h2>
     <p>
-          Posted on Sun 23 July 2017 in <a href="https://www.fredericb.info/category/advisory.html">Advisory</a>
+          Posted on Sun 23 July 2017 in <a href="https://fredericb.info/category/advisory.html">Advisory</a>
 
 
           &#8226;     Tagged with
 
-              <a href="https://www.fredericb.info/tag/vulnerability.html">vulnerability</a>,              <a href="https://www.fredericb.info/tag/advisory.html">advisory</a>,              <a href="https://www.fredericb.info/tag/samsung.html">samsung</a>,              <a href="https://www.fredericb.info/tag/cellebrite.html">cellebrite</a>,              <a href="https://www.fredericb.info/tag/bootloader.html">bootloader</a>,              <a href="https://www.fredericb.info/tag/exploit.html">exploit</a>,              <a href="https://www.fredericb.info/tag/firmware.html">firmware</a>,              <a href="https://www.fredericb.info/tag/security.html">security</a>,              <a href="https://www.fredericb.info/tag/usb.html">usb</a>,              <a href="https://www.fredericb.info/tag/arm.html">arm</a>,              <a href="https://www.fredericb.info/tag/odin.html">odin</a>
+              <a href="https://fredericb.info/tag/vulnerability.html">vulnerability</a>,              <a href="https://fredericb.info/tag/advisory.html">advisory</a>,              <a href="https://fredericb.info/tag/samsung.html">samsung</a>,              <a href="https://fredericb.info/tag/cellebrite.html">cellebrite</a>,              <a href="https://fredericb.info/tag/bootloader.html">bootloader</a>,              <a href="https://fredericb.info/tag/exploit.html">exploit</a>,              <a href="https://fredericb.info/tag/firmware.html">firmware</a>,              <a href="https://fredericb.info/tag/security.html">security</a>,              <a href="https://fredericb.info/tag/usb.html">usb</a>,              <a href="https://fredericb.info/tag/arm.html">arm</a>,              <a href="https://fredericb.info/tag/odin.html">odin</a>
     </p>
   </header>
   <div>
@@ -126,7 +126,7 @@ Peripherals implemented in QEMU for this machine are <a href="https://git.qemu.o
 <h1>Summary</h1>
 <p>Several bugs in Samsung Galaxy bootloader allow an attacker with …</p>
       <br>
-      <a class="btn" href="https://www.fredericb.info/2017/07/sve-2016-7930-multiple-buffer-overflows-in-samsung-galaxy-bootloader.html#sve-2016-7930-multiple-buffer-overflows-in-samsung-galaxy-bootloader">    Continue reading
+      <a class="btn" href="https://fredericb.info/2017/07/sve-2016-7930-multiple-buffer-overflows-in-samsung-galaxy-bootloader.html#sve-2016-7930-multiple-buffer-overflows-in-samsung-galaxy-bootloader">    Continue reading
 </a>
   </div>
 </article>
@@ -164,7 +164,7 @@ Peripherals implemented in QEMU for this machine are <a href="https://git.qemu.o
   "@context" : "http://schema.org",
   "@type" : "Blog",
   "name": " fred's notes ",
-  "url" : "https://www.fredericb.info",
+  "url" : "https://fredericb.info",
   "image": "/resources/sitelogo.jpg",
   "description": "Frédéric's Thoughts and Writings"
 }
