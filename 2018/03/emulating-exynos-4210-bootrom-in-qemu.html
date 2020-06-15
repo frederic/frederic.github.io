@@ -217,33 +217,33 @@ Following sections describe the main changes made in <a href="https://github.com
 <ul>
 <li>First OTP access is a read operation on area 0x18-0x2C. Based on static analysis, BootROM checks these fuses are provisioned (not null) :</li>
 </ul>
-<div class="highlight"><pre><span></span>  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x18</span> <span class="p">(</span><span class="mh">0x4</span><span class="p">)</span>
-  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x1c</span> <span class="p">(</span><span class="mh">0x4</span><span class="p">)</span>
-  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x20</span> <span class="p">(</span><span class="mh">0x4</span><span class="p">)</span>
-  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x24</span> <span class="p">(</span><span class="mh">0x4</span><span class="p">)</span>
-  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x28</span> <span class="p">(</span><span class="mh">0x4</span><span class="p">)</span>
+<div class="highlight"><pre><span></span>  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="err">@</span><span class="mh">0x18</span> <span class="p">(</span><span class="mh">0x4</span><span class="p">)</span>
+  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="err">@</span><span class="mh">0x1c</span> <span class="p">(</span><span class="mh">0x4</span><span class="p">)</span>
+  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="err">@</span><span class="mh">0x20</span> <span class="p">(</span><span class="mh">0x4</span><span class="p">)</span>
+  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="err">@</span><span class="mh">0x24</span> <span class="p">(</span><span class="mh">0x4</span><span class="p">)</span>
+  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="err">@</span><span class="mh">0x28</span> <span class="p">(</span><span class="mh">0x4</span><span class="p">)</span>
 </pre></div>
 
 
 <ul>
 <li>Same area 0x18-0x2C (20 bytes) is read a second time to derive HMAC-SHA1 key (to authenticate next bootloader) :</li>
 </ul>
-<div class="highlight"><pre><span></span>  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x18</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span>
-  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x19</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span>
+<div class="highlight"><pre><span></span>  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="err">@</span><span class="mh">0x18</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span>
+  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="err">@</span><span class="mh">0x19</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span>
 <span class="p">[...]</span>
-  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x2a</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span>
-  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x2b</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span>
+  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="err">@</span><span class="mh">0x2a</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span>
+  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="err">@</span><span class="mh">0x2b</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span>
 </pre></div>
 
 
 <ul>
 <li>The area is read a third time, but only first 16 bytes, to derive AES-CBC-128 key (to decrypt next bootloader) :</li>
 </ul>
-<div class="highlight"><pre><span></span>  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x18</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span>
-  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x19</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span>
+<div class="highlight"><pre><span></span>  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="err">@</span><span class="mh">0x18</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span>
+  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="err">@</span><span class="mh">0x19</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span>
 <span class="p">[...]</span>
-  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x26</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span>
-  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="mh">@0x27</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span>
+  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="err">@</span><span class="mh">0x26</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span>
+  <span class="p">[</span><span class="nl">exynos4210_otp_read</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span>   <span class="n">Read</span> <span class="n">OTP</span> <span class="err">@</span><span class="mh">0x27</span> <span class="p">(</span><span class="mh">0x1</span><span class="p">)</span>
 </pre></div>
 
 
@@ -290,22 +290,22 @@ Fortunately, these SFR are <a href="https://github.com/exynos4-sdk/uboot/blob/ma
 <p>Second issue is the lack of support for <strong><em>SD Clock Enable</em></strong> register in <a href="https://www.sdcard.org/jp/developers/overview/host_controller/simple_spec/Simplified_SD_Host_Controller_Spec.pdf">Clock Control Register</a>.
 <a href="https://github.com/frederic/qemu-exynos-bootrom/commit/9be5c9f2253dbc04ee690365f9e81eb1fbc00ee0">The patch</a> implements it like defined in the <a href="https://lists.gnu.org/archive/html/qemu-devel/2011-12/msg01271.html">original contribution</a>.</p>
 <p>Thanks to these changes, BootROM can perform SD operations. QEMU debug log shows that 0x2000 bytes are read at offset 0x200 :</p>
-<div class="highlight"><pre><span></span><span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00000200</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
-<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00000400</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
-<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00000600</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
-<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00000800</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
-<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00000a00</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
-<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00000c00</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
-<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00000e00</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
-<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00001000</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
-<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00001200</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
-<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00001400</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
-<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00001600</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
-<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00001800</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
-<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00001a00</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
-<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00001c00</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
-<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00001e00</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
-<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00002000</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
+<div class="highlight"><pre><span></span>SD: sd_blk_read: addr = 0x00000200, len = 512
+SD: sd_blk_read: addr = 0x00000400, len = 512
+SD: sd_blk_read: addr = 0x00000600, len = 512
+SD: sd_blk_read: addr = 0x00000800, len = 512
+SD: sd_blk_read: addr = 0x00000a00, len = 512
+SD: sd_blk_read: addr = 0x00000c00, len = 512
+SD: sd_blk_read: addr = 0x00000e00, len = 512
+SD: sd_blk_read: addr = 0x00001000, len = 512
+SD: sd_blk_read: addr = 0x00001200, len = 512
+SD: sd_blk_read: addr = 0x00001400, len = 512
+SD: sd_blk_read: addr = 0x00001600, len = 512
+SD: sd_blk_read: addr = 0x00001800, len = 512
+SD: sd_blk_read: addr = 0x00001a00, len = 512
+SD: sd_blk_read: addr = 0x00001c00, len = 512
+SD: sd_blk_read: addr = 0x00001e00, len = 512
+SD: sd_blk_read: addr = 0x00002000, len = 512
 </pre></div>
 
 
@@ -343,11 +343,11 @@ We attach GDB and set a breakpoint to this address :</p>
 
 <p>GDB breaks at the exception vector table of decrypted FWBL1.</p>
 <p>After resuming execution, QEMU debug log shows that FWBL1 reads 0x4000 bytes from flash memory at address 0x2200 :</p>
-<div class="highlight"><pre><span></span><span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00002200</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
-<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00002400</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
-<span class="o">[...]</span>
-<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00005e00</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
-<span class="n">SD</span><span class="o">:</span> <span class="n">sd_blk_read</span><span class="o">:</span> <span class="n">addr</span> <span class="o">=</span> <span class="mh">0x00006000</span><span class="o">,</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">512</span>
+<div class="highlight"><pre><span></span>SD: sd_blk_read: addr = 0x00002200, len = 512
+SD: sd_blk_read: addr = 0x00002400, len = 512
+[...]
+SD: sd_blk_read: addr = 0x00005e00, len = 512
+SD: sd_blk_read: addr = 0x00006000, len = 512
 </pre></div>
 
 

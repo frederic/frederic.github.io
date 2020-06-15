@@ -134,28 +134,28 @@ called with arguments (R0 = 0xFFFFFFFF, R1) :</div>
 <span class="nf">FE84B9BA</span>     <span class="no">MOVS</span>     <span class="no">R6</span><span class="p">,</span> <span class="no">R2</span>
 <span class="nf">FE84B9BC</span>     <span class="no">MOV</span>      <span class="no">R8</span><span class="p">,</span> <span class="no">R1</span>
 <span class="nf">FE84B9BE</span>     <span class="no">MOV</span>      <span class="no">R7</span><span class="p">,</span> <span class="no">R3</span>
-<span class="nf">FE84B9C0</span>     <span class="no">MOV.W</span>    <span class="no">R4</span><span class="p">,</span> <span class="c">#0xFFFFFFFF</span>
-<span class="no">FE84B9C4</span>     <span class="no">MOV</span>      <span class="no">R5</span><span class="p">,</span> <span class="c">#0xFFFFFFEE</span>
-<span class="no">FE84B9C8</span>     <span class="no">BEQ</span>      <span class="no">loc_FE84BA1A</span>
-<span class="nf">FE84B9CA</span>     <span class="no">CBZ</span>      <span class="no">R0</span><span class="p">,</span> <span class="no">loc_FE84B9D2</span> <span class="c">; R0 &gt; 1 : branch not taken</span>
-<span class="no">FE84B9CC</span>     <span class="no">CMP</span>      <span class="no">R0</span><span class="p">,</span> <span class="c">#1</span>
-<span class="no">FE84B9CE</span>     <span class="no">BEQ</span>      <span class="no">loc_FE84B9D6</span> <span class="c">; R0 &gt; 1 : branch not taken</span>
-<span class="no">FE84B9D0</span>     <span class="no">B</span>        <span class="no">loc_FE84B9D8</span> <span class="c">; branch</span>
-<span class="no">FE84B9D2</span> <span class="c">; ---------------------------------------------------------</span>
-<span class="no">FE84B9D2</span> <span class="no">loc_FE84B9D2</span>        <span class="c">; if R0 == 0</span>
-<span class="no">FE84B9D2</span>     <span class="no">MOVS</span>     <span class="no">R4</span><span class="p">,</span> <span class="c">#1</span>
-<span class="no">FE84B9D4</span>     <span class="no">B</span>        <span class="no">loc_FE84B9D8</span>
-<span class="nf">FE84B9D6</span> <span class="c">; ---------------------------------------------------------</span>
-<span class="no">FE84B9D6</span> <span class="no">loc_FE84B9D6</span>        <span class="c">; if R0 == 1</span>
-<span class="no">FE84B9D6</span>     <span class="no">MOVS</span>     <span class="no">R4</span><span class="p">,</span> <span class="c">#0</span>
-<span class="no">FE84B9D8</span>
-<span class="nf">FE84B9D8</span> <span class="no">loc_FE84B9D8</span>        <span class="c">; for any value of R0</span>
-<span class="no">FE84B9D8</span>     <span class="no">MOVS</span>     <span class="no">R0</span><span class="p">,</span> <span class="c">#1</span>
-<span class="no">FE84B9DA</span>     <span class="no">BL</span>       <span class="no">subfunc_0</span> <span class="c">; kind of &quot;is retail hardware?&quot; test</span>
-<span class="no">FE84B9DE</span>     <span class="no">CBZ</span>      <span class="no">R0</span><span class="p">,</span> <span class="no">loc_FE84B9EE</span> <span class="c">; not taken</span>
-<span class="no">FE84B9E0</span>     <span class="no">MOV</span>      <span class="no">R1</span><span class="p">,</span> <span class="no">R8</span>
-<span class="nf">FE84B9E2</span>     <span class="no">MOV</span>      <span class="no">R0</span><span class="p">,</span> <span class="no">R4</span> <span class="c">; R4 == #0xFFFFFFFF</span>
-<span class="no">FE84B9E4</span>     <span class="no">BL</span>       <span class="no">subfunc_1</span>
+<span class="nf">FE84B9C0</span>     <span class="no">MOV.W</span>    <span class="no">R4</span><span class="p">,</span> <span class="c1">#0xFFFFFFFF</span>
+<span class="nf">FE84B9C4</span>     <span class="no">MOV</span>      <span class="no">R5</span><span class="p">,</span> <span class="c1">#0xFFFFFFEE</span>
+<span class="nf">FE84B9C8</span>     <span class="no">BEQ</span>      <span class="no">loc_FE84BA1A</span>
+<span class="nf">FE84B9CA</span>     <span class="no">CBZ</span>      <span class="no">R0</span><span class="p">,</span> <span class="no">loc_FE84B9D2</span> <span class="c1">; R0 &gt; 1 : branch not taken</span>
+<span class="nf">FE84B9CC</span>     <span class="no">CMP</span>      <span class="no">R0</span><span class="p">,</span> <span class="c1">#1</span>
+<span class="nf">FE84B9CE</span>     <span class="no">BEQ</span>      <span class="no">loc_FE84B9D6</span> <span class="c1">; R0 &gt; 1 : branch not taken</span>
+<span class="nf">FE84B9D0</span>     <span class="no">B</span>        <span class="no">loc_FE84B9D8</span> <span class="c1">; branch</span>
+<span class="nf">FE84B9D2</span> <span class="c1">; ---------------------------------------------------------</span>
+<span class="nf">FE84B9D2</span> <span class="no">loc_FE84B9D2</span>        <span class="c1">; if R0 == 0</span>
+<span class="nf">FE84B9D2</span>     <span class="no">MOVS</span>     <span class="no">R4</span><span class="p">,</span> <span class="c1">#1</span>
+<span class="nf">FE84B9D4</span>     <span class="no">B</span>        <span class="no">loc_FE84B9D8</span>
+<span class="nf">FE84B9D6</span> <span class="c1">; ---------------------------------------------------------</span>
+<span class="nf">FE84B9D6</span> <span class="no">loc_FE84B9D6</span>        <span class="c1">; if R0 == 1</span>
+<span class="nf">FE84B9D6</span>     <span class="no">MOVS</span>     <span class="no">R4</span><span class="p">,</span> <span class="c1">#0</span>
+<span class="nf">FE84B9D8</span>
+<span class="nf">FE84B9D8</span> <span class="no">loc_FE84B9D8</span>        <span class="c1">; for any value of R0</span>
+<span class="nf">FE84B9D8</span>     <span class="no">MOVS</span>     <span class="no">R0</span><span class="p">,</span> <span class="c1">#1</span>
+<span class="nf">FE84B9DA</span>     <span class="no">BL</span>       <span class="no">subfunc_0</span> <span class="c1">; kind of &quot;is retail hardware?&quot; test</span>
+<span class="nf">FE84B9DE</span>     <span class="no">CBZ</span>      <span class="no">R0</span><span class="p">,</span> <span class="no">loc_FE84B9EE</span> <span class="c1">; not taken</span>
+<span class="nf">FE84B9E0</span>     <span class="no">MOV</span>      <span class="no">R1</span><span class="p">,</span> <span class="no">R8</span>
+<span class="nf">FE84B9E2</span>     <span class="no">MOV</span>      <span class="no">R0</span><span class="p">,</span> <span class="no">R4</span> <span class="c1">; R4 == #0xFFFFFFFF</span>
+<span class="nf">FE84B9E4</span>     <span class="no">BL</span>       <span class="no">subfunc_1</span>
 <span class="nf">FE84B9E8</span>     <span class="p">[...]</span>
 </pre></div>
 
@@ -167,22 +167,22 @@ to 2. However, BGE instruction operates on signed integers. So R0
 :</div>
 
 <div class="highlight"><pre><span></span><span class="nf">FE853124</span> <span class="no">subfunc_1</span>
-<span class="nf">FE853124</span>     <span class="no">CMP</span>      <span class="no">R0</span><span class="p">,</span> <span class="c">#2 ; R0 == #0xFFFFFFFF</span>
-<span class="no">FE853126</span>     <span class="no">BGE</span>      <span class="no">locret_FE85314C</span> <span class="c">; signed comparison :</span>
-<span class="no">FE853126</span>                              <span class="c">; R0(-1) &lt; 2 so branch not taken</span>
-<span class="no">FE853128</span>     <span class="no">MOVW</span>     <span class="no">R2</span><span class="p">,</span> <span class="c">#0x9EE0</span>
-<span class="no">FE85312C</span>     <span class="no">ADD.W</span>    <span class="no">R3</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">LSL</span><span class="c">#1</span>
-<span class="no">FE853130</span>     <span class="no">MOVT.W</span>   <span class="no">R2</span><span class="p">,</span> <span class="c">#0xFE82</span>
-<span class="no">FE853134</span>     <span class="no">ADD.W</span>    <span class="no">R0</span><span class="p">,</span> <span class="no">R3</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">LSL</span><span class="c">#3</span>
-<span class="no">FE853138</span>     <span class="no">LDR</span>      <span class="no">R2</span><span class="p">,</span> <span class="p">[</span><span class="no">R2</span><span class="p">,</span><span class="c">#(dword_FE829EE4 - 0xFE829EE0)]</span>
-<span class="no">FE85313A</span>     <span class="no">ADD.W</span>    <span class="no">R0</span><span class="p">,</span> <span class="no">R2</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">LSL</span><span class="c">#4</span>
-<span class="no">FE85313E</span>     <span class="no">LDRB</span>     <span class="no">R2</span><span class="p">,</span> <span class="p">[</span><span class="no">R0</span><span class="p">,</span><span class="c">#4]</span>
-<span class="no">FE853140</span>     <span class="no">CMP</span>      <span class="no">R2</span><span class="p">,</span> <span class="no">R1</span> <span class="c">; with R1 &lt; R2</span>
-<span class="no">FE853142</span>     <span class="no">BLS</span>      <span class="no">locret_FE85314C</span>
+<span class="nf">FE853124</span>     <span class="no">CMP</span>      <span class="no">R0</span><span class="p">,</span> <span class="c1">#2 ; R0 == #0xFFFFFFFF</span>
+<span class="nf">FE853126</span>     <span class="no">BGE</span>      <span class="no">locret_FE85314C</span> <span class="c1">; signed comparison :</span>
+<span class="nf">FE853126</span>                              <span class="c1">; R0(-1) &lt; 2 so branch not taken</span>
+<span class="nf">FE853128</span>     <span class="no">MOVW</span>     <span class="no">R2</span><span class="p">,</span> <span class="c1">#0x9EE0</span>
+<span class="nf">FE85312C</span>     <span class="no">ADD.W</span>    <span class="no">R3</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">LSL</span><span class="c1">#1</span>
+<span class="nf">FE853130</span>     <span class="no">MOVT.W</span>   <span class="no">R2</span><span class="p">,</span> <span class="c1">#0xFE82</span>
+<span class="nf">FE853134</span>     <span class="no">ADD.W</span>    <span class="no">R0</span><span class="p">,</span> <span class="no">R3</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">LSL</span><span class="c1">#3</span>
+<span class="nf">FE853138</span>     <span class="no">LDR</span>      <span class="no">R2</span><span class="p">,</span> <span class="p">[</span><span class="no">R2</span><span class="p">,</span><span class="c1">#(dword_FE829EE4 - 0xFE829EE0)]</span>
+<span class="nf">FE85313A</span>     <span class="no">ADD.W</span>    <span class="no">R0</span><span class="p">,</span> <span class="no">R2</span><span class="p">,</span> <span class="no">R0</span><span class="p">,</span><span class="no">LSL</span><span class="c1">#4</span>
+<span class="nf">FE85313E</span>     <span class="no">LDRB</span>     <span class="no">R2</span><span class="p">,</span> <span class="p">[</span><span class="no">R0</span><span class="p">,</span><span class="c1">#4]</span>
+<span class="nf">FE853140</span>     <span class="no">CMP</span>      <span class="no">R2</span><span class="p">,</span> <span class="no">R1</span> <span class="c1">; with R1 &lt; R2</span>
+<span class="nf">FE853142</span>     <span class="no">BLS</span>      <span class="no">locret_FE85314C</span>
 <span class="nf">FE853144</span>     <span class="no">LDR</span>      <span class="no">R0</span><span class="p">,</span> <span class="p">[</span><span class="no">R0</span><span class="p">]</span>
-<span class="nf">FE853146</span>     <span class="no">MOVS</span>     <span class="no">R2</span><span class="p">,</span> <span class="c">#0</span>
-<span class="no">FE853148</span>     <span class="no">B.W</span>      <span class="no">sub_FE856C84</span> <span class="c">; write NULL DWORD to a barely arbitrary address (derived from R1 value)</span>
-<span class="no">FE85314C</span>     <span class="p">[...]</span>
+<span class="nf">FE853146</span>     <span class="no">MOVS</span>     <span class="no">R2</span><span class="p">,</span> <span class="c1">#0</span>
+<span class="nf">FE853148</span>     <span class="no">B.W</span>      <span class="no">sub_FE856C84</span> <span class="c1">; write NULL DWORD to a barely arbitrary address (derived from R1 value)</span>
+<span class="nf">FE85314C</span>     <span class="p">[...]</span>
 </pre></div>
 
 
@@ -202,28 +202,28 @@ value:</div>
 <span class="nf">FE84B974</span>     <span class="no">MOVS</span>     <span class="no">R6</span><span class="p">,</span> <span class="no">R2</span>
 <span class="nf">FE84B976</span>     <span class="no">MOV</span>      <span class="no">R8</span><span class="p">,</span> <span class="no">R1</span>
 <span class="nf">FE84B978</span>     <span class="no">MOV</span>      <span class="no">R7</span><span class="p">,</span> <span class="no">R3</span>
-<span class="nf">FE84B97A</span>     <span class="no">MOV</span>      <span class="no">R5</span><span class="p">,</span> <span class="c">#0xFFFFFFEE</span>
-<span class="no">FE84B97E</span>     <span class="no">BEQ</span>      <span class="no">loc_FE84B9D2</span>
+<span class="nf">FE84B97A</span>     <span class="no">MOV</span>      <span class="no">R5</span><span class="p">,</span> <span class="c1">#0xFFFFFFEE</span>
+<span class="nf">FE84B97E</span>     <span class="no">BEQ</span>      <span class="no">loc_FE84B9D2</span>
 <span class="nf">FE84B980</span>     <span class="no">CBZ</span>      <span class="no">R0</span><span class="p">,</span> <span class="no">loc_FE84B98A</span>
-<span class="nf">FE84B982</span>     <span class="no">CMP</span>      <span class="no">R0</span><span class="p">,</span> <span class="c">#1</span>
-<span class="no">FE84B984</span>     <span class="no">BEQ</span>      <span class="no">loc_FE84B98E</span>
-<span class="nf">FE84B986</span>     <span class="no">ADDS</span>     <span class="no">R0</span><span class="p">,</span> <span class="no">R5</span><span class="p">,</span> <span class="c">#2</span>
-<span class="no">FE84B988</span>     <span class="no">B</span>        <span class="no">locret_FE84B7AA</span> <span class="c">; branch if R0 &gt; 1</span>
-<span class="no">FE84B98A</span> <span class="c">; ---------------------------------------------------------</span>
-<span class="no">FE84B98A</span> <span class="no">loc_FE84B98A</span>        <span class="c">; if R0 == 0</span>
-<span class="no">FE84B98A</span>     <span class="no">MOVS</span>     <span class="no">R4</span><span class="p">,</span> <span class="c">#1</span>
-<span class="no">FE84B98C</span>     <span class="no">B</span>        <span class="no">loc_FE84B990</span>
-<span class="nf">FE84B98E</span> <span class="c">; ---------------------------------------------------------</span>
-<span class="no">FE84B98E</span> <span class="no">loc_FE84B98E</span>        <span class="c">; if R0 == 1</span>
-<span class="no">FE84B98E</span>     <span class="no">MOVS</span>     <span class="no">R4</span><span class="p">,</span> <span class="c">#0</span>
-<span class="no">FE84B990</span>
-<span class="nf">FE84B990</span> <span class="no">loc_FE84B990</span>        <span class="c">; if 0 &lt;= R0 &lt; 2</span>
-<span class="no">FE84B990</span>     <span class="no">MOVS</span>     <span class="no">R0</span><span class="p">,</span> <span class="c">#1</span>
-<span class="no">FE84B992</span>     <span class="no">BL</span>       <span class="no">subfunc_0</span> <span class="c">; kind of &quot;is retail hardware?&quot; test</span>
-<span class="no">FE84B996</span>     <span class="no">CBZ</span>      <span class="no">R0</span><span class="p">,</span> <span class="no">loc_FE84B9A6</span> <span class="c">; not taken</span>
-<span class="no">FE84B998</span>     <span class="no">MOV</span>      <span class="no">R1</span><span class="p">,</span> <span class="no">R8</span>
-<span class="nf">FE84B99A</span>     <span class="no">MOV</span>      <span class="no">R0</span><span class="p">,</span> <span class="no">R4</span> <span class="c">; R4 is either 0 or 1</span>
-<span class="no">FE84B99C</span>     <span class="no">BL</span>       <span class="no">subfunc_1</span>
+<span class="nf">FE84B982</span>     <span class="no">CMP</span>      <span class="no">R0</span><span class="p">,</span> <span class="c1">#1</span>
+<span class="nf">FE84B984</span>     <span class="no">BEQ</span>      <span class="no">loc_FE84B98E</span>
+<span class="nf">FE84B986</span>     <span class="no">ADDS</span>     <span class="no">R0</span><span class="p">,</span> <span class="no">R5</span><span class="p">,</span> <span class="c1">#2</span>
+<span class="nf">FE84B988</span>     <span class="no">B</span>        <span class="no">locret_FE84B7AA</span> <span class="c1">; branch if R0 &gt; 1</span>
+<span class="nf">FE84B98A</span> <span class="c1">; ---------------------------------------------------------</span>
+<span class="nf">FE84B98A</span> <span class="no">loc_FE84B98A</span>        <span class="c1">; if R0 == 0</span>
+<span class="nf">FE84B98A</span>     <span class="no">MOVS</span>     <span class="no">R4</span><span class="p">,</span> <span class="c1">#1</span>
+<span class="nf">FE84B98C</span>     <span class="no">B</span>        <span class="no">loc_FE84B990</span>
+<span class="nf">FE84B98E</span> <span class="c1">; ---------------------------------------------------------</span>
+<span class="nf">FE84B98E</span> <span class="no">loc_FE84B98E</span>        <span class="c1">; if R0 == 1</span>
+<span class="nf">FE84B98E</span>     <span class="no">MOVS</span>     <span class="no">R4</span><span class="p">,</span> <span class="c1">#0</span>
+<span class="nf">FE84B990</span>
+<span class="nf">FE84B990</span> <span class="no">loc_FE84B990</span>        <span class="c1">; if 0 &lt;= R0 &lt; 2</span>
+<span class="nf">FE84B990</span>     <span class="no">MOVS</span>     <span class="no">R0</span><span class="p">,</span> <span class="c1">#1</span>
+<span class="nf">FE84B992</span>     <span class="no">BL</span>       <span class="no">subfunc_0</span> <span class="c1">; kind of &quot;is retail hardware?&quot; test</span>
+<span class="nf">FE84B996</span>     <span class="no">CBZ</span>      <span class="no">R0</span><span class="p">,</span> <span class="no">loc_FE84B9A6</span> <span class="c1">; not taken</span>
+<span class="nf">FE84B998</span>     <span class="no">MOV</span>      <span class="no">R1</span><span class="p">,</span> <span class="no">R8</span>
+<span class="nf">FE84B99A</span>     <span class="no">MOV</span>      <span class="no">R0</span><span class="p">,</span> <span class="no">R4</span> <span class="c1">; R4 is either 0 or 1</span>
+<span class="nf">FE84B99C</span>     <span class="no">BL</span>       <span class="no">subfunc_1</span>
 <span class="nf">FE84B9A0</span>     <span class="p">[...]</span>
 </pre></div>
 
@@ -232,10 +232,10 @@ value:</div>
 is now tested with an unsigned comparison:</div>
 
 <div class="highlight"><pre><span></span><span class="nf">FE852B94</span> <span class="p">(</span><span class="no">sub</span><span class="p">)</span><span class="no">subfunc_1</span>
-<span class="nf">FE852B94</span>     <span class="no">CMP</span>      <span class="no">R0</span><span class="p">,</span> <span class="c">#2</span>
-<span class="no">FE852B96</span>     <span class="no">BCS</span>      <span class="no">loc_FE852BBA</span> <span class="c">;unsigned comparison: branch if R0 &gt; 1</span>
-<span class="no">FE852B98</span>     <span class="no">MOVW</span>     <span class="no">R2</span><span class="p">,</span> <span class="c">#0x9F38</span>
-<span class="no">FE852B9C</span>     <span class="p">[...]</span>
+<span class="nf">FE852B94</span>     <span class="no">CMP</span>      <span class="no">R0</span><span class="p">,</span> <span class="c1">#2</span>
+<span class="nf">FE852B96</span>     <span class="no">BCS</span>      <span class="no">loc_FE852BBA</span> <span class="c1">;unsigned comparison: branch if R0 &gt; 1</span>
+<span class="nf">FE852B98</span>     <span class="no">MOVW</span>     <span class="no">R2</span><span class="p">,</span> <span class="c1">#0x9F38</span>
+<span class="nf">FE852B9C</span>     <span class="p">[...]</span>
 </pre></div>
 
 
