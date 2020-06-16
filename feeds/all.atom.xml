@@ -1,5 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>fred's notes</title><link href="https://fredericb.info/" rel="alternate"></link><link href="https://fredericb.info/feeds/all.atom.xml" rel="self"></link><id>https://fredericb.info/</id><updated>2020-06-16T00:00:00-07:00</updated><subtitle>Security &amp; Stuff</subtitle><entry><title>Reverse engineer USB stack of Exynos BootROM</title><link href="https://fredericb.info/2020/06/reverse-engineer-usb-stack-of-exynos-bootrom.html" rel="alternate"></link><published>2020-06-16T00:00:00-07:00</published><updated>2020-06-16T00:00:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2020-06-16:/2020/06/reverse-engineer-usb-stack-of-exynos-bootrom.html</id><summary type="html">&lt;p&gt;In the previous post, we explained how to &lt;a href="https://fredericb.info/2020/06/exynos8890-bootrom-dump-dump-exynos-8890-bootrom-from-samsung-galaxy-s7.html"&gt;dump Exynos bootROM&lt;/a&gt;.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>fred's notes</title><link href="https://fredericb.info/" rel="alternate"></link><link href="https://fredericb.info/feeds/all.atom.xml" rel="self"></link><id>https://fredericb.info/</id><updated>2020-06-17T00:00:00-07:00</updated><subtitle>Security &amp; Stuff</subtitle><entry><title>exynos-usbdl : unsigned code loader for Exynos BootROM</title><link href="https://fredericb.info/2020/06/exynos-usbdl-unsigned-code-loader-for-exynos-bootrom.html" rel="alternate"></link><published>2020-06-17T00:00:00-07:00</published><updated>2020-06-17T00:00:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2020-06-17:/2020/06/exynos-usbdl-unsigned-code-loader-for-exynos-bootrom.html</id><summary type="html">&lt;p&gt;In previous posts, we explained how to &lt;a href="https://fredericb.info/2020/06/exynos8890-bootrom-dump-dump-exynos-8890-bootrom-from-samsung-galaxy-s7.html"&gt;dump Exynos bootROM&lt;/a&gt; and &lt;a href="https://fredericb.info/2020/06/reverse-engineer-usb-stack-of-exynos-bootrom.html"&gt;reverse its USB stack&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;These efforts led to the discovery of a bug in the USB stack that can be exploited to run arbitrary code.&lt;/p&gt;
+&lt;p&gt;The following chipsets are known to be affected by this bug :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Exynos 8890&lt;/li&gt;
+&lt;li&gt;Exynos …&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;p&gt;In previous posts, we explained how to &lt;a href="https://fredericb.info/2020/06/exynos8890-bootrom-dump-dump-exynos-8890-bootrom-from-samsung-galaxy-s7.html"&gt;dump Exynos bootROM&lt;/a&gt; and &lt;a href="https://fredericb.info/2020/06/reverse-engineer-usb-stack-of-exynos-bootrom.html"&gt;reverse its USB stack&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;These efforts led to the discovery of a bug in the USB stack that can be exploited to run arbitrary code.&lt;/p&gt;
+&lt;p&gt;The following chipsets are known to be affected by this bug :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Exynos 8890&lt;/li&gt;
+&lt;li&gt;Exynos 8895&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;a href="https://github.com/frederic/exynos-usbdl"&gt;exynos-usbdl, an open source tool available on Github&lt;/a&gt;, exploits this vulnerability to load and run unsigned code.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Good times with dental scraper" src="https://fredericb.info/blog/exy-bootrom/scraper.png"&gt;&lt;/p&gt;
+&lt;h1&gt;Vulnerability details&lt;/h1&gt;
+&lt;p&gt;Exynos BootROM implements a very simple USB protocol to receive a bootloader binary from an USB host. That binary is encapsulated in a small structure &lt;em&gt;dldata&lt;/em&gt;, and sent through USB bulk transfers.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;typedef&lt;/span&gt; &lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;dldata_s&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;u_int32_t&lt;/span&gt; &lt;span class="n"&gt;unknown0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;u_int32_t&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="c1"&gt;// header(8) + data(n) + footer(2)&lt;/span&gt;
+    &lt;span class="n"&gt;u_int8_t&lt;/span&gt;  &lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;&lt;span class="c1"&gt;//example data of size &amp;#39;n&amp;#39;&lt;/span&gt;
+    &lt;span class="n"&gt;u_int16_t&lt;/span&gt; &lt;span class="n"&gt;unknown1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="c1"&gt;//footer&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="n"&gt;dldata&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Integer overflow bug&lt;/h2&gt;
+&lt;p&gt;BootROM writes received data into buffer &lt;em&gt;dl_buf&lt;/em&gt; at address [0x02021800..0x02070000] (0x4E800 bytes).
+But first, a check ensures that transferred data won't overflow &lt;em&gt;dl_buf&lt;/em&gt; buffer :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dl_buf&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;dldata&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;size&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x02070000&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;usb_download_status&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x02&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="c1"&gt;//error&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;However, this check on 32 bits is vulnerable to an integer overflow if &lt;em&gt;dldata.size&lt;/em&gt; is higher than 0xFDFDE7FF (&lt;em&gt;dl_buf&lt;/em&gt; + 0xFDFDE800 ≡ 0x0 mod 2³²).&lt;/p&gt;
+&lt;p&gt;So the bootROM accepts a payload of regular size [0x10..0x4E800] bytes (don't go below if you want to avoid integer underflows...), but due to that bug, &lt;strong&gt;also accepts a payload of [0xFDFDE800..0xFFFFFFFF] bytes.&lt;/strong&gt;&lt;/p&gt;
+&lt;h2&gt;Empty transfer trick&lt;/h2&gt;
+&lt;p&gt;The integer overflow bug allows us to bypass the size check to send a very large payload to the bootROM.
+Such contiguous memory overflow may corrupt memory after &lt;em&gt;dl_buf&lt;/em&gt; buffer, but the memory layout will cause the target to crash before any interesting (from attacker's point of view) memory corruption happens.&lt;/p&gt;
+&lt;p&gt;First, because &lt;em&gt;dl_buf&lt;/em&gt; is located at the end of the in-use memory (after stack area, for example), so there's no bootROM runtime data to corrupt.
+But also because accessing inexistent memory regions will cause a crash.&lt;/p&gt;
+&lt;p&gt;Nevertheless, there's a trick to overcome that limitation. A large download is expected to be splitted into multiple small transfers of equal size (0xfffe00 bytes), except the last transfer which can be smaller.&lt;/p&gt;
+&lt;p&gt;Each of these transfers triggers the USB transfer handler of the bootROM. This handler appends received data to the destination buffer &lt;em&gt;dl_buf&lt;/em&gt;. We would expect that &lt;em&gt;dl_buf&lt;/em&gt; pointer is then incremented by the size that has been appended. But instead, destination pointer &lt;em&gt;dl_buf&lt;/em&gt; is incremented by the expected transfer size (0xfffe00 bytes). So, by sending empty transfers (transfer without data), we can increment the destination pointer &lt;em&gt;dl_buf&lt;/em&gt; without actually writing any data, thus not risking any invalid memory access.&lt;/p&gt;
+&lt;p&gt;With this technique, we can easily increase &lt;em&gt;dl_buf&lt;/em&gt; pointer to reach an address convenient for exploitation.&lt;/p&gt;
+&lt;p&gt;Finally, the last transfer (non-empty this time) is used to corrupt memory pointed by manipulated address &lt;em&gt;dl_buf&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;In summary, we can write 512 bytes (or less) of arbitrary data in memory range [0x0..0x020217FF], at an arbitrary offset. In this memory range, multiple data structures can be overwritten to achieve arbitrary code execution: function pointers, stack region, etc...&lt;/p&gt;
+&lt;h1&gt;Conclusion&lt;/h1&gt;
+&lt;p&gt;The USB boot feature in the Exynos bootROM only runs signed bootloader images (when Secure Boot is enabled).
+However a pre-auth integer overflow bug allows an attacker with physical access to corrupt bootROM RAM.
+So the attacker can execute arbitrary code in Secure World, at very early boot stage.&lt;/p&gt;
+&lt;h1&gt;Timeline&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;2020-02-12 &lt;a href="https://gist.github.com/frederic/6228d60b8ddcf959eb3bea105f49348e"&gt;Bug discovery&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;2020-**-** Proof-of-concept development&lt;/li&gt;
+&lt;li&gt;2020-05-06 Vulnerability disclosed to Samsung&lt;/li&gt;
+&lt;li&gt;2020-06-10 Report dismissed as duplicate&lt;/li&gt;
+&lt;/ul&gt;</content><category term="arm"></category><category term="exynos"></category><category term="samsung"></category><category term="bootrom"></category><category term="usb"></category><category term="exploit"></category></entry><entry><title>Reverse engineer USB stack of Exynos BootROM</title><link href="https://fredericb.info/2020/06/reverse-engineer-usb-stack-of-exynos-bootrom.html" rel="alternate"></link><published>2020-06-16T00:00:00-07:00</published><updated>2020-06-16T00:00:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2020-06-16:/2020/06/reverse-engineer-usb-stack-of-exynos-bootrom.html</id><summary type="html">&lt;p&gt;In the previous post, we explained how to &lt;a href="https://fredericb.info/2020/06/exynos8890-bootrom-dump-dump-exynos-8890-bootrom-from-samsung-galaxy-s7.html"&gt;dump Exynos bootROM&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Exynos (8895 in this post) bootROM contains a minimal USB stack to load a signed bootloader from an USB host (a.k.a. boot from USB). 
 This post summarizes how this USB stack can be reversed using the Great …&lt;/p&gt;</summary><content type="html">&lt;p&gt;In the previous post, we explained how to &lt;a href="https://fredericb.info/2020/06/exynos8890-bootrom-dump-dump-exynos-8890-bootrom-from-samsung-galaxy-s7.html"&gt;dump Exynos bootROM&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Exynos (8895 in this post) bootROM contains a minimal USB stack to load a signed bootloader from an USB host (a.k.a. boot from USB). 

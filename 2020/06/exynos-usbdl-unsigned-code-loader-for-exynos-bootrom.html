@@ -1,0 +1,213 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/stylesheet/style.min.css">
+
+  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/pygments/github.min.css">
+  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/font-awesome/css/font-awesome.min.css">
+
+
+    <link href="https://fredericb.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="fred's notes Atom">
+
+
+    <link rel="shortcut icon" href="/resources/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/resources/favicon.ico" type="image/x-icon">
+
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+
+<meta name="author" content="Frédéric" />
+<meta name="description" content="In previous posts, we explained how to dump Exynos bootROM and reverse its USB stack. These efforts led to the discovery of a bug in the USB stack that can be exploited to run arbitrary code. The following chipsets are known to be affected by this bug : Exynos 8890 Exynos …" />
+<meta name="keywords" content="arm, exynos, samsung, bootrom, usb, exploit">
+
+<meta property="og:site_name" content="fred's notes"/>
+<meta property="og:title" content="exynos-usbdl : unsigned code loader for Exynos BootROM"/>
+<meta property="og:description" content="In previous posts, we explained how to dump Exynos bootROM and reverse its USB stack. These efforts led to the discovery of a bug in the USB stack that can be exploited to run arbitrary code. The following chipsets are known to be affected by this bug : Exynos 8890 Exynos …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="https://fredericb.info/2020/06/exynos-usbdl-unsigned-code-loader-for-exynos-bootrom.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2020-06-17 00:00:00-07:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="https://fredericb.info/author/frederic.html">
+<meta property="article:section" content="Tool"/>
+<meta property="article:tag" content="arm"/>
+<meta property="article:tag" content="exynos"/>
+<meta property="article:tag" content="samsung"/>
+<meta property="article:tag" content="bootrom"/>
+<meta property="article:tag" content="usb"/>
+<meta property="article:tag" content="exploit"/>
+<meta property="og:image" content="/resources/sitelogo.jpg">
+
+  <title>fred's notes &ndash; exynos-usbdl : unsigned code loader for Exynos BootROM</title>
+
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="/">
+        <img src="/resources/sitelogo.jpg" alt="fred's notes" title="fred's notes">
+      </a>
+      <h1><a href="/">fred's notes</a></h1>
+
+<p>Security & Stuff</p>
+      <nav>
+        <ul class="list">
+          <li><a href="https://fredericb.info/category/advisory.html">Advisory</a></li>
+          <li><a href="https://fredericb.info/category/article.html">Article</a></li>
+          <li><a href="https://fredericb.info/category/tool.html">Tool</a></li>
+          <li><a href="https://fredericb.info/pages/contact.html#contact">Contact</a></li>
+
+        </ul>
+      </nav>
+
+      <ul class="social">
+        <li><a class="sc-github" href="https://github.com/frederic" target="_blank"><i class="fa fa-github"></i></a></li>
+        <li><a class="sc-linkedin" href="https://www.linkedin.com/in/fredericbasse" target="_blank"><i class="fa fa-linkedin"></i></a></li>
+        <li><a class="sc-rss" href="/feeds/all.atom.xml" target="_blank"><i class="fa fa-rss"></i></a></li>
+      </ul>
+    </div>
+
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="https://fredericb.info/">    Home
+</a>
+
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+
+      <a href="https://fredericb.info/feeds/all.atom.xml">    Atom
+</a>
+
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="exynos-usbdl-unsigned-code-loader-for-exynos-bootrom">exynos-usbdl : unsigned code loader for Exynos BootROM</h1>
+    <p>
+          Posted on Wed 17 June 2020 in <a href="https://fredericb.info/category/tool.html">Tool</a>
+
+
+    </p>
+  </header>
+
+
+  <div>
+    <p>In previous posts, we explained how to <a href="https://fredericb.info/2020/06/exynos8890-bootrom-dump-dump-exynos-8890-bootrom-from-samsung-galaxy-s7.html">dump Exynos bootROM</a> and <a href="https://fredericb.info/2020/06/reverse-engineer-usb-stack-of-exynos-bootrom.html">reverse its USB stack</a>.</p>
+<p>These efforts led to the discovery of a bug in the USB stack that can be exploited to run arbitrary code.</p>
+<p>The following chipsets are known to be affected by this bug :</p>
+<ul>
+<li>Exynos 8890</li>
+<li>Exynos 8895</li>
+</ul>
+<p><a href="https://github.com/frederic/exynos-usbdl">exynos-usbdl, an open source tool available on Github</a>, exploits this vulnerability to load and run unsigned code.</p>
+<p><img alt="Good times with dental scraper" src="https://fredericb.info/blog/exy-bootrom/scraper.png"></p>
+<h1>Vulnerability details</h1>
+<p>Exynos BootROM implements a very simple USB protocol to receive a bootloader binary from an USB host. That binary is encapsulated in a small structure <em>dldata</em>, and sent through USB bulk transfers.</p>
+<div class="highlight"><pre><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">dldata_s</span> <span class="p">{</span>
+    <span class="n">u_int32_t</span> <span class="n">unknown0</span><span class="p">;</span>
+    <span class="n">u_int32_t</span> <span class="n">size</span><span class="p">;</span><span class="c1">// header(8) + data(n) + footer(2)</span>
+    <span class="n">u_int8_t</span>  <span class="n">data</span><span class="p">[</span><span class="n">n</span><span class="p">];</span><span class="c1">//example data of size &#39;n&#39;</span>
+    <span class="n">u_int16_t</span> <span class="n">unknown1</span><span class="p">;</span><span class="c1">//footer</span>
+<span class="p">}</span> <span class="n">dldata</span><span class="p">;</span>
+</pre></div>
+
+
+<h2>Integer overflow bug</h2>
+<p>BootROM writes received data into buffer <em>dl_buf</em> at address [0x02021800..0x02070000] (0x4E800 bytes).
+But first, a check ensures that transferred data won't overflow <em>dl_buf</em> buffer :</p>
+<div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="n">dl_buf</span> <span class="o">+</span> <span class="n">dldata</span><span class="p">.</span><span class="n">size</span> <span class="o">&gt;=</span> <span class="mh">0x02070000</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">usb_download_status</span> <span class="o">=</span> <span class="mh">0x02</span><span class="p">;</span><span class="c1">//error</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>However, this check on 32 bits is vulnerable to an integer overflow if <em>dldata.size</em> is higher than 0xFDFDE7FF (<em>dl_buf</em> + 0xFDFDE800 ≡ 0x0 mod 2³²).</p>
+<p>So the bootROM accepts a payload of regular size [0x10..0x4E800] bytes (don't go below if you want to avoid integer underflows...), but due to that bug, <strong>also accepts a payload of [0xFDFDE800..0xFFFFFFFF] bytes.</strong></p>
+<h2>Empty transfer trick</h2>
+<p>The integer overflow bug allows us to bypass the size check to send a very large payload to the bootROM.
+Such contiguous memory overflow may corrupt memory after <em>dl_buf</em> buffer, but the memory layout will cause the target to crash before any interesting (from attacker's point of view) memory corruption happens.</p>
+<p>First, because <em>dl_buf</em> is located at the end of the in-use memory (after stack area, for example), so there's no bootROM runtime data to corrupt.
+But also because accessing inexistent memory regions will cause a crash.</p>
+<p>Nevertheless, there's a trick to overcome that limitation. A large download is expected to be splitted into multiple small transfers of equal size (0xfffe00 bytes), except the last transfer which can be smaller.</p>
+<p>Each of these transfers triggers the USB transfer handler of the bootROM. This handler appends received data to the destination buffer <em>dl_buf</em>. We would expect that <em>dl_buf</em> pointer is then incremented by the size that has been appended. But instead, destination pointer <em>dl_buf</em> is incremented by the expected transfer size (0xfffe00 bytes). So, by sending empty transfers (transfer without data), we can increment the destination pointer <em>dl_buf</em> without actually writing any data, thus not risking any invalid memory access.</p>
+<p>With this technique, we can easily increase <em>dl_buf</em> pointer to reach an address convenient for exploitation.</p>
+<p>Finally, the last transfer (non-empty this time) is used to corrupt memory pointed by manipulated address <em>dl_buf</em>.</p>
+<p>In summary, we can write 512 bytes (or less) of arbitrary data in memory range [0x0..0x020217FF], at an arbitrary offset. In this memory range, multiple data structures can be overwritten to achieve arbitrary code execution: function pointers, stack region, etc...</p>
+<h1>Conclusion</h1>
+<p>The USB boot feature in the Exynos bootROM only runs signed bootloader images (when Secure Boot is enabled).
+However a pre-auth integer overflow bug allows an attacker with physical access to corrupt bootROM RAM.
+So the attacker can execute arbitrary code in Secure World, at very early boot stage.</p>
+<h1>Timeline</h1>
+<ul>
+<li>2020-02-12 <a href="https://gist.github.com/frederic/6228d60b8ddcf959eb3bea105f49348e">Bug discovery</a></li>
+<li>2020-**-** Proof-of-concept development</li>
+<li>2020-05-06 Vulnerability disclosed to Samsung</li>
+<li>2020-06-10 Report dismissed as duplicate</li>
+</ul>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://fredericb.info/tag/arm.html">arm</a>
+      <a href="https://fredericb.info/tag/exynos.html">exynos</a>
+      <a href="https://fredericb.info/tag/samsung.html">samsung</a>
+      <a href="https://fredericb.info/tag/bootrom.html">bootrom</a>
+      <a href="https://fredericb.info/tag/usb.html">usb</a>
+      <a href="https://fredericb.info/tag/exploit.html">exploit</a>
+    </p>
+  </div>
+
+
+
+    <div class="addthis_relatedposts_inline">
+
+
+</article>
+
+    <footer>
+<p>
+  &copy;   - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+</p>
+<p>    Powered by <a href="http://getpelican.com" target="_blank">Pelican</a> - Theme <a href="https://github.com/alexandrevicenzi/flex" target="_blank">Flex</a>
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses/by-sa/4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+         src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " fred's notes ",
+  "url" : "https://fredericb.info",
+  "image": "/resources/sitelogo.jpg",
+  "description": "Frédéric's Thoughts and Writings"
+}
+</script>
+
+</body>
+</html>
