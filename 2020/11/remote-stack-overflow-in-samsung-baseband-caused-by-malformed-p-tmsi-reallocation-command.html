@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/stylesheet/style.min.css">
+
+  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/pygments/github.min.css">
+  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/font-awesome/css/font-awesome.min.css">
+
+
+    <link href="https://fredericb.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="fred's notes Atom">
+
+
+    <link rel="shortcut icon" href="/resources/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/resources/favicon.ico" type="image/x-icon">
+
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+
+<meta name="author" content="Frédéric" />
+<meta name="description" content="Description When Samsung Shannon baseband receives message P-TMSI REALLOCATION COMMAND (9.4.7 in TS 24.008) from network, the length of the Mobile Identity IE (10.5.1.4) is not properly checked. Mobile identity data is directly copied to a stack buffer without prior size check. This stack …" />
+<meta name="keywords" content="vulnerability, advisory, samsung, shannon, baseband, security, arm">
+
+<meta property="og:site_name" content="fred's notes"/>
+<meta property="og:title" content="Remote stack overflow in Samsung baseband caused by malformed P-TMSI REALLOCATION COMMAND"/>
+<meta property="og:description" content="Description When Samsung Shannon baseband receives message P-TMSI REALLOCATION COMMAND (9.4.7 in TS 24.008) from network, the length of the Mobile Identity IE (10.5.1.4) is not properly checked. Mobile identity data is directly copied to a stack buffer without prior size check. This stack …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="https://fredericb.info/2020/11/remote-stack-overflow-in-samsung-baseband-caused-by-malformed-p-tmsi-reallocation-command.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2020-11-23 00:00:00-07:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="https://fredericb.info/author/frederic.html">
+<meta property="article:section" content="Advisory"/>
+<meta property="article:tag" content="vulnerability"/>
+<meta property="article:tag" content="advisory"/>
+<meta property="article:tag" content="samsung"/>
+<meta property="article:tag" content="shannon"/>
+<meta property="article:tag" content="baseband"/>
+<meta property="article:tag" content="security"/>
+<meta property="article:tag" content="arm"/>
+<meta property="og:image" content="/resources/sitelogo.jpg">
+
+  <title>fred's notes &ndash; Remote stack overflow in Samsung baseband caused by malformed P-TMSI REALLOCATION COMMAND</title>
+
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="/">
+        <img src="/resources/sitelogo.jpg" alt="fred's notes" title="fred's notes">
+      </a>
+      <h1><a href="/">fred's notes</a></h1>
+
+<p>Security & Stuff</p>
+      <nav>
+        <ul class="list">
+          <li><a href="https://fredericb.info/category/advisory.html">Advisory</a></li>
+          <li><a href="https://fredericb.info/category/article.html">Article</a></li>
+          <li><a href="https://fredericb.info/category/tool.html">Tool</a></li>
+          <li><a href="https://fredericb.info/pages/contact.html#contact">Contact</a></li>
+
+        </ul>
+      </nav>
+
+      <ul class="social">
+        <li><a class="sc-github" href="https://github.com/frederic" target="_blank"><i class="fa fa-github"></i></a></li>
+        <li><a class="sc-linkedin" href="https://www.linkedin.com/in/fredericbasse" target="_blank"><i class="fa fa-linkedin"></i></a></li>
+        <li><a class="sc-rss" href="/feeds/all.atom.xml" target="_blank"><i class="fa fa-rss"></i></a></li>
+      </ul>
+    </div>
+
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="https://fredericb.info/">    Home
+</a>
+
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+
+      <a href="https://fredericb.info/feeds/all.atom.xml">    Atom
+</a>
+
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="remote-stack-overflow-in-samsung-baseband-caused-by-malformed-p-tmsi-reallocation-command">Remote stack overflow in Samsung baseband caused by malformed P-TMSI REALLOCATION COMMAND</h1>
+    <p>
+          Posted on Mon 23 November 2020 in <a href="https://fredericb.info/category/advisory.html">Advisory</a>
+
+
+    </p>
+  </header>
+
+
+  <div>
+    <h1>Description</h1>
+<p>When Samsung Shannon baseband receives message P-TMSI REALLOCATION COMMAND (9.4.7 in <a href="https://www.etsi.org/deliver/etsi_ts/124000_124099/124008/13.07.00_60/ts_124008v130700p.pdf">TS 24.008</a>) from network,
+the length of the Mobile Identity IE (10.5.1.4) is not properly checked.</p>
+<p><img alt="TS 24.008 P-TMSI REALLOCATION COMMAND message" src="https://fredericb.info/blog/PTMSI/TS24.008_PTMSI-realloc-cmd.png" width="700px"></p>
+<p>Mobile identity data is directly copied to a stack buffer without prior size check. This stack overflow can lead to remote code execution in the Shannon modem.</p>
+<h1>CVSS Version 3 Metrics</h1>
+<ul>
+<li>Attack Vector (AV): Adjacent (A)</li>
+<li>Attack Complexity (AC): Low (L)</li>
+<li>Privileges Required (PR): None (N)</li>
+<li>User Interaction (UI): None (N)</li>
+<li><a href="https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:A/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H">Overall CVSS Score: 8.8</a></li>
+</ul>
+<h1>Affected Versions</h1>
+<p>Discovered in Shannon baseband of Galaxy S8 (SM-G950FD), it may affect other models based on Exynos chipsets.</p>
+<h1>Solution</h1>
+<p>Samsung security update of December 2018 fixes this vulnerability.</p>
+<h1>Timeline</h1>
+<ul>
+<li>2018-11-19 Working proof-of-concept</li>
+<li>2018-12-04 Bug fixed in Samsung security update <a href="https://security.samsungmobile.com/securityUpdate.smsb">SMR-DEC-2018</a></li>
+<li>2018-12-05 Reconsider life choices</li>
+</ul>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://fredericb.info/tag/vulnerability.html">vulnerability</a>
+      <a href="https://fredericb.info/tag/advisory.html">advisory</a>
+      <a href="https://fredericb.info/tag/samsung.html">samsung</a>
+      <a href="https://fredericb.info/tag/shannon.html">shannon</a>
+      <a href="https://fredericb.info/tag/baseband.html">baseband</a>
+      <a href="https://fredericb.info/tag/security.html">security</a>
+      <a href="https://fredericb.info/tag/arm.html">arm</a>
+    </p>
+  </div>
+
+
+
+    <div class="addthis_relatedposts_inline">
+
+
+</article>
+
+    <footer>
+<p>
+  &copy;   - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+</p>
+<p>    Powered by <a href="http://getpelican.com" target="_blank">Pelican</a> - Theme <a href="https://github.com/alexandrevicenzi/flex" target="_blank">Flex</a>
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses/by-sa/4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+         src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " fred's notes ",
+  "url" : "https://fredericb.info",
+  "image": "/resources/sitelogo.jpg",
+  "description": "Frédéric's Thoughts and Writings"
+}
+</script>
+
+</body>
+</html>

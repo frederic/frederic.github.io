@@ -1,5 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>fred's notes</title><link href="https://fredericb.info/" rel="alternate"></link><link href="https://fredericb.info/feeds/all.atom.xml" rel="self"></link><id>https://fredericb.info/</id><updated>2020-06-17T00:00:00-07:00</updated><subtitle>Security &amp; Stuff</subtitle><entry><title>exynos-usbdl : unsigned code loader for Exynos BootROM</title><link href="https://fredericb.info/2020/06/exynos-usbdl-unsigned-code-loader-for-exynos-bootrom.html" rel="alternate"></link><published>2020-06-17T00:00:00-07:00</published><updated>2020-06-17T00:00:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2020-06-17:/2020/06/exynos-usbdl-unsigned-code-loader-for-exynos-bootrom.html</id><summary type="html">&lt;p&gt;In previous posts, we explained how to &lt;a href="https://fredericb.info/2020/06/exynos8890-bootrom-dump-dump-exynos-8890-bootrom-from-samsung-galaxy-s7.html"&gt;dump Exynos bootROM&lt;/a&gt; and &lt;a href="https://fredericb.info/2020/06/reverse-engineer-usb-stack-of-exynos-bootrom.html"&gt;reverse its USB stack&lt;/a&gt;.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>fred's notes</title><link href="https://fredericb.info/" rel="alternate"></link><link href="https://fredericb.info/feeds/all.atom.xml" rel="self"></link><id>https://fredericb.info/</id><updated>2020-11-23T00:00:00-07:00</updated><subtitle>Security &amp; Stuff</subtitle><entry><title>Remote stack overflow in Samsung baseband caused by malformed P-TMSI REALLOCATION COMMAND</title><link href="https://fredericb.info/2020/11/remote-stack-overflow-in-samsung-baseband-caused-by-malformed-p-tmsi-reallocation-command.html" rel="alternate"></link><published>2020-11-23T00:00:00-07:00</published><updated>2020-11-23T00:00:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2020-11-23:/2020/11/remote-stack-overflow-in-samsung-baseband-caused-by-malformed-p-tmsi-reallocation-command.html</id><summary type="html">&lt;h1&gt;Description&lt;/h1&gt;
+&lt;p&gt;When Samsung Shannon baseband receives message P-TMSI REALLOCATION COMMAND (9.4.7 in &lt;a href="https://www.etsi.org/deliver/etsi_ts/124000_124099/124008/13.07.00_60/ts_124008v130700p.pdf"&gt;TS 24.008&lt;/a&gt;) from network,
+the length of the Mobile Identity IE (10.5.1.4) is not properly checked.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="TS 24.008 P-TMSI REALLOCATION COMMAND message" src="https://fredericb.info/blog/PTMSI/TS24.008_PTMSI-realloc-cmd.png" width="700px"&gt;&lt;/p&gt;
+&lt;p&gt;Mobile identity data is directly copied to a stack buffer without prior size check. This stack …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Description&lt;/h1&gt;
+&lt;p&gt;When Samsung Shannon baseband receives message P-TMSI REALLOCATION COMMAND (9.4.7 in &lt;a href="https://www.etsi.org/deliver/etsi_ts/124000_124099/124008/13.07.00_60/ts_124008v130700p.pdf"&gt;TS 24.008&lt;/a&gt;) from network,
+the length of the Mobile Identity IE (10.5.1.4) is not properly checked.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="TS 24.008 P-TMSI REALLOCATION COMMAND message" src="https://fredericb.info/blog/PTMSI/TS24.008_PTMSI-realloc-cmd.png" width="700px"&gt;&lt;/p&gt;
+&lt;p&gt;Mobile identity data is directly copied to a stack buffer without prior size check. This stack overflow can lead to remote code execution in the Shannon modem.&lt;/p&gt;
+&lt;h1&gt;CVSS Version 3 Metrics&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;Attack Vector (AV): Adjacent (A)&lt;/li&gt;
+&lt;li&gt;Attack Complexity (AC): Low (L)&lt;/li&gt;
+&lt;li&gt;Privileges Required (PR): None (N)&lt;/li&gt;
+&lt;li&gt;User Interaction (UI): None (N)&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:A/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"&gt;Overall CVSS Score: 8.8&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;Affected Versions&lt;/h1&gt;
+&lt;p&gt;Discovered in Shannon baseband of Galaxy S8 (SM-G950FD), it may affect other models based on Exynos chipsets.&lt;/p&gt;
+&lt;h1&gt;Solution&lt;/h1&gt;
+&lt;p&gt;Samsung security update of December 2018 fixes this vulnerability.&lt;/p&gt;
+&lt;h1&gt;Timeline&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;2018-11-19 Working proof-of-concept&lt;/li&gt;
+&lt;li&gt;2018-12-04 Bug fixed in Samsung security update &lt;a href="https://security.samsungmobile.com/securityUpdate.smsb"&gt;SMR-DEC-2018&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;2018-12-05 Reconsider life choices&lt;/li&gt;
+&lt;/ul&gt;</content><category term="vulnerability"></category><category term="advisory"></category><category term="samsung"></category><category term="shannon"></category><category term="baseband"></category><category term="security"></category><category term="arm"></category></entry><entry><title>exynos-usbdl : unsigned code loader for Exynos BootROM</title><link href="https://fredericb.info/2020/06/exynos-usbdl-unsigned-code-loader-for-exynos-bootrom.html" rel="alternate"></link><published>2020-06-17T00:00:00-07:00</published><updated>2020-06-17T00:00:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2020-06-17:/2020/06/exynos-usbdl-unsigned-code-loader-for-exynos-bootrom.html</id><summary type="html">&lt;p&gt;In previous posts, we explained how to &lt;a href="https://fredericb.info/2020/06/exynos8890-bootrom-dump-dump-exynos-8890-bootrom-from-samsung-galaxy-s7.html"&gt;dump Exynos bootROM&lt;/a&gt; and &lt;a href="https://fredericb.info/2020/06/reverse-engineer-usb-stack-of-exynos-bootrom.html"&gt;reverse its USB stack&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;These efforts led to the discovery of a bug in the USB stack that can be exploited to run arbitrary code.&lt;/p&gt;
 &lt;p&gt;The following chipsets are known to be affected by this bug :&lt;/p&gt;
 &lt;ul&gt;

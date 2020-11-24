@@ -85,6 +85,30 @@
 
 <article>
   <header>
+    <h2><a href="https://fredericb.info/2020/11/remote-stack-overflow-in-samsung-baseband-caused-by-malformed-p-tmsi-reallocation-command.html#remote-stack-overflow-in-samsung-baseband-caused-by-malformed-p-tmsi-reallocation-command">Remote stack overflow in Samsung baseband caused by malformed P-TMSI REALLOCATION COMMAND</a></h2>
+    <p>
+          Posted on Mon 23 November 2020 in <a href="https://fredericb.info/category/advisory.html">Advisory</a>
+
+
+          &#8226;     Tagged with
+
+              <a href="https://fredericb.info/tag/vulnerability.html">vulnerability</a>,              <a href="https://fredericb.info/tag/advisory.html">advisory</a>,              <a href="https://fredericb.info/tag/samsung.html">samsung</a>,              <a href="https://fredericb.info/tag/shannon.html">shannon</a>,              <a href="https://fredericb.info/tag/baseband.html">baseband</a>,              <a href="https://fredericb.info/tag/security.html">security</a>,              <a href="https://fredericb.info/tag/arm.html">arm</a>
+    </p>
+  </header>
+  <div>
+      <h1>Description</h1>
+<p>When Samsung Shannon baseband receives message P-TMSI REALLOCATION COMMAND (9.4.7 in <a href="https://www.etsi.org/deliver/etsi_ts/124000_124099/124008/13.07.00_60/ts_124008v130700p.pdf">TS 24.008</a>) from network,
+the length of the Mobile Identity IE (10.5.1.4) is not properly checked.</p>
+<p><img alt="TS 24.008 P-TMSI REALLOCATION COMMAND message" src="https://fredericb.info/blog/PTMSI/TS24.008_PTMSI-realloc-cmd.png" width="700px"></p>
+<p>Mobile identity data is directly copied to a stack buffer without prior size check. This stack …</p>
+      <br>
+      <a class="btn" href="https://fredericb.info/2020/11/remote-stack-overflow-in-samsung-baseband-caused-by-malformed-p-tmsi-reallocation-command.html#remote-stack-overflow-in-samsung-baseband-caused-by-malformed-p-tmsi-reallocation-command">    Continue reading
+</a>
+  </div>
+  <hr />
+</article>
+<article>
+  <header>
     <h2><a href="https://fredericb.info/2017/07/sve-2016-7930-multiple-buffer-overflows-in-samsung-galaxy-bootloader.html#sve-2016-7930-multiple-buffer-overflows-in-samsung-galaxy-bootloader">SVE-2016-7930: Multiple buffer overflows in Samsung Galaxy bootloader</a></h2>
     <p>
           Posted on Sun 23 July 2017 in <a href="https://fredericb.info/category/advisory.html">Advisory</a>
