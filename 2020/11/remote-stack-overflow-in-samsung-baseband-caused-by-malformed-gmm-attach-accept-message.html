@@ -24,18 +24,30 @@
     <meta name="robots" content="" />
 
 
-    <meta name="author" content="Frédéric" />
-    <meta name="description" content="Frédéric's Thoughts and Writings" />
+<meta name="author" content="Frédéric" />
+<meta name="description" content="Description When Samsung Shannon baseband receives message GMM ATTACH ACCEPT (9.4.2 in TS 24.008) from network, the minimum length of the MS Identity IE (10.5.1.4) is not properly checked. MS Identity (IEI 0x23) length is decremented without prior check. If this value is zero …" />
+<meta name="keywords" content="vulnerability, advisory, samsung, shannon, baseband, security, arm">
+
 <meta property="og:site_name" content="fred's notes"/>
-<meta property="og:type" content="blog"/>
-<meta property="og:title" content="fred's notes"/>
-<meta property="og:description" content="Frédéric's Thoughts and Writings"/>
+<meta property="og:title" content="Remote stack overflow in Samsung baseband caused by malformed GMM ATTACH ACCEPT message"/>
+<meta property="og:description" content="Description When Samsung Shannon baseband receives message GMM ATTACH ACCEPT (9.4.2 in TS 24.008) from network, the minimum length of the MS Identity IE (10.5.1.4) is not properly checked. MS Identity (IEI 0x23) length is decremented without prior check. If this value is zero …"/>
 <meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="https://fredericb.info"/>
+<meta property="og:url" content="https://fredericb.info/2020/11/remote-stack-overflow-in-samsung-baseband-caused-by-malformed-gmm-attach-accept-message.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2020-11-30 00:00:00-07:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="https://fredericb.info/author/frederic.html">
+<meta property="article:section" content="Advisory"/>
+<meta property="article:tag" content="vulnerability"/>
+<meta property="article:tag" content="advisory"/>
+<meta property="article:tag" content="samsung"/>
+<meta property="article:tag" content="shannon"/>
+<meta property="article:tag" content="baseband"/>
+<meta property="article:tag" content="security"/>
+<meta property="article:tag" content="arm"/>
 <meta property="og:image" content="/resources/sitelogo.jpg">
 
-  <title>fred's notes &ndash;     Tag baseband
-</title>
+  <title>fred's notes &ndash; Remote stack overflow in Samsung baseband caused by malformed GMM ATTACH ACCEPT message</title>
 
 </head>
 <body>
@@ -81,61 +93,62 @@
 
     </nav>
 
-
-
-<article>
+<article class="single">
   <header>
-    <h2><a href="https://fredericb.info/2020/11/remote-stack-overflow-in-samsung-baseband-caused-by-malformed-gmm-attach-accept-message.html#remote-stack-overflow-in-samsung-baseband-caused-by-malformed-gmm-attach-accept-message">Remote stack overflow in Samsung baseband caused by malformed GMM ATTACH ACCEPT message</a></h2>
+      
+    <h1 id="remote-stack-overflow-in-samsung-baseband-caused-by-malformed-gmm-attach-accept-message">Remote stack overflow in Samsung baseband caused by malformed GMM ATTACH ACCEPT message</h1>
     <p>
           Posted on Mon 30 November 2020 in <a href="https://fredericb.info/category/advisory.html">Advisory</a>
 
 
-          &#8226;     Tagged with
-
-              <a href="https://fredericb.info/tag/vulnerability.html">vulnerability</a>,              <a href="https://fredericb.info/tag/advisory.html">advisory</a>,              <a href="https://fredericb.info/tag/samsung.html">samsung</a>,              <a href="https://fredericb.info/tag/shannon.html">shannon</a>,              <a href="https://fredericb.info/tag/baseband.html">baseband</a>,              <a href="https://fredericb.info/tag/security.html">security</a>,              <a href="https://fredericb.info/tag/arm.html">arm</a>
     </p>
   </header>
+
+
   <div>
-      <h1>Description</h1>
+    <h1>Description</h1>
 <p>When Samsung Shannon baseband receives message GMM ATTACH ACCEPT (9.4.2 in <a href="https://www.etsi.org/deliver/etsi_ts/124000_124099/124008/14.04.00_60/ts_124008v140400p.pdf">TS 24.008</a>) from network,
 the minimum length of the MS Identity IE (10.5.1.4) is not properly checked.</p>
 <p><img alt="TS 24.008 GMM ATTACH ACCEPT message" src="https://fredericb.info/blog/Shannon_MS_ID/gmm_attach_accept.png" width="700px"></p>
-<p>MS Identity (IEI 0x23) length is decremented without prior check. If this value is zero …</p>
-      <br>
-      <a class="btn" href="https://fredericb.info/2020/11/remote-stack-overflow-in-samsung-baseband-caused-by-malformed-gmm-attach-accept-message.html#remote-stack-overflow-in-samsung-baseband-caused-by-malformed-gmm-attach-accept-message">    Continue reading
-</a>
+<p>MS Identity (IEI 0x23) length is decremented without prior check. If this value is zero, a short integer underflow occurs. This invalid size is then used to copy received MS Identity data to a stack buffer. This stack overflow can lead to remote arbitrary code execution in the Shannon modem.</p>
+<h1>CVSS Version 3 Metrics</h1>
+<ul>
+<li>Attack Vector (AV): Adjacent (A)</li>
+<li>Attack Complexity (AC): Low (L)</li>
+<li>Privileges Required (PR): None (N)</li>
+<li>User Interaction (UI): None (N)</li>
+<li><a href="https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:A/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H">Overall CVSS Score: 8.8</a></li>
+</ul>
+<h1>Affected Versions</h1>
+<p>Discovered in Shannon baseband of Galaxy S8 (SM-G950FD), it may affect other models based on Exynos chipsets.</p>
+<h1>Solution</h1>
+<p>Samsung security update of December 2018 fixes this vulnerability.</p>
+<h1>Timeline</h1>
+<ul>
+<li>2018-12-04 Bug fixed in Samsung security update <a href="https://security.samsungmobile.com/securityUpdate.smsb">SMR-DEC-2018</a></li>
+<li>2019-05-25 Bug discovered in old firmware</li>
+<li>2019-05-28 Bug fix discovered in latest firmware</li>
+<li>2019-05-28 Bug hunting procedures reconsidered</li>
+</ul>
   </div>
-  <hr />
-</article>
-<article>
-  <header>
-    <h2><a href="https://fredericb.info/2020/11/remote-stack-overflow-in-samsung-baseband-caused-by-malformed-p-tmsi-reallocation-command.html#remote-stack-overflow-in-samsung-baseband-caused-by-malformed-p-tmsi-reallocation-command">Remote stack overflow in Samsung baseband caused by malformed P-TMSI REALLOCATION COMMAND</a></h2>
+  <div class="tag-cloud">
     <p>
-          Posted on Mon 23 November 2020 in <a href="https://fredericb.info/category/advisory.html">Advisory</a>
-
-
-          &#8226;     Tagged with
-
-              <a href="https://fredericb.info/tag/vulnerability.html">vulnerability</a>,              <a href="https://fredericb.info/tag/advisory.html">advisory</a>,              <a href="https://fredericb.info/tag/samsung.html">samsung</a>,              <a href="https://fredericb.info/tag/shannon.html">shannon</a>,              <a href="https://fredericb.info/tag/baseband.html">baseband</a>,              <a href="https://fredericb.info/tag/security.html">security</a>,              <a href="https://fredericb.info/tag/arm.html">arm</a>
+      <a href="https://fredericb.info/tag/vulnerability.html">vulnerability</a>
+      <a href="https://fredericb.info/tag/advisory.html">advisory</a>
+      <a href="https://fredericb.info/tag/samsung.html">samsung</a>
+      <a href="https://fredericb.info/tag/shannon.html">shannon</a>
+      <a href="https://fredericb.info/tag/baseband.html">baseband</a>
+      <a href="https://fredericb.info/tag/security.html">security</a>
+      <a href="https://fredericb.info/tag/arm.html">arm</a>
     </p>
-  </header>
-  <div>
-      <h1>Description</h1>
-<p>When Samsung Shannon baseband receives message P-TMSI REALLOCATION COMMAND (9.4.7 in <a href="https://www.etsi.org/deliver/etsi_ts/124000_124099/124008/13.07.00_60/ts_124008v130700p.pdf">TS 24.008</a>) from network,
-the length of the Mobile Identity IE (10.5.1.4) is not properly checked.</p>
-<p><img alt="TS 24.008 P-TMSI REALLOCATION COMMAND message" src="https://fredericb.info/blog/PTMSI/TS24.008_PTMSI-realloc-cmd.png" width="700px"></p>
-<p>Mobile identity data is directly copied to a stack buffer without prior size check. This stack …</p>
-      <br>
-      <a class="btn" href="https://fredericb.info/2020/11/remote-stack-overflow-in-samsung-baseband-caused-by-malformed-p-tmsi-reallocation-command.html#remote-stack-overflow-in-samsung-baseband-caused-by-malformed-p-tmsi-reallocation-command">    Continue reading
-</a>
   </div>
+
+
+
+    <div class="addthis_relatedposts_inline">
+
+
 </article>
-
-  <div class="pagination">
-  </div>
-
-
-
 
     <footer>
 <p>
