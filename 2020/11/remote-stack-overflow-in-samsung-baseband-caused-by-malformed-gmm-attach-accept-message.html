@@ -25,12 +25,12 @@
 
 
 <meta name="author" content="Frédéric" />
-<meta name="description" content="Description When Samsung Shannon baseband receives message GMM ATTACH ACCEPT (9.4.2 in TS 24.008) from network, the minimum length of the MS Identity IE (10.5.1.4) is not properly checked. MS Identity (IEI 0x23) length is decremented without prior check. If this value is zero …" />
+<meta name="description" content="Description When Samsung Shannon baseband receives message GMM ATTACH ACCEPT (9.4.2 in TS 24.008) from network, the minimum length for MS Identity IE (10.5.1.4) is not properly checked. MS Identity (IEI 0x23) length is decremented without prior check. If this value is zero, a …" />
 <meta name="keywords" content="vulnerability, advisory, samsung, shannon, baseband, security, arm">
 
 <meta property="og:site_name" content="fred's notes"/>
 <meta property="og:title" content="Remote stack overflow in Samsung baseband caused by malformed GMM ATTACH ACCEPT message"/>
-<meta property="og:description" content="Description When Samsung Shannon baseband receives message GMM ATTACH ACCEPT (9.4.2 in TS 24.008) from network, the minimum length of the MS Identity IE (10.5.1.4) is not properly checked. MS Identity (IEI 0x23) length is decremented without prior check. If this value is zero …"/>
+<meta property="og:description" content="Description When Samsung Shannon baseband receives message GMM ATTACH ACCEPT (9.4.2 in TS 24.008) from network, the minimum length for MS Identity IE (10.5.1.4) is not properly checked. MS Identity (IEI 0x23) length is decremented without prior check. If this value is zero, a …"/>
 <meta property="og:locale" content="en_US"/>
 <meta property="og:url" content="https://fredericb.info/2020/11/remote-stack-overflow-in-samsung-baseband-caused-by-malformed-gmm-attach-accept-message.html"/>
 <meta property="og:type" content="article"/>
@@ -108,7 +108,7 @@
   <div>
     <h1>Description</h1>
 <p>When Samsung Shannon baseband receives message GMM ATTACH ACCEPT (9.4.2 in <a href="https://www.etsi.org/deliver/etsi_ts/124000_124099/124008/14.04.00_60/ts_124008v140400p.pdf">TS 24.008</a>) from network,
-the minimum length of the MS Identity IE (10.5.1.4) is not properly checked.</p>
+the minimum length for MS Identity IE (10.5.1.4) is not properly checked.</p>
 <p><img alt="TS 24.008 GMM ATTACH ACCEPT message" src="https://fredericb.info/blog/Shannon_MS_ID/gmm_attach_accept.png" width="700px"></p>
 <p>MS Identity (IEI 0x23) length is decremented without prior check. If this value is zero, a short integer underflow occurs. This invalid size is then used to copy received MS Identity data to a stack buffer. This stack overflow can lead to remote arbitrary code execution in the Shannon modem.</p>
 <h1>CVSS Version 3 Metrics</h1>

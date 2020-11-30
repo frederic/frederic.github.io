@@ -97,9 +97,9 @@
   <div>
       <h1>Description</h1>
 <p>When Samsung Shannon baseband receives message GMM ATTACH ACCEPT (9.4.2 in <a href="https://www.etsi.org/deliver/etsi_ts/124000_124099/124008/14.04.00_60/ts_124008v140400p.pdf">TS 24.008</a>) from network,
-the minimum length of the MS Identity IE (10.5.1.4) is not properly checked.</p>
+the minimum length for MS Identity IE (10.5.1.4) is not properly checked.</p>
 <p><img alt="TS 24.008 GMM ATTACH ACCEPT message" src="https://fredericb.info/blog/Shannon_MS_ID/gmm_attach_accept.png" width="700px"></p>
-<p>MS Identity (IEI 0x23) length is decremented without prior check. If this value is zero …</p>
+<p>MS Identity (IEI 0x23) length is decremented without prior check. If this value is zero, a …</p>
       <br>
       <a class="btn" href="https://fredericb.info/2020/11/remote-stack-overflow-in-samsung-baseband-caused-by-malformed-gmm-attach-accept-message.html#remote-stack-overflow-in-samsung-baseband-caused-by-malformed-gmm-attach-accept-message">    Continue reading
 </a>
