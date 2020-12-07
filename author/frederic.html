@@ -85,6 +85,29 @@
 
 <article>
   <header>
+    <h2><a href="https://fredericb.info/2020/12/sve-2019-13963-remote-stack-overflow-in-samsung-baseband-caused-by-malformed-immediate-assignment-message.html#sve-2019-13963-remote-stack-overflow-in-samsung-baseband-caused-by-malformed-immediate-assignment-message">SVE-2019-13963 : Remote stack overflow in Samsung baseband caused by malformed IMMEDIATE ASSIGNMENT message</a></h2>
+    <p>
+          Posted on Mon 07 December 2020 in <a href="https://fredericb.info/category/advisory.html">Advisory</a>
+
+
+          &#8226;     Tagged with
+
+              <a href="https://fredericb.info/tag/vulnerability.html">vulnerability</a>,              <a href="https://fredericb.info/tag/advisory.html">advisory</a>,              <a href="https://fredericb.info/tag/samsung.html">samsung</a>,              <a href="https://fredericb.info/tag/shannon.html">shannon</a>,              <a href="https://fredericb.info/tag/baseband.html">baseband</a>,              <a href="https://fredericb.info/tag/security.html">security</a>,              <a href="https://fredericb.info/tag/arm.html">arm</a>
+    </p>
+  </header>
+  <div>
+      <h1>Description</h1>
+<p>When Samsung Shannon baseband receives message IMMEDIATE ASSIGNMENT (9.1.18 in <a href="https://www.etsi.org/deliver/etsi_gts/04/0408/05.03.00_60/gsmts_0408v050300p.pdf">GSM/04.08</a>) from network, the length of the Mobile Allocation IE (GSM/04.08 10.5.2.21) is not properly checked.</p>
+<p><img alt="GSM/04.08 IMMEDIATE ASSIGNMENT message" src="https://fredericb.info/blog/SVE-2019-13963/gsm_imm-assign.png" width="700px"></p>
+<p>Mobile allocation data is directly copied to a buffer on the stack without checking …</p>
+      <br>
+      <a class="btn" href="https://fredericb.info/2020/12/sve-2019-13963-remote-stack-overflow-in-samsung-baseband-caused-by-malformed-immediate-assignment-message.html#sve-2019-13963-remote-stack-overflow-in-samsung-baseband-caused-by-malformed-immediate-assignment-message">    Continue reading
+</a>
+  </div>
+  <hr />
+</article>
+<article>
+  <header>
     <h2><a href="https://fredericb.info/2020/11/remote-stack-overflow-in-samsung-baseband-caused-by-malformed-gmm-attach-accept-message.html#remote-stack-overflow-in-samsung-baseband-caused-by-malformed-gmm-attach-accept-message">Remote stack overflow in Samsung baseband caused by malformed GMM ATTACH ACCEPT message</a></h2>
     <p>
           Posted on Mon 30 November 2020 in <a href="https://fredericb.info/category/advisory.html">Advisory</a>
@@ -318,34 +341,6 @@ System Block Diagram</td>
 The SoC contains a Secure …</p>
       <br>
       <a class="btn" href="https://fredericb.info/2016/10/amlogic-s905-soc-bypassing-not-so.html#amlogic-s905-soc-bypassing-not-so">    Continue reading
-</a>
-  </div>
-  <hr />
-</article>
-<article>
-  <header>
-    <h2><a href="https://fredericb.info/2016/02/powerline-plc-support-in-openwrt-for-d.html#powerline-plc-support-in-openwrt-for-d">PowerLine (PLC) support in OpenWrt for D-Link DHP-1565</a></h2>
-    <p>
-          Posted on Sat 20 February 2016 in <a href="https://fredericb.info/category/article.html">Article</a>
-
-
-          &#8226;     Tagged with
-
-              <a href="https://fredericb.info/tag/plc.html">PLC</a>,              <a href="https://fredericb.info/tag/dhp-1565.html">dhp-1565</a>,              <a href="https://fredericb.info/tag/ar7400.html">AR7400</a>,              <a href="https://fredericb.info/tag/openwrt.html">openwrt</a>
-    </p>
-  </header>
-  <div>
-      <p>D-Link 1565 is one of the few routers which integrates a PLC (Power
-line Communication) chipset (in this case QCA AR7400).
-Unfortunately, OpenWrt does not provide support for this feature
-yet.<br>
-<br>
-This post presents configuration steps to enable PLC support in
-OpenWrt for this device.
-<h2>Hardware configuration</h2>
-By digging into …</p>
-      <br>
-      <a class="btn" href="https://fredericb.info/2016/02/powerline-plc-support-in-openwrt-for-d.html#powerline-plc-support-in-openwrt-for-d">    Continue reading
 </a>
   </div>
 </article>

@@ -85,6 +85,29 @@
 
 <article>
   <header>
+    <h2><a href="https://fredericb.info/2020/12/sve-2019-13963-remote-stack-overflow-in-samsung-baseband-caused-by-malformed-immediate-assignment-message.html#sve-2019-13963-remote-stack-overflow-in-samsung-baseband-caused-by-malformed-immediate-assignment-message">SVE-2019-13963 : Remote stack overflow in Samsung baseband caused by malformed IMMEDIATE ASSIGNMENT message</a></h2>
+    <p>
+          Posted on Mon 07 December 2020 in <a href="https://fredericb.info/category/advisory.html">Advisory</a>
+
+
+          &#8226;     Tagged with
+
+              <a href="https://fredericb.info/tag/vulnerability.html">vulnerability</a>,              <a href="https://fredericb.info/tag/advisory.html">advisory</a>,              <a href="https://fredericb.info/tag/samsung.html">samsung</a>,              <a href="https://fredericb.info/tag/shannon.html">shannon</a>,              <a href="https://fredericb.info/tag/baseband.html">baseband</a>,              <a href="https://fredericb.info/tag/security.html">security</a>,              <a href="https://fredericb.info/tag/arm.html">arm</a>
+    </p>
+  </header>
+  <div>
+      <h1>Description</h1>
+<p>When Samsung Shannon baseband receives message IMMEDIATE ASSIGNMENT (9.1.18 in <a href="https://www.etsi.org/deliver/etsi_gts/04/0408/05.03.00_60/gsmts_0408v050300p.pdf">GSM/04.08</a>) from network, the length of the Mobile Allocation IE (GSM/04.08 10.5.2.21) is not properly checked.</p>
+<p><img alt="GSM/04.08 IMMEDIATE ASSIGNMENT message" src="https://fredericb.info/blog/SVE-2019-13963/gsm_imm-assign.png" width="700px"></p>
+<p>Mobile allocation data is directly copied to a buffer on the stack without checking …</p>
+      <br>
+      <a class="btn" href="https://fredericb.info/2020/12/sve-2019-13963-remote-stack-overflow-in-samsung-baseband-caused-by-malformed-immediate-assignment-message.html#sve-2019-13963-remote-stack-overflow-in-samsung-baseband-caused-by-malformed-immediate-assignment-message">    Continue reading
+</a>
+  </div>
+  <hr />
+</article>
+<article>
+  <header>
     <h2><a href="https://fredericb.info/2020/11/remote-stack-overflow-in-samsung-baseband-caused-by-malformed-gmm-attach-accept-message.html#remote-stack-overflow-in-samsung-baseband-caused-by-malformed-gmm-attach-accept-message">Remote stack overflow in Samsung baseband caused by malformed GMM ATTACH ACCEPT message</a></h2>
     <p>
           Posted on Mon 30 November 2020 in <a href="https://fredericb.info/category/advisory.html">Advisory</a>
