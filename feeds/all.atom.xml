@@ -1,5 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>fred's notes</title><link href="https://fredericb.info/" rel="alternate"></link><link href="https://fredericb.info/feeds/all.atom.xml" rel="self"></link><id>https://fredericb.info/</id><updated>2020-12-07T00:00:00-07:00</updated><subtitle>Security &amp; Stuff</subtitle><entry><title>SVE-2019-13963 : Remote stack overflow in Samsung baseband caused by malformed IMMEDIATE ASSIGNMENT message</title><link href="https://fredericb.info/2020/12/sve-2019-13963-remote-stack-overflow-in-samsung-baseband-caused-by-malformed-immediate-assignment-message.html" rel="alternate"></link><published>2020-12-07T00:00:00-07:00</published><updated>2020-12-07T00:00:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2020-12-07:/2020/12/sve-2019-13963-remote-stack-overflow-in-samsung-baseband-caused-by-malformed-immediate-assignment-message.html</id><summary type="html">&lt;h1&gt;Description&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>fred's notes</title><link href="https://fredericb.info/" rel="alternate"></link><link href="https://fredericb.info/feeds/all.atom.xml" rel="self"></link><id>https://fredericb.info/</id><updated>2021-02-09T00:00:00-08:00</updated><subtitle>Security &amp; Stuff</subtitle><entry><title>Dump Amlogic S905D3 BootROM from Khadas VIM3L board</title><link href="https://fredericb.info/2021/02/dump-amlogic-s905d3-bootrom-from-khadas-vim3l-board.html" rel="alternate"></link><published>2021-02-09T00:00:00-08:00</published><updated>2021-02-09T00:00:00-08:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2021-02-09:/2021/02/dump-amlogic-s905d3-bootrom-from-khadas-vim3l-board.html</id><summary type="html">&lt;p&gt;This post describes how to dump bootROM from &lt;a href="https://www.amlogic.com/#Products/392/index.html"&gt;Amlogic S905D3 SoC&lt;/a&gt; using &lt;a href="https://www.khadas.com/vim3l"&gt;Khadas VIM3L board&lt;/a&gt;.
+Since this board doesn't use Secure Boot, we can execute custom code in Secure World (a.k.a TrustZone) without exploiting any vulnerability.
+In addition, the board exposes an UART connector, which is convenient for …&lt;/p&gt;</summary><content type="html">&lt;p&gt;This post describes how to dump bootROM from &lt;a href="https://www.amlogic.com/#Products/392/index.html"&gt;Amlogic S905D3 SoC&lt;/a&gt; using &lt;a href="https://www.khadas.com/vim3l"&gt;Khadas VIM3L board&lt;/a&gt;.
+Since this board doesn't use Secure Boot, we can execute custom code in Secure World (a.k.a TrustZone) without exploiting any vulnerability.
+In addition, the board exposes an UART connector, which is convenient for communicating with baremetal code running on target.&lt;/p&gt;
+&lt;p&gt;&lt;img _="," alt="Collect bootroms" src="https://fredericb.info/blog/exy-bootrom/Collect_bootroms.png" style="display: block;margin-left: auto;margin-right: auto;" width="800px"&gt;&lt;/p&gt;
+&lt;h1&gt;Ressources&lt;/h1&gt;
+&lt;p&gt;&lt;img alt="Khadas VIM3L" src="https://fredericb.info/blog/aml-bootrom/vim3l.png" style="display: block;margin-left: auto;margin-right: auto;"&gt;&lt;/p&gt;
+&lt;p&gt;The following resources were abused to complete this project :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.khadas.com/vim3l"&gt;VIM3L board&lt;/a&gt; : SBC based on Amlogic S905D3 System-On-Chip.&lt;/li&gt;
+&lt;li&gt;USB to TTL Converter : to enable communication between host and target using UART port.&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://dl.khadas.com/Hardware/VIM3/Datasheet/S905D3_datasheet_0.2_Wesion.pdf"&gt;S905D3 SoC datasheet&lt;/a&gt; : Khadas published a datasheet for S905D3. It contains a memory map, including the bootROM address.&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/khadas/u-boot"&gt;khadas-uboot&lt;/a&gt; : U-Boot code released by Khadas contains a signing tool to package a bootloader image.&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/khadas/utils"&gt;khadas-utils&lt;/a&gt; : Khadas released a tool to communicate with the bootROM via USB.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;Procedure&lt;/h1&gt;
+&lt;p&gt;In order to dump the bootROM, we need to execute custom code in Secure World.&lt;/p&gt;
+&lt;p&gt;On most firmwares provided by Khadas, U-Boot shell is accessible via UART port. However, U-Boot runs in Non-Secure World (a.k.a. Normal World) and therefore isn't helpful.&lt;/p&gt;
+&lt;p&gt;Instead, we need to execute our code earlier in the boot chain.
+Since Secure Boot is disabled on this board, we could modify the &lt;a href="https://github.com/ARM-software/arm-trusted-firmware/blob/master/docs/design/firmware-design.rst"&gt;BL2 bootloader&lt;/a&gt; stored in flash memory.
+However, there's a more convienent solution : the bootROM implements a &lt;a href="https://docs.khadas.com/vim3/UpgradeViaUSBCable.html"&gt;feature to load BL2 bootloader via the USB Type-C port&lt;/a&gt;. This in-RAM solution has the advantage of not altering the flash memory.&lt;/p&gt;
+&lt;p&gt;Finally, we also take advantage of the UART port to transfer data to our host.&lt;/p&gt;
+&lt;h2&gt;Code&lt;/h2&gt;
+&lt;p&gt;The code to dump the bootROM is straightforward : each byte is read then sent to UART port.&lt;/p&gt;
+&lt;p&gt;The &lt;a href="https://dl.khadas.com/Hardware/VIM3/Datasheet/S905D3_datasheet_0.2_Wesion.pdf"&gt;datasheet published by Khadas&lt;/a&gt; indicates that bootROM memory is at address &lt;strong&gt;[0xFFFF0000-0xFFFFFFFF]&lt;/strong&gt; (region named &lt;em&gt;a53_rom&lt;/em&gt;).
+To send data to UART port, we &lt;a href="https://github.com/khadas/u-boot/blob/khadas-vims-pie/arch/arm/cpu/armv8/g12a/firmware/scp_task/uart.c"&gt;reuse open-source code from U-Boot&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Early tests revealed an issue : UART data transfers would stop inconsistently before completion, and the board would then reset.
+This issue was caused by a &lt;a href="https://en.wikipedia.org/wiki/Watchdog_timer"&gt;watchdog&lt;/a&gt; timeout. U-Boot source repository contains the code to &lt;a href="https://github.com/khadas/u-boot/blob/khadas-vims-pie/arch/arm/cpu/armv8/g12a/watchdog.c"&gt;reset the watchdog&lt;/a&gt;, which solves that issue.&lt;/p&gt;
+&lt;script src="https://gist.github.com/frederic/e080d28a8accf58a779b29cc423b01fa.js"&gt;&lt;/script&gt;
+
+&lt;h2&gt;Build&lt;/h2&gt;
+&lt;p&gt;The code is built using GNU C cross-compiler for the arm64 architecture (packages &lt;strong&gt;gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu&lt;/strong&gt; on Debian) :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ aarch64-linux-gnu-gcc -O3 -nostdlib -Wl,--build-id&lt;span class="o"&gt;=&lt;/span&gt;none -o S905D3_dump_bootrom.elf S905D3_dump_bootrom.c
+$ aarch64-linux-gnu-objcopy -O binary -j .text S905D3_dump_bootrom.elf S905D3_dump_bootrom.bin
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then, the binary is packaged as regular BL2 image for this target using the &lt;strong&gt;aml_encrypt_g12a&lt;/strong&gt; tool from &lt;a href="https://github.com/khadas/u-boot"&gt;khadas-uboot&lt;/a&gt; repository: &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ./khadas-uboot/fip/g12a/aml_encrypt_g12a --bl2sig --input ./S905D3_dump_bootrom.bin --output ./S905D3_dump_bootrom.img
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Connect&lt;/h2&gt;
+&lt;p&gt;Khadas documentation explains how to &lt;a href="https://docs.khadas.com/vim3/SetupSerialTool.html"&gt;connect UART port&lt;/a&gt; on VIM3L board. On host side, we use &lt;em&gt;minicom&lt;/em&gt; software to communicate with this port :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo minicom -D /dev/ttyUSB0
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then, we boot the board in &lt;strong&gt;USB Upgrade mode&lt;/strong&gt; (a.k.a. TST mode or USB Download mode) as &lt;a href="https://docs.khadas.com/vim3/HowtoBootIntoUpgradeMode.html#TST-Mode-Recommended"&gt;explained in Khadas documentation&lt;/a&gt;. In &lt;em&gt;minicom&lt;/em&gt; console, we can see :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;SM1:BL:511f6b:81ca2f&lt;span class="p"&gt;;&lt;/span&gt;FEAT:A0F83180:20282000&lt;span class="p"&gt;;&lt;/span&gt;POC:D&lt;span class="p"&gt;;&lt;/span&gt;RCY:0&lt;span class="p"&gt;;&lt;/span&gt;USB:0&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This string ending with &lt;em&gt;USB:0;&lt;/em&gt; means the board has started in USB Upgrade mode.&lt;/p&gt;
+&lt;p&gt;On the host side, we see a new USB device :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;[10504.840173] usb 1-4.3.1: new high-speed USB device number 16 using xhci_hcd
+[10504.979469] usb 1-4.3.1: New USB device found, idVendor=1b8e, idProduct=c003, bcdDevice= 0.20
+[10504.979495] usb 1-4.3.1: New USB device strings: Mfr=1, Product=2, SerialNumber=0
+[10504.979514] usb 1-4.3.1: Product: GX-CHIP
+[10504.979525] usb 1-4.3.1: Manufacturer: Amlogic
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In &lt;em&gt;minicom&lt;/em&gt;, we use the capture feature (CTRL-A L) to save data sent by our program into a file &lt;em&gt;minicom.cap&lt;/em&gt;.&lt;/p&gt;
+&lt;h2&gt;Run&lt;/h2&gt;
+&lt;p&gt;Our code is uploaded and run on the board using the &lt;strong&gt;update&lt;/strong&gt; tool from &lt;a href="https://github.com/khadas/utils"&gt;khadas-utils&lt;/a&gt; repository.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ./khadas-utils/aml-flash-tool/tools/linux-x86/update write ./S905D3_dump_bootrom.img 0xfffa0000
+..
+Transfer Complete! total size is &lt;span class="m"&gt;65536&lt;/span&gt; Bytes
+
+$ ./khadas-utils/aml-flash-tool/tools/linux-x86/update run 0xfffa0000
+&lt;span class="o"&gt;[&lt;/span&gt;update&lt;span class="o"&gt;]&lt;/span&gt;Run at Addr fffa0000
+AmlUsbRunBinCode:ram_addr&lt;span class="o"&gt;=&lt;/span&gt;fffa0000
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In &lt;em&gt;minicom&lt;/em&gt; console, we received the bootROM dump sent by our code :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;e0031faae1031faae2031faae3031faae4031faae5031faae6031faae7031faae8031fa
+ae9031faaea031faaeb031faaec031faaed031faaee031faaef031faaf0031faaf1031f
+aaf2031faaf3031faaf4031faaf5031faaf6031faaf7031faaf8031faaf9031faafa031
+&lt;span class="o"&gt;[&lt;/span&gt;...&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Since the dump is encoded in hexadecimal representation, the last step is to convert it back to binary :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ cat minicom.cap &lt;span class="p"&gt;|&lt;/span&gt; xxd -r -p &amp;gt; VIM3L.bootrom.bin
+
+$ sha1sum VIM3L.bootrom.bin
+5de02d2958d4d7214b28521239ec9b63fe9a2dbe  VIM3L.bootrom.bin
+
+$ wc -c VIM3L.bootrom.bin 
+&lt;span class="m"&gt;65536&lt;/span&gt;   VIM3L.bootrom.bin
+
+$ strings -13 VIM3L.bootrom.bin
+auth failed, reboot...
+511f6b60cfd40c6
+ken.amlogic.com
+&lt;span class="m"&gt;03&lt;/span&gt;/26/19_12:20:42
+gcc version &lt;span class="m"&gt;4&lt;/span&gt;.8
+511f6b60cfd40c6
+INDXCHIPOPS_ROMVfb_e1
+FAILkey error
+FAILkey len error
+FAILmissing var
+max-download-size
+FAILmissing var!
+FAILUnkonw chipinfo id
+FAILVariable not implemented
+FAILdata invalid size
+FAILdata too large
+FAILkey_len error
+FAILunknow &lt;span class="nb"&gt;command&lt;/span&gt;
+New World Cup
+usb_dnl_fastboot
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The strings in the bootROM dump reveal that Fastboot protocol is implemented (different protocol than the one we just used to upload our code).&lt;/p&gt;</content><category term="arm"></category><category term="amlogic"></category><category term="bootloader"></category><category term="bootrom"></category><category term="khadas"></category><category term="vim3l"></category></entry><entry><title>SVE-2019-13963 : Remote stack overflow in Samsung baseband caused by malformed IMMEDIATE ASSIGNMENT message</title><link href="https://fredericb.info/2020/12/sve-2019-13963-remote-stack-overflow-in-samsung-baseband-caused-by-malformed-immediate-assignment-message.html" rel="alternate"></link><published>2020-12-07T00:00:00-07:00</published><updated>2020-12-07T00:00:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2020-12-07:/2020/12/sve-2019-13963-remote-stack-overflow-in-samsung-baseband-caused-by-malformed-immediate-assignment-message.html</id><summary type="html">&lt;h1&gt;Description&lt;/h1&gt;
 &lt;p&gt;When Samsung Shannon baseband receives message IMMEDIATE ASSIGNMENT (9.1.18 in &lt;a href="https://www.etsi.org/deliver/etsi_gts/04/0408/05.03.00_60/gsmts_0408v050300p.pdf"&gt;GSM/04.08&lt;/a&gt;) from network, the length of the Mobile Allocation IE (GSM/04.08 10.5.2.21) is not properly checked.&lt;/p&gt;
 &lt;p&gt;&lt;img alt="GSM/04.08 IMMEDIATE ASSIGNMENT message" src="https://fredericb.info/blog/SVE-2019-13963/gsm_imm-assign.png" width="700px"&gt;&lt;/p&gt;
 &lt;p&gt;Mobile allocation data is directly copied to a buffer on the stack without checking …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Description&lt;/h1&gt;
