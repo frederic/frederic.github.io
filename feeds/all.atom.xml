@@ -1,5 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>fred's notes</title><link href="https://fredericb.info/" rel="alternate"></link><link href="https://fredericb.info/feeds/all.atom.xml" rel="self"></link><id>https://fredericb.info/</id><updated>2021-02-09T00:00:00-08:00</updated><subtitle>Security &amp; Stuff</subtitle><entry><title>Dump Amlogic S905D3 BootROM from Khadas VIM3L board</title><link href="https://fredericb.info/2021/02/dump-amlogic-s905d3-bootrom-from-khadas-vim3l-board.html" rel="alternate"></link><published>2021-02-09T00:00:00-08:00</published><updated>2021-02-09T00:00:00-08:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2021-02-09:/2021/02/dump-amlogic-s905d3-bootrom-from-khadas-vim3l-board.html</id><summary type="html">&lt;p&gt;This post describes how to dump bootROM from &lt;a href="https://www.amlogic.com/#Products/392/index.html"&gt;Amlogic S905D3 SoC&lt;/a&gt; using &lt;a href="https://www.khadas.com/vim3l"&gt;Khadas VIM3L board&lt;/a&gt;.
+<feed xmlns="http://www.w3.org/2005/Atom"><title>fred's notes</title><link href="https://fredericb.info/" rel="alternate"></link><link href="https://fredericb.info/feeds/all.atom.xml" rel="self"></link><id>https://fredericb.info/</id><updated>2021-02-10T00:00:00-08:00</updated><subtitle>Security &amp; Stuff</subtitle><entry><title>amlogic-usbdl : unsigned code loader for Amlogic BootROM</title><link href="https://fredericb.info/2021/02/amlogic-usbdl-unsigned-code-loader-for-amlogic-bootrom.html" rel="alternate"></link><published>2021-02-10T00:00:00-08:00</published><updated>2021-02-10T00:00:00-08:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2021-02-10:/2021/02/amlogic-usbdl-unsigned-code-loader-for-amlogic-bootrom.html</id><summary type="html">&lt;p&gt;In previous posts, we explained how to &lt;a href="https://fredericb.info/2020/06/reverse-engineer-usb-stack-of-exynos-bootrom.html"&gt;reverse the USB stack in the Exynos bootROM&lt;/a&gt;, which led to the &lt;a href="https://fredericb.info/2020/06/exynos-usbdl-unsigned-code-loader-for-exynos-bootrom.html"&gt;discovery of a critical bug&lt;/a&gt;.
+After reproducing this methodology on &lt;a href="https://fredericb.info/2021/02/dump-amlogic-s905d3-bootrom-from-khadas-vim3l-board.html"&gt;Amlogic bootROM recently dumped&lt;/a&gt;, a similar vulnerability has been discovered in the USB stack that can be exploited to run arbitrary …&lt;/p&gt;</summary><content type="html">&lt;p&gt;In previous posts, we explained how to &lt;a href="https://fredericb.info/2020/06/reverse-engineer-usb-stack-of-exynos-bootrom.html"&gt;reverse the USB stack in the Exynos bootROM&lt;/a&gt;, which led to the &lt;a href="https://fredericb.info/2020/06/exynos-usbdl-unsigned-code-loader-for-exynos-bootrom.html"&gt;discovery of a critical bug&lt;/a&gt;.
+After reproducing this methodology on &lt;a href="https://fredericb.info/2021/02/dump-amlogic-s905d3-bootrom-from-khadas-vim3l-board.html"&gt;Amlogic bootROM recently dumped&lt;/a&gt;, a similar vulnerability has been discovered in the USB stack that can be exploited to run arbitrary code.&lt;/p&gt;
+&lt;p&gt;The following targets are known to be vulnerable :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.khadas.com/vim3l"&gt;Khadas VIM3L&lt;/a&gt; (S905D3) (Secure boot is disabled anyway)&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://store.google.com/us/product/chromecast_google_tv"&gt;Chromecast with Google TV&lt;/a&gt; (S905D3G)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The difference between S905D3 &amp;amp; S905D3&lt;strong&gt;G&lt;/strong&gt; is not clear at this moment; it may be related to the &lt;a href="https://www.riscure.com/services/riscure-assurance-for-premium-content-registry/"&gt;gold certification&lt;/a&gt; this component received for &lt;em&gt;Premium Content&lt;/em&gt; processing.&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/frederic/amlogic-usbdl"&gt;amlogic-usbdl, an open source tool available on Github&lt;/a&gt;, exploits this vulnerability to load and run unsigned code.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Cash 4 gold" src="https://fredericb.info/blog/aml-bootrom/c4g.gif" style="display: block;margin-left: auto;margin-right: auto;"&gt;&lt;/p&gt;
+&lt;h1&gt;Vulnerability details&lt;/h1&gt;
+&lt;h2&gt;USB Download protocol&lt;/h2&gt;
+&lt;p&gt;Amlogic BootROM implements a custom USB protocol that allows USB host to execute a &lt;a href="https://github.com/khadas/u-boot/blob/khadas-vims-pie/drivers/usb/gadget/aml_tiny_usbtool/usb_pcd.h"&gt;set of commands&lt;/a&gt; on target device i.e. read/write memory, run code, read/write registers. A common use-case for this protocol is to upload a bootloader and run it.
+On Secure Boot-enabled devices like Chromecast, a signature check is performed first before executing any uploaded code.&lt;/p&gt;
+&lt;p&gt;Among these commands, USB host can use &lt;a href="https://github.com/khadas/u-boot/blob/0bfb38ab1e9ab34585ded5b8c921fbe12361f5bf/drivers/usb/gadget/aml_tiny_usbtool/usb_pcd.h#L40"&gt;AM_REQ_WR_LARGE_MEM&lt;/a&gt; to upload data into device memory.&lt;/p&gt;
+&lt;p&gt;First, USB host sends an USB CONTROL transfer with some infos regarding the payload :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;URB setup
+    bmRequestType: 0x40 : Direction: Host-to-device - Type: Vendor (0x2) - Recipient: Device (0x00)
+    bRequest: 17 (0x11) : Write memory command AM_REQ_WR_LARGE_MEM
+    wValue: 0x1000      : size of each BULK transfer
+    wIndex: 16 (0x0010) : count of BULK transfers
+    wLength: 16         : size of data in this CONTROL transfer
+    Data Fragment: 0000faff000010000000000000000000
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The data fragment follows the following structure :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;dldata_s&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;u_int32_t&lt;/span&gt; &lt;span class="n"&gt;addr&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;// address where to write payload i.e. 0xfffa0000&lt;/span&gt;
+    &lt;span class="n"&gt;u_int32_t&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;// payload size i.e. 0x00010000&lt;/span&gt;
+    &lt;span class="n"&gt;u_int32_t&lt;/span&gt; &lt;span class="n"&gt;unk0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;// unused&lt;/span&gt;
+    &lt;span class="n"&gt;u_int32_t&lt;/span&gt; &lt;span class="n"&gt;unk1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;// unused&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="n"&gt;dldata&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Parameters &lt;em&gt;addr&lt;/em&gt; &amp;amp; &lt;em&gt;size&lt;/em&gt; specify where in device memory data should be written. BootROM checks these parameters to ensure that uploaded data will fit into the download buffer [0xfffa0000-0xfffaffff] (0x10000 bytes maximum).&lt;/p&gt;
+&lt;p&gt;Then, the payload is uploaded by simply sending &lt;em&gt;wIndex&lt;/em&gt; BULK transfers of size &lt;em&gt;wValue&lt;/em&gt; each.&lt;/p&gt;
+&lt;h2&gt;Unfortunate bugs conjunction&lt;/h2&gt;
+&lt;p&gt;Although the overall logic of command &lt;strong&gt;AM_REQ_WR_LARGE_MEM&lt;/strong&gt; looks simple and fine, there're still few peculiar details :
+size of uploaded data is defined in two different ways:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;dldata.size&lt;/strong&gt; : exact size of uploaded data&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;wValue&lt;/strong&gt; * &lt;strong&gt;wIndex&lt;/strong&gt; : size of each BULK transfer multiplied by the count of BULK transfers&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;While the first one &lt;strong&gt;dldata.size&lt;/strong&gt; is checked, the second one isn't :
+size of each BULK transfer &lt;em&gt;wValue&lt;/em&gt; is maxed out at 0x1000, but the &lt;strong&gt;count of BULK transfers &lt;em&gt;wIndex&lt;/em&gt; is not checked&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;As a consequence, an attacker can submit more BULK transfers than required to fill the download buffer.
+However, the BULK transfer handler tracks the total size of received data to ensure not exceeding the expected size &lt;strong&gt;dldata.size&lt;/strong&gt;. So an invalid &lt;strong&gt;wIndex&lt;/strong&gt; value is not sufficient to overflow the download buffer.&lt;/p&gt;
+&lt;p&gt;Nevertheless, a second bug makes exploitation trivial : after each BULK transfer, &lt;strong&gt;the download buffer pointer (initially set to 0xfffa0000) is incremented by the expected transfer size &lt;em&gt;wValue&lt;/em&gt;, regardless of the actual size of data received&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;So it's time to reuse that empty transfer trick we already used in the Exynos bootROM exploit.
+By sending empty BULK transfers, &lt;strong&gt;an attacker can manipulate the download buffer pointer to reach critical bootROM structures&lt;/strong&gt;, like stack memory (below 0xfffe3800).
+For example, if the attacker sends 0x43 empty transfers, with &lt;em&gt;wValue&lt;/em&gt; = 0x1000 : (0xfffa0000 + (0x1000 * 0x43) = &lt;strong&gt;0xfffe3000&lt;/strong&gt;, which is stack bottom address.&lt;/p&gt;
+&lt;p&gt;Once download buffer pointer has been manipulated, a &lt;strong&gt;last, non-empty BULK transfer is sent to overwrite memory&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Ultimately, these bugs lead to arbitrary code execution at bootROM level, even before the data signature check takes place.&lt;/p&gt;
+&lt;h1&gt;Conclusion&lt;/h1&gt;
+&lt;p&gt;USB download feature in Amlogic bootROM only runs signed bootloader images (when Secure Boot is enabled).
+However, few bugs in the USB stack allow an attacker with physical access to corrupt bootROM RAM.
+Ultimately, an attacker can execute arbitrary code in Secure World, at very early boot stage.&lt;/p&gt;
+&lt;p&gt;Despite these bugs, the overall code is quite robust for a BL1-kind software. It implements several hardening techniques :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;time-constant memory compare : to resist timing attacks ?&lt;/li&gt;
+&lt;li&gt;complex return codes (i.e. success code is 0xa8df61e7 instead of one or zero) : to resist bit-flip attacks ?&lt;/li&gt;
+&lt;li&gt;random execution delays : to resist glitching attacks ?&lt;/li&gt;
+&lt;li&gt;mysterious recurrent hash check that immediately reboots if failed : control flow integrity ?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Amlogic bootROM also supports a password protection. This can be used to restrict access to the USB download feature, and thus mitigate this vulnerability.&lt;/p&gt;
+&lt;h1&gt;Timeline&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;2020-10-19 &lt;a href="https://gist.github.com/frederic/0246dde2ecbb8c35f7bb61e98002ceb0"&gt;Bug discovery&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;2020-10 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; Vulnerability disclosed to Google&lt;/li&gt;
+&lt;li&gt;2020-11-05 Google shared the report with Amlogic&lt;/li&gt;
+&lt;li&gt;2020-12 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; Password mitigation enabled in factory for new Chromecast devices&lt;/li&gt;
+&lt;li&gt;2021-02-08 Password mitigation enabled by software update for Chromecast devices&lt;/li&gt;
+&lt;li&gt;2021-02-10 Public disclosure&lt;/li&gt;
+&lt;/ul&gt;</content><category term="arm"></category><category term="amlogic"></category><category term="chromecast"></category><category term="bootrom"></category><category term="usb"></category><category term="exploit"></category></entry><entry><title>Dump Amlogic S905D3 BootROM from Khadas VIM3L board</title><link href="https://fredericb.info/2021/02/dump-amlogic-s905d3-bootrom-from-khadas-vim3l-board.html" rel="alternate"></link><published>2021-02-09T00:00:00-08:00</published><updated>2021-02-09T00:00:00-08:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2021-02-09:/2021/02/dump-amlogic-s905d3-bootrom-from-khadas-vim3l-board.html</id><summary type="html">&lt;p&gt;This post describes how to dump bootROM from &lt;a href="https://www.amlogic.com/#Products/392/index.html"&gt;Amlogic S905D3 SoC&lt;/a&gt; using &lt;a href="https://www.khadas.com/vim3l"&gt;Khadas VIM3L board&lt;/a&gt;.
 Since this board doesn't use Secure Boot, we can execute custom code in Secure World (a.k.a TrustZone) without exploiting any vulnerability.
 In addition, the board exposes an UART connector, which is convenient for …&lt;/p&gt;</summary><content type="html">&lt;p&gt;This post describes how to dump bootROM from &lt;a href="https://www.amlogic.com/#Products/392/index.html"&gt;Amlogic S905D3 SoC&lt;/a&gt; using &lt;a href="https://www.khadas.com/vim3l"&gt;Khadas VIM3L board&lt;/a&gt;.
 Since this board doesn't use Secure Boot, we can execute custom code in Secure World (a.k.a TrustZone) without exploiting any vulnerability.
@@ -90,7 +166,7 @@ aaf2031faaf3031faaf4031faaf5031faaf6031faaf7031faaf8031faaf9031faafa031
 $ sha1sum VIM3L.bootrom.bin
 5de02d2958d4d7214b28521239ec9b63fe9a2dbe  VIM3L.bootrom.bin
 
-$ wc -c VIM3L.bootrom.bin 
+$ wc -c VIM3L.bootrom.bin
 &lt;span class="m"&gt;65536&lt;/span&gt;   VIM3L.bootrom.bin
 
 $ strings -13 VIM3L.bootrom.bin

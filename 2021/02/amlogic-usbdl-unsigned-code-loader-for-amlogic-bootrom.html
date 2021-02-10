@@ -1,0 +1,237 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/stylesheet/style.min.css">
+
+  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/pygments/github.min.css">
+  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/font-awesome/css/font-awesome.min.css">
+
+
+    <link href="https://fredericb.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="fred's notes Atom">
+
+
+    <link rel="shortcut icon" href="/resources/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/resources/favicon.ico" type="image/x-icon">
+
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+
+<meta name="author" content="Frédéric" />
+<meta name="description" content="In previous posts, we explained how to reverse the USB stack in the Exynos bootROM, which led to the discovery of a critical bug. After reproducing this methodology on Amlogic bootROM recently dumped, a similar vulnerability has been discovered in the USB stack that can be exploited to run arbitrary …" />
+<meta name="keywords" content="arm, amlogic, chromecast, bootrom, usb, exploit">
+
+<meta property="og:site_name" content="fred's notes"/>
+<meta property="og:title" content="amlogic-usbdl : unsigned code loader for Amlogic BootROM"/>
+<meta property="og:description" content="In previous posts, we explained how to reverse the USB stack in the Exynos bootROM, which led to the discovery of a critical bug. After reproducing this methodology on Amlogic bootROM recently dumped, a similar vulnerability has been discovered in the USB stack that can be exploited to run arbitrary …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="https://fredericb.info/2021/02/amlogic-usbdl-unsigned-code-loader-for-amlogic-bootrom.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2021-02-10 00:00:00-08:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="https://fredericb.info/author/frederic.html">
+<meta property="article:section" content="Tool"/>
+<meta property="article:tag" content="arm"/>
+<meta property="article:tag" content="amlogic"/>
+<meta property="article:tag" content="chromecast"/>
+<meta property="article:tag" content="bootrom"/>
+<meta property="article:tag" content="usb"/>
+<meta property="article:tag" content="exploit"/>
+<meta property="og:image" content="/resources/sitelogo.jpg">
+
+  <title>fred's notes &ndash; amlogic-usbdl : unsigned code loader for Amlogic BootROM</title>
+
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="/">
+        <img src="/resources/sitelogo.jpg" alt="fred's notes" title="fred's notes">
+      </a>
+      <h1><a href="/">fred's notes</a></h1>
+
+<p>Security & Stuff</p>
+      <nav>
+        <ul class="list">
+          <li><a href="https://fredericb.info/category/advisory.html">Advisory</a></li>
+          <li><a href="https://fredericb.info/category/article.html">Article</a></li>
+          <li><a href="https://fredericb.info/category/tool.html">Tool</a></li>
+          <li><a href="https://fredericb.info/pages/contact.html#contact">Contact</a></li>
+
+        </ul>
+      </nav>
+
+      <ul class="social">
+        <li><a class="sc-github" href="https://github.com/frederic" target="_blank"><i class="fa fa-github"></i></a></li>
+        <li><a class="sc-linkedin" href="https://www.linkedin.com/in/fredericbasse" target="_blank"><i class="fa fa-linkedin"></i></a></li>
+        <li><a class="sc-rss" href="/feeds/all.atom.xml" target="_blank"><i class="fa fa-rss"></i></a></li>
+      </ul>
+    </div>
+
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="https://fredericb.info/">    Home
+</a>
+
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+
+      <a href="https://fredericb.info/feeds/all.atom.xml">    Atom
+</a>
+
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="amlogic-usbdl-unsigned-code-loader-for-amlogic-bootrom">amlogic-usbdl : unsigned code loader for Amlogic BootROM</h1>
+    <p>
+          Posted on Wed 10 February 2021 in <a href="https://fredericb.info/category/tool.html">Tool</a>
+
+
+    </p>
+  </header>
+
+
+  <div>
+    <p>In previous posts, we explained how to <a href="https://fredericb.info/2020/06/reverse-engineer-usb-stack-of-exynos-bootrom.html">reverse the USB stack in the Exynos bootROM</a>, which led to the <a href="https://fredericb.info/2020/06/exynos-usbdl-unsigned-code-loader-for-exynos-bootrom.html">discovery of a critical bug</a>.
+After reproducing this methodology on <a href="https://fredericb.info/2021/02/dump-amlogic-s905d3-bootrom-from-khadas-vim3l-board.html">Amlogic bootROM recently dumped</a>, a similar vulnerability has been discovered in the USB stack that can be exploited to run arbitrary code.</p>
+<p>The following targets are known to be vulnerable :</p>
+<ul>
+<li><a href="https://www.khadas.com/vim3l">Khadas VIM3L</a> (S905D3) (Secure boot is disabled anyway)</li>
+<li><a href="https://store.google.com/us/product/chromecast_google_tv">Chromecast with Google TV</a> (S905D3G)</li>
+</ul>
+<p>The difference between S905D3 &amp; S905D3<strong>G</strong> is not clear at this moment; it may be related to the <a href="https://www.riscure.com/services/riscure-assurance-for-premium-content-registry/">gold certification</a> this component received for <em>Premium Content</em> processing.</p>
+<p><a href="https://github.com/frederic/amlogic-usbdl">amlogic-usbdl, an open source tool available on Github</a>, exploits this vulnerability to load and run unsigned code.</p>
+<p><img alt="Cash 4 gold" src="https://fredericb.info/blog/aml-bootrom/c4g.gif" style="display: block;margin-left: auto;margin-right: auto;"></p>
+<h1>Vulnerability details</h1>
+<h2>USB Download protocol</h2>
+<p>Amlogic BootROM implements a custom USB protocol that allows USB host to execute a <a href="https://github.com/khadas/u-boot/blob/khadas-vims-pie/drivers/usb/gadget/aml_tiny_usbtool/usb_pcd.h">set of commands</a> on target device i.e. read/write memory, run code, read/write registers. A common use-case for this protocol is to upload a bootloader and run it.
+On Secure Boot-enabled devices like Chromecast, a signature check is performed first before executing any uploaded code.</p>
+<p>Among these commands, USB host can use <a href="https://github.com/khadas/u-boot/blob/0bfb38ab1e9ab34585ded5b8c921fbe12361f5bf/drivers/usb/gadget/aml_tiny_usbtool/usb_pcd.h#L40">AM_REQ_WR_LARGE_MEM</a> to upload data into device memory.</p>
+<p>First, USB host sends an USB CONTROL transfer with some infos regarding the payload :</p>
+<div class="highlight"><pre><span></span>URB setup
+    bmRequestType: 0x40 : Direction: Host-to-device - Type: Vendor (0x2) - Recipient: Device (0x00)
+    bRequest: 17 (0x11) : Write memory command AM_REQ_WR_LARGE_MEM
+    wValue: 0x1000      : size of each BULK transfer
+    wIndex: 16 (0x0010) : count of BULK transfers
+    wLength: 16         : size of data in this CONTROL transfer
+    Data Fragment: 0000faff000010000000000000000000
+</pre></div>
+
+
+<p>The data fragment follows the following structure :</p>
+<div class="highlight"><pre><span></span><span class="k">struct</span> <span class="n">dldata_s</span> <span class="p">{</span>
+    <span class="n">u_int32_t</span> <span class="n">addr</span><span class="p">;</span> <span class="c1">// address where to write payload i.e. 0xfffa0000</span>
+    <span class="n">u_int32_t</span> <span class="n">size</span><span class="p">;</span> <span class="c1">// payload size i.e. 0x00010000</span>
+    <span class="n">u_int32_t</span> <span class="n">unk0</span><span class="p">;</span> <span class="c1">// unused</span>
+    <span class="n">u_int32_t</span> <span class="n">unk1</span><span class="p">;</span> <span class="c1">// unused</span>
+<span class="p">}</span> <span class="n">dldata</span><span class="p">;</span>
+</pre></div>
+
+
+<p>Parameters <em>addr</em> &amp; <em>size</em> specify where in device memory data should be written. BootROM checks these parameters to ensure that uploaded data will fit into the download buffer [0xfffa0000-0xfffaffff] (0x10000 bytes maximum).</p>
+<p>Then, the payload is uploaded by simply sending <em>wIndex</em> BULK transfers of size <em>wValue</em> each.</p>
+<h2>Unfortunate bugs conjunction</h2>
+<p>Although the overall logic of command <strong>AM_REQ_WR_LARGE_MEM</strong> looks simple and fine, there're still few peculiar details :
+size of uploaded data is defined in two different ways:</p>
+<ul>
+<li><strong>dldata.size</strong> : exact size of uploaded data</li>
+<li><strong>wValue</strong> * <strong>wIndex</strong> : size of each BULK transfer multiplied by the count of BULK transfers</li>
+</ul>
+<p>While the first one <strong>dldata.size</strong> is checked, the second one isn't :
+size of each BULK transfer <em>wValue</em> is maxed out at 0x1000, but the <strong>count of BULK transfers <em>wIndex</em> is not checked</strong>.</p>
+<p>As a consequence, an attacker can submit more BULK transfers than required to fill the download buffer.
+However, the BULK transfer handler tracks the total size of received data to ensure not exceeding the expected size <strong>dldata.size</strong>. So an invalid <strong>wIndex</strong> value is not sufficient to overflow the download buffer.</p>
+<p>Nevertheless, a second bug makes exploitation trivial : after each BULK transfer, <strong>the download buffer pointer (initially set to 0xfffa0000) is incremented by the expected transfer size <em>wValue</em>, regardless of the actual size of data received</strong>.</p>
+<p>So it's time to reuse that empty transfer trick we already used in the Exynos bootROM exploit.
+By sending empty BULK transfers, <strong>an attacker can manipulate the download buffer pointer to reach critical bootROM structures</strong>, like stack memory (below 0xfffe3800).
+For example, if the attacker sends 0x43 empty transfers, with <em>wValue</em> = 0x1000 : (0xfffa0000 + (0x1000 * 0x43) = <strong>0xfffe3000</strong>, which is stack bottom address.</p>
+<p>Once download buffer pointer has been manipulated, a <strong>last, non-empty BULK transfer is sent to overwrite memory</strong>.</p>
+<p>Ultimately, these bugs lead to arbitrary code execution at bootROM level, even before the data signature check takes place.</p>
+<h1>Conclusion</h1>
+<p>USB download feature in Amlogic bootROM only runs signed bootloader images (when Secure Boot is enabled).
+However, few bugs in the USB stack allow an attacker with physical access to corrupt bootROM RAM.
+Ultimately, an attacker can execute arbitrary code in Secure World, at very early boot stage.</p>
+<p>Despite these bugs, the overall code is quite robust for a BL1-kind software. It implements several hardening techniques :</p>
+<ul>
+<li>time-constant memory compare : to resist timing attacks ?</li>
+<li>complex return codes (i.e. success code is 0xa8df61e7 instead of one or zero) : to resist bit-flip attacks ?</li>
+<li>random execution delays : to resist glitching attacks ?</li>
+<li>mysterious recurrent hash check that immediately reboots if failed : control flow integrity ?</li>
+</ul>
+<p>Amlogic bootROM also supports a password protection. This can be used to restrict access to the USB download feature, and thus mitigate this vulnerability.</p>
+<h1>Timeline</h1>
+<ul>
+<li>2020-10-19 <a href="https://gist.github.com/frederic/0246dde2ecbb8c35f7bb61e98002ceb0">Bug discovery</a></li>
+<li>2020-10 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Vulnerability disclosed to Google</li>
+<li>2020-11-05 Google shared the report with Amlogic</li>
+<li>2020-12 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Password mitigation enabled in factory for new Chromecast devices</li>
+<li>2021-02-08 Password mitigation enabled by software update for Chromecast devices</li>
+<li>2021-02-10 Public disclosure</li>
+</ul>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://fredericb.info/tag/arm.html">arm</a>
+      <a href="https://fredericb.info/tag/amlogic.html">amlogic</a>
+      <a href="https://fredericb.info/tag/chromecast.html">chromecast</a>
+      <a href="https://fredericb.info/tag/bootrom.html">bootrom</a>
+      <a href="https://fredericb.info/tag/usb.html">usb</a>
+      <a href="https://fredericb.info/tag/exploit.html">exploit</a>
+    </p>
+  </div>
+
+
+
+    <div class="addthis_relatedposts_inline">
+
+
+</article>
+
+    <footer>
+<p>
+  &copy;   - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+</p>
+<p>    Powered by <a href="http://getpelican.com" target="_blank">Pelican</a> - Theme <a href="https://github.com/alexandrevicenzi/flex" target="_blank">Flex</a>
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses/by-sa/4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+         src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " fred's notes ",
+  "url" : "https://fredericb.info",
+  "image": "/resources/sitelogo.jpg",
+  "description": "Frédéric's Thoughts and Writings"
+}
+</script>
+
+</body>
+</html>
