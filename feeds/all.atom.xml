@@ -71,10 +71,12 @@ Ultimately, an attacker can execute arbitrary code in Secure World, at very earl
 &lt;ul&gt;
 &lt;li&gt;2020-10-19 &lt;a href="https://gist.github.com/frederic/0246dde2ecbb8c35f7bb61e98002ceb0"&gt;Bug discovery&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;2020-10 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; Vulnerability disclosed to Google&lt;/li&gt;
-&lt;li&gt;2020-11-05 Google shared the report with Amlogic&lt;/li&gt;
+&lt;li&gt;&lt;s&gt;2020-11-05 Google shared the report with Amlogic&lt;/s&gt;&lt;/li&gt;
 &lt;li&gt;2020-12 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; Password mitigation enabled in factory for new Chromecast devices&lt;/li&gt;
 &lt;li&gt;2021-02-08 Password mitigation enabled by software update for Chromecast devices&lt;/li&gt;
 &lt;li&gt;2021-02-10 Public disclosure&lt;/li&gt;
+&lt;li&gt;2021-02-12 CVE-2021-0467 assigned to this issue&lt;/li&gt;
+&lt;li&gt;2021-02-15 Google retracts the date they communicated with Amlogic&lt;/li&gt;
 &lt;/ul&gt;</content><category term="arm"></category><category term="amlogic"></category><category term="chromecast"></category><category term="bootrom"></category><category term="usb"></category><category term="exploit"></category></entry><entry><title>Dump Amlogic S905D3 BootROM from Khadas VIM3L board</title><link href="https://fredericb.info/2021/02/dump-amlogic-s905d3-bootrom-from-khadas-vim3l-board.html" rel="alternate"></link><published>2021-02-09T00:00:00-08:00</published><updated>2021-02-09T00:00:00-08:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2021-02-09:/2021/02/dump-amlogic-s905d3-bootrom-from-khadas-vim3l-board.html</id><summary type="html">&lt;p&gt;This post describes how to dump bootROM from &lt;a href="https://www.amlogic.com/#Products/392/index.html"&gt;Amlogic S905D3 SoC&lt;/a&gt; using &lt;a href="https://www.khadas.com/vim3l"&gt;Khadas VIM3L board&lt;/a&gt;.
 Since this board doesn't use Secure Boot, we can execute custom code in Secure World (a.k.a TrustZone) without exploiting any vulnerability.
 In addition, the board exposes an UART connector, which is convenient for …&lt;/p&gt;</summary><content type="html">&lt;p&gt;This post describes how to dump bootROM from &lt;a href="https://www.amlogic.com/#Products/392/index.html"&gt;Amlogic S905D3 SoC&lt;/a&gt; using &lt;a href="https://www.khadas.com/vim3l"&gt;Khadas VIM3L board&lt;/a&gt;.
