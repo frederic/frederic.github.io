@@ -1,0 +1,421 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/stylesheet/style.min.css">
+
+  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/pygments/github.min.css">
+  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/font-awesome/css/font-awesome.min.css">
+
+
+    <link href="https://fredericb.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="fred's notes Atom">
+
+
+    <link rel="shortcut icon" href="/resources/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/resources/favicon.ico" type="image/x-icon">
+
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+
+<meta name="author" content="Frédéric" />
+<meta name="description" content="In a previous post, we detailed a vulnerability in the Amlogic System-On-Chip bootROM that allows arbitrary code execution at EL3. Since the Chromecast with Google TV (CCwGTV) is one of the devices affected by this issue, it opens the possibility to run a custom OS like Ubuntu. This post describes …" />
+<meta name="keywords" content="arm, amlogic, bootloader, bootrom, chromecast, uboot, ubuntu, usb">
+
+<meta property="og:site_name" content="fred's notes"/>
+<meta property="og:title" content="Booting Ubuntu on Google Chromecast With Google TV"/>
+<meta property="og:description" content="In a previous post, we detailed a vulnerability in the Amlogic System-On-Chip bootROM that allows arbitrary code execution at EL3. Since the Chromecast with Google TV (CCwGTV) is one of the devices affected by this issue, it opens the possibility to run a custom OS like Ubuntu. This post describes …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="https://fredericb.info/2021/11/booting-ubuntu-on-google-chromecast-with-google-tv.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2021-11-29 00:00:00-08:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="https://fredericb.info/author/frederic.html">
+<meta property="article:section" content="Article"/>
+<meta property="article:tag" content="arm"/>
+<meta property="article:tag" content="amlogic"/>
+<meta property="article:tag" content="bootloader"/>
+<meta property="article:tag" content="bootrom"/>
+<meta property="article:tag" content="chromecast"/>
+<meta property="article:tag" content="uboot"/>
+<meta property="article:tag" content="ubuntu"/>
+<meta property="article:tag" content="usb"/>
+<meta property="og:image" content="/resources/sitelogo.jpg">
+
+  <title>fred's notes &ndash; Booting Ubuntu on Google Chromecast With Google TV</title>
+
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="/">
+        <img src="/resources/sitelogo.jpg" alt="fred's notes" title="fred's notes">
+      </a>
+      <h1><a href="/">fred's notes</a></h1>
+
+<p>Security & Stuff</p>
+      <nav>
+        <ul class="list">
+          <li><a href="https://fredericb.info/category/advisory.html">Advisory</a></li>
+          <li><a href="https://fredericb.info/category/article.html">Article</a></li>
+          <li><a href="https://fredericb.info/category/tool.html">Tool</a></li>
+          <li><a href="https://fredericb.info/pages/contact.html#contact">Contact</a></li>
+
+        </ul>
+      </nav>
+
+      <ul class="social">
+        <li><a class="sc-github" href="https://github.com/frederic" target="_blank"><i class="fa fa-github"></i></a></li>
+        <li><a class="sc-linkedin" href="https://www.linkedin.com/in/fredericbasse" target="_blank"><i class="fa fa-linkedin"></i></a></li>
+        <li><a class="sc-rss" href="/feeds/all.atom.xml" target="_blank"><i class="fa fa-rss"></i></a></li>
+      </ul>
+    </div>
+
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="https://fredericb.info/">    Home
+</a>
+
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+
+      <a href="https://fredericb.info/feeds/all.atom.xml">    Atom
+</a>
+
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="booting-ubuntu-on-google-chromecast-with-google-tv">Booting Ubuntu on Google Chromecast With Google TV</h1>
+    <p>
+          Posted on Mon 29 November 2021 in <a href="https://fredericb.info/category/article.html">Article</a>
+
+
+    </p>
+  </header>
+
+
+  <div>
+    <p>In a previous post, we detailed <a href="https://fredericb.info/2021/02/amlogic-usbdl-unsigned-code-loader-for-amlogic-bootrom.html">a vulnerability in the Amlogic System-On-Chip bootROM</a> that allows arbitrary code execution at EL3.
+Since the <a href="https://store.google.com/us/product/chromecast_google_tv">Chromecast with Google TV</a> (CCwGTV) is one of the devices affected by this issue, it opens the possibility to run a custom OS like Ubuntu.</p>
+<p>This post describes the journey to boot Ubuntu on CCwGTV starting from arbitrary code execution in its bootROM. All the resources (bootloaders/tools/scripts) are <a href="https://github.com/frederic/sabrina-custom-os">available on GitHub, as well as a step-by-step guide</a>.</p>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/pBg6oJn8aZM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+<h1>Disclaimer</h1>
+<p>You are solely responsible for any damage caused to your hardware/software/keys/DRM licences/warranty/data/cat/etc...</p>
+<h1>A straightforward plan</h1>
+<p>CCwGTV, released on September 30th 2020, is based on the Amlogic S905D3 System-on-Chip and runs Android OS.
+The objective is to boot Ubuntu instead, and doing so from an USB drive to keep the original OS untouched.</p>
+<p>The device implements Secure Boot, which means each software component of the boot chain is <a href="https://en.wikipedia.org/wiki/Digital_signature">digitally signed</a> to prevent non-official code execution.
+In order to boot a custom OS like Ubuntu, we'll rely on the bootROM vulnerability to break the Secure Boot and run custom code via the USB interface.</p>
+<p>Google has <a href="https://support.google.com/chromecastbuiltin/answer/6121012">released Open Source code</a> of U-Boot and Linux for this device, which is very helpful for this project.</p>
+<p>First, we'll obtain the <em>bootloader</em> image and extract BL2 image to customize it.
+Then, we'll build a custom U-Boot image that boots from USB flash drive by default.
+Finally, we'll repack the <em>bootloader</em> image with our custom U-Boot image.</p>
+<h1>Boot chain overview</h1>
+<p>The boot chain of this device is based on <a href="https://github.com/ARM-software/arm-trusted-firmware">ARM Trusted Firmware</a> (ATF).
+In this design, the boot flow is divided in 5 steps executed one after another :</p>
+<ul>
+<li>Boot Loader stage 1 (BL1) <em>AP Trusted ROM</em> ↴</li>
+<li>Boot Loader stage 2 (BL2) <em>Trusted Boot Firmware</em> ↴</li>
+<li>Boot Loader stage 3-1 (BL31) <em>EL3 Runtime Software</em> ↴</li>
+<li>Boot Loader stage 3-2 (BL32) <em>Secure-EL1 Payload</em> (optional) ↴</li>
+<li>Boot Loader stage 3-3 (BL33) <em>Non-trusted Firmware</em></li>
+</ul>
+<p>The first stage of the boot flow, referred to as BL1, is the SoC bootROM. All firmware images for the next stages are stored in the <em>bootloader</em> partition on the internal flash memory.
+The last stage, referred to as BL33, is the U-Boot image; unique Open Source firmware in this boot chain.</p>
+<p>Using the vulnerability, we can exploit BL1 to run arbitrary code as BL2 stage. But we can't just run U-Boot as a BL2 image: all the firmwares are required to properly initialize the board (<a href="https://en.wikipedia.org/wiki/Phase-locked_loop">PLL</a>, <a href="https://en.wikipedia.org/wiki/Clock_signal">clocks</a>, DDR training, ...). So we have to load all the firmwares, and only replace the last one (BL33) with our custom U-Boot image.</p>
+<p>Fortunately, the entire boot chain is designed to support loading over USB : if BL2 image detects that it has been loaded (in SRAM) via USB, it loads all the next stages (BL3x) over USB instead of the internal eMMC storage memory. The <a href="https://github.com/khadas/utils/blob/master/aml-flash-tool/tools/linux-x86/update">host-side tool</a> to send the bootloaders via USB is even provided by Khadas.</p>
+<h1>Getting the firmware : the hard way</h1>
+<p>When I started this research, no firmware or update files were available to download. So I had to remove the eMMC flash chip to dump the firmware and get a copy of the <em>bootloader</em> partition.</p>
+<p><img alt="eMMC chip-off" src="https://fredericb.info/blog/sabrina/sabrina-emmc.png"></p>
+<p>I used a <strong>YIHUA 8786D hot air rework station</strong> to remove the chip, and a <strong>ALLSOCKET eMMC153/169-SD Adapter</strong> to dump its content. Since it was my first attempt at eMMC chip-off technique, I followed the instructions given in a great talk from <a href="https://www.exploitee.rs/">Exploitee.rs</a> at <a href="https://www.blackhat.com/us-17/briefings/schedule/#hacking-hardware-with-a--sd-card-reader-6753">Black Hat 2017</a>.</p>
+<p>Later on, few <a href="https://forum.xda-developers.com/t/cc-w-gtv-sabrina-new-ota-factory-image-dump.4198909/">OTA update files</a> appeared online, so this hardware modification is no longer required to get the <em>bootloader</em> partition image.</p>
+<p>A <a href="https://github.com/ReFirmLabs/binwalk">quick analysis</a> of this <em>bootloader</em> partition doesn't reveal any standard filesystem, this file format seems proprietary. But since we also <a href="https://fredericb.info/2021/02/dump-amlogic-s905d3-bootrom-from-khadas-vim3l-board.html">dumped the bootROM</a>, we can still analyze the code that loads the BL2 image to find its location in the <em>bootloader</em> partition :</p>
+<table>
+<thead>
+<tr>
+<th>OFFSET</th>
+<th>SIZE</th>
+<th>DESCRIPTION</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0x0</td>
+<td>0x1000</td>
+<td>BL2 header</td>
+</tr>
+<tr>
+<td>0x1000</td>
+<td>0xF000</td>
+<td>BL2 code</td>
+</tr>
+<tr>
+<td>0x10000</td>
+<td>n</td>
+<td>Encrypted (BL3x)</td>
+</tr>
+</tbody>
+</table>
+<h1>Payload for BL1 exploitation</h1>
+<p>The <a href="https://github.com/frederic/amlogic-usbdl">exploitation tool amlogic-usbdl</a> allows us to load BL2 image in SRAM and execute it without signature check.
+However, the bootROM exploitation leaves the USB controller in an invalid state, and this will prevent U-Boot from using it.</p>
+<p>So we need a payload that restores the USB controller state before jumping to BL2 image :</p>
+<div class="highlight"><pre><span></span><span class="cp">#define _clear_icache() ((void (*)(void))0xffff048c)()</span>
+<span class="cp">#define _dwc_pcd_irq() ((void (*)(void))0xffff8250)()</span>
+<span class="cp">#define _jmp_bl2() ((void (*)(void))0xfffa1000)()</span>
+<span class="kt">void</span> <span class="nf">_start</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">_clear_icache</span><span class="p">();</span> <span class="c1">//clear instruction cache</span>
+    <span class="n">_dwc_pcd_irq</span><span class="p">();</span>  <span class="c1">//clear USB state</span>
+    <span class="n">_dwc_pcd_irq</span><span class="p">();</span>  <span class="c1">//after exploitation</span>
+    <span class="n">_jmp_bl2</span><span class="p">();</span>      <span class="c1">//jump to BL2 entrypoint</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>Function <code>_dwc_pcd_irq</code> is the USB interruption handler implemented in the bootROM USB stack. 
+When the bootROM vulnerability is exploited, the code flow is diverted from this function, which obviously
+prevents USB events to be fully and properly handled. Luckily for us, executing that USB handler a couple of times is enough to restore USB controller state.</p>
+<p>This payload is copied at the beginning of the BL2 image. The data overwritten are headers that aren't used because the exploit jumps directly to this payload, which then jumps to BL2 entrypoint.</p>
+<h1>Hacking BL2 image</h1>
+<p>As previously mentioned, we use the <a href="https://github.com/frederic/amlogic-usbdl">exploitation tool amlogic-usbdl</a> to load and run BL2 image. But the original BL2 image implements few features we must first disable to boot properly. This is where it gets dirty. We are free to modify BL2 code because it's signature won't be checked.</p>
+<h2>Disabling BL33 Authentication</h2>
+<p>Once loaded via USB and run, the BL2 code expects to receive the rest of the boot chain. If Secure Boot is enabled, BL2 checks the signature of all images including BL33 (U-Boot). We don't have the right key to sign our custom BL33 image, therefore we need to disable the BL33 signature check. We modify BL2 code to ignore the result of the signature check on BL33 image :</p>
+<div class="highlight"><pre><span></span><span class="gd">--- &lt;sabrina.bl2.factory.2020-07-13.img&gt;</span>
+<span class="gi">+++ &lt;sabrina.bl2.noSB.img&gt;</span>
+<span class="gu">@@ -3,5 +3,5 @@</span>
+ fffabd70 81 c2 00 91     add        x1,x20,#0x30
+ fffabd74 02 04 80 d2     mov        x2,#0x20
+ fffabd78 8a 02 00 94     bl         secure_memcmp
+<span class="gd">-fffabd7c 60 03 00 35     cbnz       w0,auth_fail</span>
+<span class="gi">+fffabd7c 00 00 80 52     mov        w0,#0x0</span>
+ fffabd80 80 72 40 39     ldrb       w0,[x20, #0x1c]
+</pre></div>
+
+
+<h2>Disabling Anti-RollBack</h2>
+<p>Anti-rollback (ARB) feature prevents execution of firmware images older than a specific version, which is stored in One Time Programmable (OTP a.k.a. efuses) memory. When firmware images are updated to a higher ARB version number, the OTP version is bumped-up by burning additional efuses.</p>
+<p>So two kind of issues could arise depending on the bootloader version we run :</p>
+<ul>
+<li>if older than the version in OTP: ARB check will fail and it just won't boot.</li>
+<li>if more recent than version in OTP : OTP version will be increased, and the ARB protection will block the original firmware (older version) from booting.</li>
+</ul>
+<p>In order to prevent such issues, we picked the oldest <em>bootloader</em> partition available (factory firmware), and we disable ARB feature in BL2 code :</p>
+<div class="highlight"><pre><span></span><span class="gd">--- &lt;sabrina.bl2.noSB.img&gt;</span>
+<span class="gi">+++ &lt;sabrina.bl2.noSB.noARB.img&gt;</span>
+<span class="gu">@@ -1,8 +1,8 @@</span>
+                      uint __cdecl IS_FEAT_ANTIROLLBACK_ENABLE(void)
+      uint              w0:4           &lt;RETURN&gt;
+                      IS_FEAT_ANTIROLLBACK_ENABLE
+ fffa1744 00 06 80 d2     mov        x0,#0x30
+ fffa1748 60 ec bf f2     movk       x0,#0xff63, LSL #16
+ fffa174c 00 00 40 b9     ldr        w0,[x0]=&gt;SEC_EFUSE_LIC0
+<span class="gd">-fffa1750 00 18 46 d3     ubfx       x0,x0,#0x6,#0x1</span>
+<span class="gi">+fffa1750 00 00 80 d2     mov        x0,#0x0</span>
+ fffa1754 c0 03 5f d6     ret
+</pre></div>
+
+
+<h2>Size reduction</h2>
+<p>We remove 0x100 bytes of padding at the end of the BL2 image (original size is 0x10000 bytes) to comply with the 0xFF00 bytes payload size limit imposed by the exploitation tool.</p>
+<h1>Building &amp; customizing BL33</h1>
+<p>Unlike BL2, BL33 is based on <a href="https://support.google.com/chromecastbuiltin/answer/6121012">Open Source software U-Boot</a>, so building &amp; customizing it is pretty straightforward.</p>
+<p>U-Boot boot sequence is defined with a scripting language that supports variables (global, local), control structures (if, while, etc...), and commands. We <a href="https://github.com/frederic/sabrina-uboot/commit/048ce71f67ac2622dc973f86a944679fbc026374">modify</a> the original script that boots from internal eMMC to instead load and run another script named <code>s905_autoscript</code> from an USB drive :</p>
+<div class="highlight"><pre><span></span><span class="gd">--- sabrina-uboot/board/amlogic/configs/sm1_sabrina_v1.h</span>
+<span class="gi">+++ sabrina-uboot/board/amlogic/configs/sm1_sabrina_v1.h</span>
+<span class="gu">@@ -297,17 +299,14 @@</span>
+             &quot;if test ${active_slot} != normal; then &quot;\
+                 &quot;setenv bootargs ${bootargs} androidboot.slot_suffix=${active_slot};&quot;\
+             &quot;fi;&quot;\
+<span class="gd">-            &quot;if test ${avb2} = 0; then &quot;\</span>
+<span class="gd">-                &quot;if test ${active_slot} = _a; then &quot;\</span>
+<span class="gd">-                    &quot;setenv bootargs ${bootargs} root=/dev/mmcblk0p23;&quot;\</span>
+<span class="gd">-                &quot;else if test ${active_slot} = _b; then &quot;\</span>
+<span class="gd">-                    &quot;setenv bootargs ${bootargs} root=/dev/mmcblk0p24;&quot;\</span>
+<span class="gd">-                &quot;fi;fi;&quot;\</span>
+<span class="gd">-            &quot;fi;&quot;\</span>
+<span class="gd">-            &quot;if imgread kernel ${boot_part} ${loadaddr}; then &quot;\</span>
+<span class="gd">-                &quot;bootm ${loadaddr};&quot;\</span>
+<span class="gd">-            &quot;fi;&quot;\</span>
+<span class="gd">-            &quot;run fallback;&quot;\</span>
+<span class="gi">+            &quot;echo Sleep 10 secs before USB DRIVE boot from ${loadaddr} ...; &quot;\</span>
+<span class="gi">+            &quot;sleep 10; &quot;\</span>
+<span class="gi">+            &quot;usb start 0; &quot;\</span>
+<span class="gi">+            &quot;usb tree; &quot;\</span>
+<span class="gi">+            &quot;usb info; &quot;\</span>
+<span class="gi">+            &quot;fatload usb 0 ${loadaddr} s905_autoscript;&quot;\</span>
+<span class="gi">+            &quot;setenv autoscript_source usb; &quot;\</span>
+<span class="gi">+            &quot;autoscr ${loadaddr};&quot;\</span>
+             &quot;\0&quot;\
+         &quot;upgrade_check=&quot; \
+             &quot;echo upgrade_step=${upgrade_step}; &quot;\
+</pre></div>
+
+
+<p>By loading and running a script from an external media, we have the possibility to change the boot script without recompiling U-Boot or repacking the <em>bootloader</em> image.</p>
+<p>Just like other bootloaders in the chain, U-Boot detects if it's been loaded from USB. In such case, U-Boot skips the normal boot sequence and starts an USB recovery interface (a.k.a. USB burning mode) instead. We have to disable that behavior to ensure the boot sequence we just modified is run :</p>
+<div class="highlight"><pre><span></span><span class="gd">--- sabrina-uboot/board/amlogic/sm1_sabrina_v1/sm1_sabrina_v1.c</span>
+<span class="gi">+++ sabrina-uboot/board/amlogic/sm1_sabrina_v1/sm1_sabrina_v1.c</span>
+<span class="gu">@@ -583,13 +583,6 @@ void set_i2c_ao_pinmux(void)</span>
+ int board_init(void)
+ {
+        sys_led_init();
+<span class="gd">-    //Please keep CONFIG_AML_V2_FACTORY_BURN at first place of board_init</span>
+<span class="gd">-    //As NOT NEED other board init If USB BOOT MODE</span>
+<span class="gd">-#ifdef CONFIG_AML_V2_FACTORY_BURN</span>
+<span class="gd">-       if ((0x1b8ec003 != readl(P_PREG_STICKY_REG2)) &amp;&amp; (0x1b8ec004 != readl(P_PREG_STICKY_REG2))) {</span>
+<span class="gd">-                               aml_try_factory_usb_burning(0, gd-&gt;bd);</span>
+<span class="gd">-       }</span>
+<span class="gd">-#endif// #ifdef CONFIG_AML_V2_FACTORY_BURN</span>
+ #ifdef CONFIG_USB_XHCI_AMLOGIC_V2
+        board_usb_pll_disable(&amp;g_usb_config_GXL_skt);
+        board_usb_init(&amp;g_usb_config_GXL_skt,BOARD_USB_MODE_HOST);
+</pre></div>
+
+
+<p>Nevertheless, this recovery interface can still be useful in some cases, so we repurpose the physical button <em>GPIOAO_10</em> :</p>
+<div class="highlight"><pre><span></span><span class="gd">--- sabrina-uboot/board/amlogic/configs/sm1_sabrina_v1.h</span>
+<span class="gi">+++ sabrina-uboot/board/amlogic/configs/sm1_sabrina_v1.h</span>
+<span class="gu">@@ -397,9 +396,7 @@</span>
+         &quot;upgrade_key=&quot; \
+             &quot;if gpio input GPIOAO_10; then &quot; \
+                 &quot;echo GPIOAO_10 pressed;&quot; \
+<span class="gd">-                &quot;if usb start 0; then &quot; \</span>
+<span class="gd">-                    &quot;run recovery_from_udisk;&quot; \</span>
+<span class="gd">-                &quot;fi;&quot; \</span>
+<span class="gi">+                &quot;update 0;&quot; \</span>
+             &quot;fi;&quot; \
+             &quot;\0&quot;
+</pre></div>
+
+
+<p>When the physical button is hold while U-Boot starts, the USB recovery interface is started by executing <a href="https://github.com/frederic/sabrina-uboot/blob/048ce71f67ac2622dc973f86a944679fbc026374/drivers/usb/gadget/v2_burning/v2_usb_tool/optimus_core.c#L77">U-Boot command "update"</a>.</p>
+<p><a href="https://github.com/frederic/sabrina-uboot">U-Boot source tree with these modifications</a> is available on GitHub, as well as building instructions in the <a href="https://github.com/frederic/sabrina-uboot/blob/QTS2.200918.025-USBboot/README.md">README file</a>. A <a href="https://github.com/frederic/sabrina-custom-os/blob/main/bootloader/u-boot.bin">prebuilt image</a> is also available.</p>
+<h1>Repacking bootloader with custom BL33</h1>
+<p>Essentially, we just need to replace the original BL33 image with the custom one in the <em>bootloader</em> partition. However in practice, it's a trickier task than it appears.
+First, the <em>bootloader</em> partition is encrypted (except BL2). Then, its format is proprietary. Last, BL33 image is compressed using LZ4 algorithm.</p>
+<p>Ideally, we would write a complete (un)packing tool with encryption/compression support for the <em>bootloader</em> partition.
+It didn't happen. Instead, we'll hack it quick 'n dirty. The following steps are implemented in script <a href="https://github.com/frederic/sabrina-custom-os/blob/main/scripts/repack_bootloader.sh">repack_bootloader.sh</a>.</p>
+<h2>AES decryption</h2>
+<p>By analyzing the bootROM, we learn that the <em>bootloader</em> partition is encrypted with AES-256-CBC and the key is stored at address 0xFFFE0020. This key can be dumped using the exploitation tool <a href="https://github.com/frederic/amlogic-usbdl">amlogic-usbdl</a> with the <a href="https://github.com/frederic/amlogic-usbdl/blob/main/payloads/memdump_over_usb.c">memdump_over_usb</a> payload. We can then use <a href="https://wiki.openssl.org/index.php/Enc">OpenSSL</a> to decrypt the <em>bootloader</em> :</p>
+<div class="highlight"><pre><span></span>$ openssl enc -aes-256-cbc -nopad -d -K <span class="m">0000000000000000000000000000000000000000000000000000000000000000</span> -iv <span class="m">00000000000000000000000000000000</span> -in bootloader.enc -out bootloader.img
+</pre></div>
+
+
+<h2>LZ4 compression</h2>
+<p>We compress our custom BL33 image using the official tool <a href="https://github.com/khadas/u-boot/blob/khadas-vims-pie/fip/g12a/aml_encrypt_g12a">aml_encrypt_g12a</a> provided by Khadas.</p>
+<div class="highlight"><pre><span></span>$ aml_encrypt_g12a --bl3sig --input u-boot.bin --compress lz4 --output u-boot.enc --level v3 --type bl33
+</pre></div>
+
+
+<h2>dd editing</h2>
+<p>Compressed BL33 image starts with a magic value <strong>LZ4C</strong>. Thanks to this marker, we can identify the BL33 image offset in the <em>bootloader</em> partition, and simply overwrite it with our custom, compressed BL33 <em>u-boot.enc</em> :</p>
+<div class="highlight"><pre><span></span>$ <span class="nv">IN_OFFSET</span><span class="o">=</span><span class="sb">`</span>grep --byte-offset --only-matching --text LZ4C u-boot.enc <span class="p">|</span> head -1 <span class="p">|</span> cut -d: -f1<span class="sb">`</span>
+$ <span class="nv">OUT_OFFSET</span><span class="o">=</span><span class="sb">`</span>grep --byte-offset --only-matching --text LZ4C bootloader.img <span class="p">|</span> head -1 <span class="p">|</span> cut -d: -f1<span class="sb">`</span>
+$ dd <span class="k">if</span><span class="o">=</span>u-boot.enc <span class="nv">of</span><span class="o">=</span>bootloader.img <span class="nv">skip</span><span class="o">=</span><span class="nv">$IN_OFFSET</span> <span class="nv">seek</span><span class="o">=</span><span class="nv">$OUT_OFFSET</span> <span class="nv">bs</span><span class="o">=</span><span class="m">1</span> <span class="nv">conv</span><span class="o">=</span>notrunc
+</pre></div>
+
+
+<h2>AES encryption</h2>
+<p>Finally, the modified <em>bootloader</em> image is encrypted back using OpenSSL again.</p>
+<h1>Preparing bootable USB flash drive</h1>
+<p>With our customized bootchain ready to boot from USB, it's time to prepare the OS on an USB flash drive.</p>
+<p>First, we write a <a href="https://drive.google.com/file/d/1Xw8iReDfNtXyDvh0qtqMKMYjw7HsCpeI/view?usp=sharing">preinstalled image of Ubuntu for ARM64</a> on the USB flash drive :</p>
+<div class="highlight"><pre><span></span>$ dd <span class="k">if</span><span class="o">=</span>ubuntu-20.10-preinstalled-desktop-arm64+raspi.img <span class="nv">of</span><span class="o">=</span>/dev/&lt;device&gt; <span class="nv">bs</span><span class="o">=</span>1M
+</pre></div>
+
+
+<p>Then, we add few files in <em>boot</em> partition :</p>
+<ul>
+<li><a href="https://github.com/frederic/sabrina-custom-os/blob/main/rootfs/s905_autoscript">s905_autoscript</a> : compiled boot script (<a href="https://github.com/frederic/sabrina-custom-os/blob/main/rootfs/s905_autoscript.cmd">source</a>)</li>
+<li><a href="https://github.com/frederic/sabrina-custom-os/blob/main/rootfs/env.txt">env.txt</a> : additional U-Boot environment variables</li>
+<li><a href="https://github.com/frederic/sabrina-custom-os/blob/main/rootfs/dtb.img">dtb.img</a> : Device Tree Blob for CCwGTV (<a href="https://github.com/frederic/sabrina-linux">source</a>)</li>
+<li><a href="https://github.com/frederic/sabrina-custom-os/blob/main/rootfs/uInitrd">uInitrd</a> : original ramdisk from Ubuntu (<a href="https://github.com/frederic/sabrina-custom-os/blob/main/scripts/repack_initrd.sh">repacked for U-Boot</a>)</li>
+<li><a href="https://github.com/frederic/sabrina-custom-os/blob/main/rootfs/zImage">zImage</a> : Linux kernel image for CCwGTV (<a href="https://github.com/frederic/sabrina-linux">source</a>)</li>
+</ul>
+<p>Precompiled files and detailed instructions are <a href="https://github.com/frederic/sabrina-custom-os#readme">available on GitHub</a>.</p>
+<h1>Booting Ubuntu from USB</h1>
+<p>We can finally boot Ubuntu from the USB flash drive by following these steps :</p>
+<ul>
+<li>Connect target to host via USB to exploit bootROM and run modified BL2</li>
+<li>Send over USB the custom <em>bootloader</em> image (which includes the custom U-Boot image)</li>
+<li>Connect USB flash drive that contains boot script, kernel image and the rest of the OS.</li>
+</ul>
+<p>Since CCwGTV only offers a single USB-C port, we also need an <a href="https://intpw.com/collections/hub/products/intpw-usb-c-to-hdmi-adapter-for-nintendo-switch">USB-C adapter</a> that splits power and data, so we can connect simultaneously a power source and an USB device.</p>
+<p>Detailed instructions are available in the <a href="https://github.com/frederic/sabrina-custom-os/">README file on GitHub, along with all the resources (bootloaders/tools/scripts)</a>.</p>
+<h1>Conclusion</h1>
+<p>Due to a bootROM vulnerability, the entire software stack of CCwGTV can be replaced. This means booting an alternative OS like Ubuntu is theoretically possible. But in practice, replacing proprietary software components (like bootloaders or TEE) requires significant engineering efforts, especially without debugging capabilities.</p>
+<p>Instead, we preferred to reuse as many original software components as possible, which we minimally modified to boot a custom OS.</p>
+<p>As explained in the previous blog post, the <a href="https://fredericb.info/2021/02/amlogic-usbdl-unsigned-code-loader-for-amlogic-bootrom.html">vulnerability has since been mitigated</a> with a software update. It doesn't fix the bug, as bootROM is read-only. But, luckily, the SoC allows OEMs to restrict access to the USB download mode by burning <a href="https://en.wikipedia.org/wiki/Efuse">eFuses</a>. This software update burns eFuses to make the vulnerable code inaccessible to attackers.</p>
+<p>However, once in possession of a vulnerable device (unpatched eFuses), attackers can modify software updates before applying them to neutralize the eFuse patch.
+Therefore, they can run an official up-to-date OS while keeping the vulnerable USB download mode accessible for exploitation.</p>
+<p>This issue is serious for devices like CCwGTV that are supposed to guarantee a Trusted Execution Environment for DRM. Once root-of-trust has been compromised, restoring it is a difficult challenge for OEMs.</p>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://fredericb.info/tag/arm.html">arm</a>
+      <a href="https://fredericb.info/tag/amlogic.html">amlogic</a>
+      <a href="https://fredericb.info/tag/bootloader.html">bootloader</a>
+      <a href="https://fredericb.info/tag/bootrom.html">bootrom</a>
+      <a href="https://fredericb.info/tag/chromecast.html">chromecast</a>
+      <a href="https://fredericb.info/tag/uboot.html">uboot</a>
+      <a href="https://fredericb.info/tag/ubuntu.html">ubuntu</a>
+      <a href="https://fredericb.info/tag/usb.html">usb</a>
+    </p>
+  </div>
+
+
+
+    <div class="addthis_relatedposts_inline">
+
+
+</article>
+
+    <footer>
+<p>
+  &copy;   - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+</p>
+<p>    Powered by <a href="http://getpelican.com" target="_blank">Pelican</a> - Theme <a href="https://github.com/alexandrevicenzi/flex" target="_blank">Flex</a>
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses/by-sa/4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+         src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " fred's notes ",
+  "url" : "https://fredericb.info",
+  "image": "/resources/sitelogo.jpg",
+  "description": "Frédéric's Thoughts and Writings"
+}
+</script>
+
+</body>
+</html>

@@ -34,7 +34,7 @@
 <meta property="og:url" content="https://fredericb.info"/>
 <meta property="og:image" content="/resources/sitelogo.jpg">
 
-  <title>fred's notes &ndash;     Tag amlogic
+  <title>fred's notes &ndash;     Tag uboot
 </title>
 
 </head>
@@ -101,93 +101,6 @@ Since the <a href="https://store.google.com/us/product/chromecast_google_tv">Chr
 <p>This post describes …</p>
       <br>
       <a class="btn" href="https://fredericb.info/2021/11/booting-ubuntu-on-google-chromecast-with-google-tv.html#booting-ubuntu-on-google-chromecast-with-google-tv">    Continue reading
-</a>
-  </div>
-  <hr />
-</article>
-<article>
-  <header>
-    <h2><a href="https://fredericb.info/2021/02/amlogic-usbdl-unsigned-code-loader-for-amlogic-bootrom.html#amlogic-usbdl-unsigned-code-loader-for-amlogic-bootrom">amlogic-usbdl : unsigned code loader for Amlogic BootROM</a></h2>
-    <p>
-          Posted on Wed 10 February 2021 in <a href="https://fredericb.info/category/tool.html">Tool</a>
-
-
-          &#8226;     Tagged with
-
-              <a href="https://fredericb.info/tag/arm.html">arm</a>,              <a href="https://fredericb.info/tag/amlogic.html">amlogic</a>,              <a href="https://fredericb.info/tag/chromecast.html">chromecast</a>,              <a href="https://fredericb.info/tag/bootrom.html">bootrom</a>,              <a href="https://fredericb.info/tag/usb.html">usb</a>,              <a href="https://fredericb.info/tag/exploit.html">exploit</a>
-    </p>
-  </header>
-  <div>
-      <p>In previous posts, we explained how to <a href="https://fredericb.info/2020/06/reverse-engineer-usb-stack-of-exynos-bootrom.html">reverse the USB stack in the Exynos bootROM</a>, which led to the <a href="https://fredericb.info/2020/06/exynos-usbdl-unsigned-code-loader-for-exynos-bootrom.html">discovery of a critical bug</a>.
-After reproducing this methodology on <a href="https://fredericb.info/2021/02/dump-amlogic-s905d3-bootrom-from-khadas-vim3l-board.html">Amlogic bootROM recently dumped</a>, a similar vulnerability has been discovered in the USB stack that can be exploited to run arbitrary …</p>
-      <br>
-      <a class="btn" href="https://fredericb.info/2021/02/amlogic-usbdl-unsigned-code-loader-for-amlogic-bootrom.html#amlogic-usbdl-unsigned-code-loader-for-amlogic-bootrom">    Continue reading
-</a>
-  </div>
-  <hr />
-</article>
-<article>
-  <header>
-    <h2><a href="https://fredericb.info/2021/02/dump-amlogic-s905d3-bootrom-from-khadas-vim3l-board.html#dump-amlogic-s905d3-bootrom-from-khadas-vim3l-board">Dump Amlogic S905D3 BootROM from Khadas VIM3L board</a></h2>
-    <p>
-          Posted on Tue 09 February 2021 in <a href="https://fredericb.info/category/article.html">Article</a>
-
-
-          &#8226;     Tagged with
-
-              <a href="https://fredericb.info/tag/arm.html">arm</a>,              <a href="https://fredericb.info/tag/amlogic.html">amlogic</a>,              <a href="https://fredericb.info/tag/bootloader.html">bootloader</a>,              <a href="https://fredericb.info/tag/bootrom.html">bootrom</a>,              <a href="https://fredericb.info/tag/khadas.html">khadas</a>,              <a href="https://fredericb.info/tag/vim3l.html">vim3l</a>
-    </p>
-  </header>
-  <div>
-      <p>This post describes how to dump bootROM from <a href="https://www.amlogic.com/#Products/392/index.html">Amlogic S905D3 SoC</a> using <a href="https://www.khadas.com/vim3l">Khadas VIM3L board</a>.
-Since this board doesn't use Secure Boot, we can execute custom code in Secure World (a.k.a TrustZone) without exploiting any vulnerability.
-In addition, the board exposes an UART connector, which is convenient for …</p>
-      <br>
-      <a class="btn" href="https://fredericb.info/2021/02/dump-amlogic-s905d3-bootrom-from-khadas-vim3l-board.html#dump-amlogic-s905d3-bootrom-from-khadas-vim3l-board">    Continue reading
-</a>
-  </div>
-  <hr />
-</article>
-<article>
-  <header>
-    <h2><a href="https://fredericb.info/2016/10/amlogic-s905-soc-bypassing-not-so.html#amlogic-s905-soc-bypassing-not-so">Amlogic S905 SoC: bypassing the (not so) Secure Boot to dump the BootROM</a></h2>
-    <p>
-          Posted on Wed 05 October 2016 in <a href="https://fredericb.info/category/article.html">Article</a>
-
-
-          &#8226;     Tagged with
-
-              <a href="https://fredericb.info/tag/vulnerability.html">vulnerability</a>,              <a href="https://fredericb.info/tag/amlogic.html">amlogic</a>,              <a href="https://fredericb.info/tag/arm.html">arm</a>,              <a href="https://fredericb.info/tag/security.html">security</a>,              <a href="https://fredericb.info/tag/firmware.html">firmware</a>,              <a href="https://fredericb.info/tag/trustzone.html">trustzone</a>,              <a href="https://fredericb.info/tag/bootrom.html">bootrom</a>,              <a href="https://fredericb.info/tag/bug.html">bug</a>
-    </p>
-  </header>
-  <div>
-      <p>The <a href=
-"http://www.amlogic.com/#Products/176/index.html">Amlogic S905
-System-On-Chip</a> is an ARM processor designed for video
-applications. It's widely used in Android/Kodi media boxes. The SoC
-implements the TrustZone security extensions to run a Trusted
-Execution Environment (TEE) that enables DRM &amp; other security
-features :<br>
-<br>
-<table align="center" cellpadding="0" cellspacing="0" class=
-"tr-caption-container" style=
-"margin-left: auto; margin-right: auto; text-align: center;">
-<tbody>
-<tr>
-<td style="text-align: center;">
-<img alt="S905 block diagram" src="https://fredericb.info/blog/amlogic-sb/S905_arch.png">
-</td>
-</tr>
-<tr>
-<td class="tr-caption" style="text-align: center;">Amlogic S905
-System Block Diagram</td>
-</tr>
-</tbody>
-</table>
-<br>
-The SoC contains a Secure …</p>
-      <br>
-      <a class="btn" href="https://fredericb.info/2016/10/amlogic-s905-soc-bypassing-not-so.html#amlogic-s905-soc-bypassing-not-so">    Continue reading
 </a>
   </div>
 </article>
