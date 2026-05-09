@@ -2,105 +2,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
-
-    <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/stylesheet/style.min.css">
-
-  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/pygments/github.min.css">
-  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/font-awesome/css/font-awesome.min.css">
-
-
-    <link href="https://fredericb.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="fred's notes Atom">
-
-
-    <link rel="shortcut icon" href="/resources/favicon.ico" type="image/x-icon">
-    <link rel="icon" href="/resources/favicon.ico" type="image/x-icon">
-
-
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="HandheldFriendly" content="True" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="robots" content="" />
+  <meta name="robots" content="index, follow" />
 
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/stylesheet/style.min.css">
+
+    <link id="dark-theme-style" rel="stylesheet" type="text/css"
+          media="(prefers-color-scheme: dark)"
+    href="https://fredericb.info/theme/stylesheet/dark-theme.min.css">
+
+    <link id="pygments-dark-theme" rel="stylesheet" type="text/css"
+              media="(prefers-color-scheme: dark)"
+          href="https://fredericb.info/theme/pygments/monokai.min.css">
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+              media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)"
+          href="https://fredericb.info/theme/pygments/monokai.min.css">
+
+
+
+  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/font-awesome/css/solid.css">
+
+
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <!-- Chrome, Firefox OS and Opera -->
+  <meta name="theme-color" content="#333333">
+  <!-- Windows Phone -->
+  <meta name="msapplication-navbutton-color" content="#333333">
+  <!-- iOS Safari -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <!-- Microsoft EDGE -->
+  <meta name="msapplication-TileColor" content="#333333">
+
+  <link href="https://fredericb.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="fred's notes Atom">
+
+
+
+ 
 
 <meta name="author" content="Frédéric" />
 <meta name="description" content="The Amlogic S905 System-On-Chip is an ARM processor designed for video applications. It&#39;s widely used in Android/Kodi media boxes. The SoC implements the TrustZone security extensions to run a Trusted Execution Environment (TEE) that enables DRM &amp; other security features : Amlogic S905 System Block Diagram The SoC contains a Secure …" />
 <meta name="keywords" content="vulnerability, amlogic, arm, security, firmware, trustzone, bootrom, bug">
 
-<meta property="og:site_name" content="fred's notes"/>
-<meta property="og:title" content="Amlogic S905 SoC: bypassing the (not so) Secure Boot to dump the BootROM"/>
-<meta property="og:description" content="The Amlogic S905 System-On-Chip is an ARM processor designed for video applications. It&#39;s widely used in Android/Kodi media boxes. The SoC implements the TrustZone security extensions to run a Trusted Execution Environment (TEE) that enables DRM &amp; other security features : Amlogic S905 System Block Diagram The SoC contains a Secure …"/>
-<meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="https://fredericb.info/2016/10/amlogic-s905-soc-bypassing-not-so.html"/>
-<meta property="og:type" content="article"/>
-<meta property="article:published_time" content="2016-10-05 00:00:00.001000-07:00"/>
-<meta property="article:modified_time" content=""/>
-<meta property="article:author" content="https://fredericb.info/author/frederic.html">
-<meta property="article:section" content="Article"/>
-<meta property="article:tag" content="vulnerability"/>
-<meta property="article:tag" content="amlogic"/>
-<meta property="article:tag" content="arm"/>
-<meta property="article:tag" content="security"/>
-<meta property="article:tag" content="firmware"/>
-<meta property="article:tag" content="trustzone"/>
-<meta property="article:tag" content="bootrom"/>
-<meta property="article:tag" content="bug"/>
-<meta property="og:image" content="/resources/sitelogo.jpg">
+
+  <meta property="og:site_name" content="fred's notes"/>
+  <meta property="og:title" content="Amlogic S905 SoC: bypassing the (not so) Secure Boot to dump the BootROM"/>
+  <meta property="og:description" content="The Amlogic S905 System-On-Chip is an ARM processor designed for video applications. It&#39;s widely used in Android/Kodi media boxes. The SoC implements the TrustZone security extensions to run a Trusted Execution Environment (TEE) that enables DRM &amp; other security features : Amlogic S905 System Block Diagram The SoC contains a Secure …"/>
+  <meta property="og:locale" content="en_US"/>
+  <meta property="og:url" content="https://fredericb.info/2016/10/amlogic-s905-soc-bypassing-not-so.html"/>
+  <meta property="og:type" content="article"/>
+  <meta property="article:published_time" content="2016-10-05 00:00:00.001000-07:00"/>
+  <meta property="article:modified_time" content=""/>
+  <meta property="article:author" content="https://fredericb.info/author/frederic.html">
+  <meta property="article:section" content="Article"/>
+  <meta property="article:tag" content="vulnerability"/>
+  <meta property="article:tag" content="amlogic"/>
+  <meta property="article:tag" content="arm"/>
+  <meta property="article:tag" content="security"/>
+  <meta property="article:tag" content="firmware"/>
+  <meta property="article:tag" content="trustzone"/>
+  <meta property="article:tag" content="bootrom"/>
+  <meta property="article:tag" content="bug"/>
+  <meta property="og:image" content="/sitelogo.jpg">
 
   <title>fred's notes &ndash; Amlogic S905 SoC: bypassing the (not so) Secure Boot to dump the BootROM</title>
 
+
 </head>
-<body>
-  <aside>
-    <div>
-      <a href="/">
-        <img src="/resources/sitelogo.jpg" alt="fred's notes" title="fred's notes">
-      </a>
-      <h1><a href="/">fred's notes</a></h1>
+<body >
 
-<p>Security & Stuff</p>
-      <nav>
-        <ul class="list">
-          <li><a href="https://fredericb.info/category/advisory.html">Advisory</a></li>
-          <li><a href="https://fredericb.info/category/article.html">Article</a></li>
-          <li><a href="https://fredericb.info/category/tool.html">Tool</a></li>
-          <li><a href="https://fredericb.info/pages/contact.html#contact">Contact</a></li>
+<aside>
+  <div>
+    <a href="https://fredericb.info/">
+      <img src="/sitelogo.jpg" alt="fred's notes" title="fred's notes">
+    </a>
 
-        </ul>
-      </nav>
+    <h1>
+      <a href="https://fredericb.info/">fred's notes</a>
+    </h1>
 
-      <ul class="social">
-        <li><a class="sc-github" href="https://github.com/frederic" target="_blank"><i class="fa fa-github"></i></a></li>
-        <li><a class="sc-linkedin" href="https://www.linkedin.com/in/fredericbasse" target="_blank"><i class="fa fa-linkedin"></i></a></li>
-        <li><a class="sc-rss" href="/feeds/all.atom.xml" target="_blank"><i class="fa fa-rss"></i></a></li>
-      </ul>
-    </div>
+    <p>Security & Stuff</p>
 
-
-  </aside>
-  <main>
 
     <nav>
-      <a href="https://fredericb.info/">    Home
-</a>
+      <ul class="list">
 
-      <a href="/archives.html">Archives</a>
-      <a href="/categories.html">Categories</a>
-      <a href="/tags.html">Tags</a>
 
-      <a href="https://fredericb.info/feeds/all.atom.xml">    Atom
-</a>
+            <li>
+              <a target="_self"
+                 href="https://fredericb.info/pages/contact.html">
+                Contact
+              </a>
+            </li>
 
+          <li>
+            <a target="_self" href="/category/advisory.html" >advisory</a>
+          </li>
+          <li>
+            <a target="_self" href="/category/article.html" >article</a>
+          </li>
+          <li>
+            <a target="_self" href="/category/tool.html" >tool</a>
+          </li>
+      </ul>
     </nav>
+
+    <ul class="social">
+      <li>
+        <a class="sc-github"
+           href="https://github.com/frederic"
+           target="_blank">
+          <i class="fa-brands fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a class="sc-mastodon"
+rel="me"           href="https://infosec.exchange/@zeewox"
+           target="_blank">
+          <i class="fa-brands fa-mastodon"></i>
+        </a>
+      </li>
+      <li>
+        <a class="sc-rss"
+           href="/feeds/all.atom.xml"
+           target="_blank">
+          <i class="fa-solid fa-rss"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+</aside>
+  <main>
+
+<nav>
+  <a href="https://fredericb.info/">Home</a>
+
+  <a href="/archives.html">Archives</a>
+  <a href="/categories.html">Categories</a>
+  <a href="/tags.html">Tags</a>
+
+  <a href="https://fredericb.info/feeds/all.atom.xml">Atom</a>
+
+</nav>
 
 <article class="single">
   <header>
       
     <h1 id="amlogic-s905-soc-bypassing-not-so">Amlogic S905 SoC: bypassing the (not so) Secure Boot to dump the BootROM</h1>
     <p>
-          Posted on Wed 05 October 2016 in <a href="https://fredericb.info/category/article.html">Article</a>
-
+      Posted on Wed 05 October 2016 in <a href="https://fredericb.info/category/article.html">Article</a>
 
     </p>
   </header>
@@ -114,14 +174,14 @@ applications. It's widely used in Android/Kodi media boxes. The SoC
 implements the TrustZone security extensions to run a Trusted
 Execution Environment (TEE) that enables DRM &amp; other security
 features :<br>
-<br>
+<br></p>
 <table align="center" cellpadding="0" cellspacing="0" class=
 "tr-caption-container" style=
 "margin-left: auto; margin-right: auto; text-align: center;">
 <tbody>
 <tr>
 <td style="text-align: center;">
-<img alt="S905 block diagram" src="https://fredericb.info/blog/amlogic-sb/S905_arch.png">
+<img src="https://fredericb.info/blog/amlogic-sb/S905_arch.png" alt="S905 block diagram">
 </td>
 </tr>
 <tr>
@@ -130,7 +190,7 @@ System Block Diagram</td>
 </tr>
 </tbody>
 </table>
-<br>
+<p><br>
 The SoC contains a Secure Boot mechanism to authenticate the TEE
 image before loading it in TrustZone. And the first link of this
 Secure Boot chain is the BootROM code, stored directly in the
@@ -138,9 +198,9 @@ chip.<br>
 <span style="background-color: red;"><br></span>This articles
 describes how to extract the BootROM code from this SoC in the
 Android-based&nbsp;<a href="http://www.inphic.com/">Inphic Spot i7
-device</a>.<br>
+device</a>.<br></p>
 <h2>Technical documentation</h2>
-Amlogic released a public version of the S905 datasheet thanks to
+<p>Amlogic released a public version of the S905 datasheet thanks to
 <a href=
 "http://www.hardkernel.com/main/products/prdt_info.php?g_code=G145457216438&amp;tab_idx=2">
 Hardkernel</a>. However, it's heavily redacted, and most parts
@@ -152,28 +212,26 @@ packages released by <a href=
 "https://github.com/150balbes/Amlogic_s905-kernel">OEMs</a>.<br>
 For example, we can find a potential address for the BootROM
 code:<br></p>
-<div class="highlight"><pre><span></span><span class="cp">#define ROMBOOT_START   0xD9040000</span>
+<div class="highlight"><pre><span></span><code><span class="cp">#define ROMBOOT_START   0xD9040000</span>
 <span class="cp">#define ROM_SIZE        (64 * 1024)</span>
 <span class="cp">#define ROMBOOT_END     (ROMBOOT_START + ROM_SIZE)</span>
-</pre></div>
-
+</code></pre></div>
 
 <h2>Root access over the UART</h2>
-
 <p>We start by connecting the serial port (or UART) because this
 interface could provide a quick &amp; easy access to debug messages &amp;
 serial console on bootloaders and Linux kernel.<br>
 <a href=
 "http://www.devttys0.com/2012/11/reverse-engineering-serial-ports/">
 Identifying the serial port</a>&nbsp;on this board is quite simple
-since there is a port header with labels for the pinout:<br>
+since there is a port header with labels for the pinout:<br></p>
 <table align="center" cellpadding="0" cellspacing="0" class=
 "tr-caption-container" style=
 "margin-left: auto; margin-right: auto; text-align: center;">
 <tbody>
 <tr>
 <td style="text-align: center;">
-<img alt="UART" src="https://fredericb.info/blog/amlogic-sb/uart_header.jpg">
+<img src="https://fredericb.info/blog/amlogic-sb/uart_header.jpg" alt="UART">
 </td>
 </tr>
 <tr>
@@ -182,70 +240,63 @@ Spot i7 board</td>
 </tr>
 </tbody>
 </table>
-<br>
+<p><br>
 We connect an USB to UART adapter to this port. Once the Linux
 kernel boot process is finished, we have directly access to a root
 shell.<br>
 We can start to explore the (Non-Secure side of the)
 system.&nbsp;For example, we can dump the partitions :<br></p>
-<div class="highlight"><pre><span></span>root@p200:/# ls -l /dev/block/platform/d0074000.emmc/
-lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 boot -&gt; /dev/block/boot
-lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 bootloader -&gt; /dev/block/bootloader
-drwxr-xr-x root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 by-num
-lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 cache -&gt; /dev/block/cache
-lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 crypt -&gt; /dev/block/crypt
-lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 data -&gt; /dev/block/data
-lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 env -&gt; /dev/block/env
-lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 instaboot -&gt; /dev/block/instaboot
-lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 logo -&gt; /dev/block/logo
-lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 misc -&gt; /dev/block/misc
-lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 mmcblk0 -&gt; /dev/block/mmcblk0
-lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 mmcblk0boot0 -&gt; /dev/block/mmcblk0boot0
-lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 mmcblk0boot1 -&gt; /dev/block/mmcblk0boot1
-lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 mmcblk0rpmb -&gt; /dev/block/mmcblk0rpmb
-lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 recovery -&gt; /dev/block/recovery
-lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 reserved -&gt; /dev/block/reserved
-lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 rsv -&gt; /dev/block/rsv
-lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 system -&gt; /dev/block/system
-lrwxrwxrwx root     root              <span class="m">2015</span>-01-01 <span class="m">00</span>:00 tee -&gt; /dev/block/tee
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>root@p200:/#<span class="w"> </span>ls<span class="w"> </span>-l<span class="w"> </span>/dev/block/platform/d0074000.emmc/
+lrwxrwxrwx<span class="w"> </span>root<span class="w">     </span>root<span class="w">              </span><span class="m">2015</span>-01-01<span class="w"> </span><span class="m">00</span>:00<span class="w"> </span>boot<span class="w"> </span>-&gt;<span class="w"> </span>/dev/block/boot
+lrwxrwxrwx<span class="w"> </span>root<span class="w">     </span>root<span class="w">              </span><span class="m">2015</span>-01-01<span class="w"> </span><span class="m">00</span>:00<span class="w"> </span>bootloader<span class="w"> </span>-&gt;<span class="w"> </span>/dev/block/bootloader
+drwxr-xr-x<span class="w"> </span>root<span class="w">     </span>root<span class="w">              </span><span class="m">2015</span>-01-01<span class="w"> </span><span class="m">00</span>:00<span class="w"> </span>by-num
+lrwxrwxrwx<span class="w"> </span>root<span class="w">     </span>root<span class="w">              </span><span class="m">2015</span>-01-01<span class="w"> </span><span class="m">00</span>:00<span class="w"> </span>cache<span class="w"> </span>-&gt;<span class="w"> </span>/dev/block/cache
+lrwxrwxrwx<span class="w"> </span>root<span class="w">     </span>root<span class="w">              </span><span class="m">2015</span>-01-01<span class="w"> </span><span class="m">00</span>:00<span class="w"> </span>crypt<span class="w"> </span>-&gt;<span class="w"> </span>/dev/block/crypt
+lrwxrwxrwx<span class="w"> </span>root<span class="w">     </span>root<span class="w">              </span><span class="m">2015</span>-01-01<span class="w"> </span><span class="m">00</span>:00<span class="w"> </span>data<span class="w"> </span>-&gt;<span class="w"> </span>/dev/block/data
+lrwxrwxrwx<span class="w"> </span>root<span class="w">     </span>root<span class="w">              </span><span class="m">2015</span>-01-01<span class="w"> </span><span class="m">00</span>:00<span class="w"> </span>env<span class="w"> </span>-&gt;<span class="w"> </span>/dev/block/env
+lrwxrwxrwx<span class="w"> </span>root<span class="w">     </span>root<span class="w">              </span><span class="m">2015</span>-01-01<span class="w"> </span><span class="m">00</span>:00<span class="w"> </span>instaboot<span class="w"> </span>-&gt;<span class="w"> </span>/dev/block/instaboot
+lrwxrwxrwx<span class="w"> </span>root<span class="w">     </span>root<span class="w">              </span><span class="m">2015</span>-01-01<span class="w"> </span><span class="m">00</span>:00<span class="w"> </span>logo<span class="w"> </span>-&gt;<span class="w"> </span>/dev/block/logo
+lrwxrwxrwx<span class="w"> </span>root<span class="w">     </span>root<span class="w">              </span><span class="m">2015</span>-01-01<span class="w"> </span><span class="m">00</span>:00<span class="w"> </span>misc<span class="w"> </span>-&gt;<span class="w"> </span>/dev/block/misc
+lrwxrwxrwx<span class="w"> </span>root<span class="w">     </span>root<span class="w">              </span><span class="m">2015</span>-01-01<span class="w"> </span><span class="m">00</span>:00<span class="w"> </span>mmcblk0<span class="w"> </span>-&gt;<span class="w"> </span>/dev/block/mmcblk0
+lrwxrwxrwx<span class="w"> </span>root<span class="w">     </span>root<span class="w">              </span><span class="m">2015</span>-01-01<span class="w"> </span><span class="m">00</span>:00<span class="w"> </span>mmcblk0boot0<span class="w"> </span>-&gt;<span class="w"> </span>/dev/block/mmcblk0boot0
+lrwxrwxrwx<span class="w"> </span>root<span class="w">     </span>root<span class="w">              </span><span class="m">2015</span>-01-01<span class="w"> </span><span class="m">00</span>:00<span class="w"> </span>mmcblk0boot1<span class="w"> </span>-&gt;<span class="w"> </span>/dev/block/mmcblk0boot1
+lrwxrwxrwx<span class="w"> </span>root<span class="w">     </span>root<span class="w">              </span><span class="m">2015</span>-01-01<span class="w"> </span><span class="m">00</span>:00<span class="w"> </span>mmcblk0rpmb<span class="w"> </span>-&gt;<span class="w"> </span>/dev/block/mmcblk0rpmb
+lrwxrwxrwx<span class="w"> </span>root<span class="w">     </span>root<span class="w">              </span><span class="m">2015</span>-01-01<span class="w"> </span><span class="m">00</span>:00<span class="w"> </span>recovery<span class="w"> </span>-&gt;<span class="w"> </span>/dev/block/recovery
+lrwxrwxrwx<span class="w"> </span>root<span class="w">     </span>root<span class="w">              </span><span class="m">2015</span>-01-01<span class="w"> </span><span class="m">00</span>:00<span class="w"> </span>reserved<span class="w"> </span>-&gt;<span class="w"> </span>/dev/block/reserved
+lrwxrwxrwx<span class="w"> </span>root<span class="w">     </span>root<span class="w">              </span><span class="m">2015</span>-01-01<span class="w"> </span><span class="m">00</span>:00<span class="w"> </span>rsv<span class="w"> </span>-&gt;<span class="w"> </span>/dev/block/rsv
+lrwxrwxrwx<span class="w"> </span>root<span class="w">     </span>root<span class="w">              </span><span class="m">2015</span>-01-01<span class="w"> </span><span class="m">00</span>:00<span class="w"> </span>system<span class="w"> </span>-&gt;<span class="w"> </span>/dev/block/system
+lrwxrwxrwx<span class="w"> </span>root<span class="w">     </span>root<span class="w">              </span><span class="m">2015</span>-01-01<span class="w"> </span><span class="m">00</span>:00<span class="w"> </span>tee<span class="w"> </span>-&gt;<span class="w"> </span>/dev/block/tee
+</code></pre></div>
 
 <div>While the&nbsp;<i>tee</i> partition (Trusted Execution
 Environment) turns out to be empty, the <i>bootloader</i> partition
 contains several bootloaders. But not the BootROM&nbsp;because it's
 stored in the SoC, not the flash.</div>
-
 <h2>(Fail at) Reading the BootROM</h2>
-
 <p>Since we have root permissions and a potential memory address for
 the BootROM, we can try to read it directly. The provided Android
 ROM contains a handy debugfs interface to peek &amp; poke physical
 memory from user-land:<br></p>
-<div class="highlight"><pre><span></span>root@p200:/# <span class="nb">echo</span> <span class="s2">&quot;d0070000&quot;</span> &gt;/sys/kernel/debug/aml_reg/paddr               
-root@p200:/# cat /sys/kernel/debug/aml_reg/paddr                             
-<span class="o">[</span>0xd0070000<span class="o">]</span> <span class="o">=</span> 0x1000254
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>root@p200:/#<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;d0070000&quot;</span><span class="w"> </span>&gt;/sys/kernel/debug/aml_reg/paddr<span class="w">               </span>
+root@p200:/#<span class="w"> </span>cat<span class="w"> </span>/sys/kernel/debug/aml_reg/paddr<span class="w">                             </span>
+<span class="o">[</span>0xd0070000<span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>0x1000254
+</code></pre></div>
 
 <div>This <i>aml_reg</i> driver uses the <i>ioremap</i> kernel
 function to set up an appropriate kernel page-table mapping for the
 requested address.</div>
-
 <div><br></div>
-
 <div>However, if we try to read the
 hypothetical&nbsp;BootROM&nbsp;area:</div>
 
-<div class="highlight"><pre><span></span>root@p200:/# <span class="nb">echo</span> <span class="s2">&quot;d9040000&quot;</span> &gt;/sys/kernel/debug/aml_reg/paddr
-root@p200:/# cat /sys/kernel/debug/aml_reg/paddr
-<span class="o">[</span>  <span class="m">376</span>.546491@0<span class="o">]</span> Unhandled fault: synchronous external abort <span class="o">(</span>0x96000010<span class="o">)</span> at 0xffffff80001aa000
-<span class="o">[</span>  <span class="m">376</span>.549396@0<span class="o">]</span> Internal error: : <span class="m">96000010</span> <span class="o">[</span><span class="c1">#1] PREEMPT SMP</span>
-<span class="o">[</span>  <span class="m">376</span>.554712@0<span class="o">]</span> Modules linked in: dwc_otg dhd<span class="o">(</span>O<span class="o">)</span> aml_thermal<span class="o">(</span>O<span class="o">)</span> mali<span class="o">(</span>O<span class="o">)</span> aml_nftl_dev<span class="o">(</span>PO<span class="o">)</span>
-</pre></div>
+<div class="highlight"><pre><span></span><code>root@p200:/#<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;d9040000&quot;</span><span class="w"> </span>&gt;/sys/kernel/debug/aml_reg/paddr
+root@p200:/#<span class="w"> </span>cat<span class="w"> </span>/sys/kernel/debug/aml_reg/paddr
+<span class="o">[</span><span class="w">  </span><span class="m">376</span>.546491@0<span class="o">]</span><span class="w"> </span>Unhandled<span class="w"> </span>fault:<span class="w"> </span>synchronous<span class="w"> </span>external<span class="w"> </span>abort<span class="w"> </span><span class="o">(</span>0x96000010<span class="o">)</span><span class="w"> </span>at<span class="w"> </span>0xffffff80001aa000
+<span class="o">[</span><span class="w">  </span><span class="m">376</span>.549396@0<span class="o">]</span><span class="w"> </span>Internal<span class="w"> </span>error:<span class="w"> </span>:<span class="w"> </span><span class="m">96000010</span><span class="w"> </span><span class="o">[</span><span class="c1">#1] PREEMPT SMP</span>
+<span class="o">[</span><span class="w">  </span><span class="m">376</span>.554712@0<span class="o">]</span><span class="w"> </span>Modules<span class="w"> </span>linked<span class="w"> </span><span class="k">in</span>:<span class="w"> </span>dwc_otg<span class="w"> </span>dhd<span class="o">(</span>O<span class="o">)</span><span class="w"> </span>aml_thermal<span class="o">(</span>O<span class="o">)</span><span class="w"> </span>mali<span class="o">(</span>O<span class="o">)</span><span class="w"> </span>aml_nftl_dev<span class="o">(</span>PO<span class="o">)</span>
+</code></pre></div>
 
-
-<p>&nbsp;
+<p>&nbsp;</p>
 <div>The kernel crashes. So either the&nbsp;BootROM&nbsp;address is
 wrong or this memory area is set as <a href=
 "http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.prd29-genc-009492c/ch03s03s02.html">
@@ -268,7 +319,7 @@ Firmware (ATF)</a> reference implementation.</div>
 <tbody>
 <tr>
 <td style="text-align: center;">
-<img alt="ARM Trusted Firmware Design" src="https://fredericb.info/blog/amlogic-sb/securebootflow.png">
+<img src="https://fredericb.info/blog/amlogic-sb/securebootflow.png" alt="ARM Trusted Firmware Design">
 </td>
 </tr>
 <tr>
@@ -305,7 +356,7 @@ U-Boot 2015.01-ga9e9562-dirty (May 06 2016 - 03:36:02)</blockquote>
 So at this point we are already locked out of the Secure World.
 Next.<br>
 <h2>SMC interface</h2>
-Secure &amp; Non-Secure Worlds can communicate through the ARM Secure
+Secure & Non-Secure Worlds can communicate through the ARM Secure
 Monitor Call (SMC). When a core executes the SMC instruction, it
 switches to Secure Monitor mode (exception level EL3).</div>
 <div>In the ATF design, the code that runs in EL3 is named the Boot
@@ -325,7 +376,8 @@ from Normal World:<br>
 <tbody>
 <tr>
 <td style="text-align: center;">
-<img alt="" src="https://fredericb.info/blog/amlogic-sb/rt_svc_descs.png">
+<img src="https://fredericb.info/blog/amlogic-sb/rt_svc_descs.png" alt="Registered
+services in BL31 image">
 </td>
 </tr>
 <tr>
@@ -344,7 +396,8 @@ several custom functions developed by Amlogic:<br>
 <tbody>
 <tr>
 <td style="text-align: center;">
-<img alt="" src="https://fredericb.info/blog/amlogic-sb/sip_svc_plat_ops.png">
+<img src="https://fredericb.info/blog/amlogic-sb/sip_svc_plat_ops.png" alt="List of handlers
+in the SIP service">
 </td>
 </tr>
 <tr>
@@ -355,7 +408,7 @@ in the SIP service</td>
 </table>
 At first glance, functions&nbsp;<i>hdcp22_sec_read_reg</i>
 &amp;&nbsp;<i>hdcp22_sec_write_reg</i> look promising because they
-are read &amp; write primitives for the secure memory. However, they
+are read & write primitives for the secure memory. However, they
 strictly restrict access to specific memory ranges:<br>
 <div class="separator" style="clear: both; text-align: center;">
 </div>
@@ -365,7 +418,7 @@ strictly restrict access to specific memory ranges:<br>
 <tbody>
 <tr>
 <td style="text-align: center;">
-<img alt="" src="https://fredericb.info/blog/amlogic-sb/hdcp22_sec_read_reg.png">
+<img src="https://fredericb.info/blog/amlogic-sb/hdcp22_sec_read_reg.png" alt="Function hdcp22_sec_read_reg decompiled">
 </td>
 </tr>
 <tr>
@@ -408,7 +461,7 @@ Fortunately, the BL2 image is quite small: ~40KB. And we have some
 ideas to save time:</div>
 <div><span style="background-color: red;"><br></span>Like BL31, the
 BL2 image follows the ATF code logic, so reverse engineering
-efforts are a bit simplified: we can quickly spot main functions &amp;
+efforts are a bit simplified: we can quickly spot main functions &
 structures defined in the ATF code base.</div>
 <div><br></div>
 <div>Another RE trick is to identify the memory-mapped devices
@@ -424,7 +477,7 @@ Finally, we don't want to spend time reversing open source code,
 especially cryptographic code because the task is quite hard. And
 since it's also complex from the developer perspective, we can
 expect they used a library, which may be open source. So we looked
-for similarities in function prototypes, call sequence &amp;
+for similarities in function prototypes, call sequence &
 initialization of context structures between BL2 code and few
 potential OSS libraries. In our case, we quickly figured out that
 the&nbsp;cryptographic&nbsp;code comes from the <a href=
@@ -438,32 +491,33 @@ constant <i>magic</i> value "<b>@AML</b>". This helps to quickly
 locate the parsing code in the BL2 binary.<br>
 We combine "guessing" (i.e. looking at the BL31 header in a hex
 editor) and reverse engineering of the BL2 parsing code to figure
-out some members of the header structure:<br></p>
-<div class="highlight"><pre><span></span><span class="k">struct</span> <span class="n">aml_img_header</span> <span class="p">{</span>
-  <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">magic</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span><span class="c1">// &quot;@AML&quot;</span>
-  <span class="kt">uint32_t</span> <span class="n">total_len</span><span class="p">;</span>
-  <span class="kt">uint8_t</span> <span class="n">header_len</span><span class="p">;</span>
-  <span class="kt">uint8_t</span> <span class="n">unk_x9</span><span class="p">;</span>
-  <span class="kt">uint8_t</span> <span class="n">unk_xA</span><span class="p">;</span>
-  <span class="kt">uint8_t</span> <span class="n">unk_xB</span><span class="p">;</span>
-  <span class="kt">uint32_t</span> <span class="n">unk_xC</span><span class="p">;</span>
-  <span class="kt">uint32_t</span> <span class="n">sig_type</span><span class="p">;</span>
-  <span class="kt">uint32_t</span> <span class="n">sig_offset</span><span class="p">;</span>
-  <span class="kt">uint32_t</span> <span class="n">sig_size</span><span class="p">;</span>
-  <span class="kt">uint32_t</span> <span class="n">data_offset</span><span class="p">;</span>
-  <span class="kt">uint32_t</span> <span class="n">unk_x20</span><span class="p">;</span>
-  <span class="kt">uint32_t</span> <span class="n">cert_offset</span><span class="p">;</span>
-  <span class="kt">uint32_t</span> <span class="n">cert_size</span><span class="p">;</span>
-  <span class="kt">uint32_t</span> <span class="n">data_len</span><span class="p">;</span>
-  <span class="kt">uint32_t</span> <span class="n">unk_x30</span><span class="p">;</span>
-  <span class="kt">uint32_t</span> <span class="n">code_offset</span><span class="p">;</span>
-  <span class="kt">uint32_t</span> <span class="n">code_len</span><span class="p">;</span>
-  <span class="kt">uint32_t</span> <span class="n">unk_x3C</span><span class="p">;</span>
-<span class="p">}</span> <span class="n">aml_img_header_t</span><span class="p">;</span>
-</pre></div>
+out some members of the header structure:<br>
+
+<div class="highlight"><pre><span></span><code><span class="k">struct</span><span class="w"> </span><span class="nc">aml_img_header</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">magic</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span><span class="c1">// &quot;@AML&quot;</span>
+<span class="w">  </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">total_len</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">header_len</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">unk_x9</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">unk_xA</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">unk_xB</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">unk_xC</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">sig_type</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">sig_offset</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">sig_size</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">data_offset</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">unk_x20</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">cert_offset</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">cert_size</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">data_len</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">unk_x30</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">code_offset</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">code_len</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">unk_x3C</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="n">aml_img_header_t</span><span class="p">;</span>
+</code></pre></div>
 
 
-<p>The header indicates that the image is split in 4 parts:<br>
+The header indicates that the image is split in 4 parts:<br>
 <ul>
 <li>header : always 64 bytes</li>
 <li>signature : RSA-1024, RSA-2048, RSA-4096 or SHA-256</li>
@@ -475,20 +529,21 @@ On our target device, the signature type of the BL31 image
 because a SHA-256 hash alone is not enough to provide
 authentication.<br>
 The following pseudocode is the simplified algorithm of the
-authentication routine in BL2 :<br></p>
-<div class="highlight"><pre><span></span><span class="kt">int</span> <span class="nf">auth_image</span><span class="p">(</span><span class="n">aml_img_header_t</span> <span class="o">*</span><span class="n">img</span><span class="p">){</span>
-  <span class="n">validate_header</span><span class="p">(</span><span class="n">img</span><span class="p">);</span> <span class="c1">// checks on magic value &amp; header length</span>
-  <span class="n">hash</span> <span class="o">=</span> <span class="n">hash_sha256</span><span class="p">(</span><span class="n">img</span><span class="p">);</span><span class="c1">// hash whole image except signature</span>
-  <span class="k">if</span><span class="p">(</span><span class="n">img</span><span class="o">-&gt;</span><span class="n">sig_type</span> <span class="o">==</span> <span class="n">RSA</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="n">check_rsa_signature</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">hash</span><span class="p">)</span>
-  <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-    <span class="k">return</span> <span class="n">memcmp</span><span class="p">(</span><span class="n">hash</span><span class="p">,</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">img</span> <span class="o">+</span> <span class="p">(</span><span class="n">img</span><span class="o">-&gt;</span><span class="n">sig_offset</span><span class="p">));</span>
-  <span class="p">}</span>
+authentication routine in BL2 :<br>
+
+<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="nf">auth_image</span><span class="p">(</span><span class="n">aml_img_header_t</span><span class="w"> </span><span class="o">*</span><span class="n">img</span><span class="p">){</span>
+<span class="w">  </span><span class="n">validate_header</span><span class="p">(</span><span class="n">img</span><span class="p">);</span><span class="w"> </span><span class="c1">// checks on magic value &amp; header length</span>
+<span class="w">  </span><span class="n">hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hash_sha256</span><span class="p">(</span><span class="n">img</span><span class="p">);</span><span class="c1">// hash whole image except signature</span>
+<span class="w">  </span><span class="k">if</span><span class="p">(</span><span class="n">img</span><span class="o">-&gt;</span><span class="n">sig_type</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">RSA</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">check_rsa_signature</span><span class="p">(</span><span class="n">img</span><span class="p">,</span><span class="w"> </span><span class="n">hash</span><span class="p">)</span>
+<span class="w">  </span><span class="p">}</span><span class="k">else</span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">memcmp</span><span class="p">(</span><span class="n">hash</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">img</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">img</span><span class="o">-&gt;</span><span class="n">sig_offset</span><span class="p">));</span>
+<span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
+</code></pre></div>
 
 
-<p>We can confirm that the SHA-256 option will only hash the loaded
+We can confirm that the SHA-256 option will only hash the loaded
 image and compare the result against the precomputed hash in the
 same image. We could have imagined a more complex solution like a
 HMAC, but actually in this case only the integrity is checked,
@@ -515,7 +570,7 @@ thus obtain full access to secure memory.<br>
 <tbody>
 <tr>
 <td style="text-align: center;">
-<img alt="" src="https://fredericb.info/blog/amlogic-sb/bl31-hdcp22_sec_read_reg-asm-custom.png">
+<img src="https://fredericb.info/blog/amlogic-sb/bl31-hdcp22_sec_read_reg-asm-custom.png" alt="BL31 sec read">
 </td>
 </tr>
 <tr>
@@ -536,7 +591,8 @@ By default, the following memory regions are mapped:<br>
 <tbody>
 <tr>
 <td style="text-align: center;">
-<img alt="" src="https://fredericb.info/blog/amlogic-sb/plat_gxb_mmap.png">
+<img src="https://fredericb.info/blog/amlogic-sb/plat_gxb_mmap.png" alt="Original list of
+memory regions mapped in BL31">
 </td>
 </tr>
 <tr>
@@ -553,7 +609,7 @@ We extend the size of one of them to cover the BootROM region:<br>
 <tbody>
 <tr>
 <td style="text-align: center;">
-<img alt="" src="https://fredericb.info/blog/amlogic-sb/bl31-plat_gxb_mmap-custom.png">
+<img src="https://fredericb.info/blog/amlogic-sb/bl31-plat_gxb_mmap-custom.png">
 </td>
 </tr>
 <tr>
@@ -576,44 +632,46 @@ GitHub</a>.<br>
 Each bootloader is identified by an UUID, they are <a href=
 "https://github.com/ARM-software/arm-trusted-firmware/blob/master/include/common/firmware_image_package.h">
 defined in the ATF source code</a>. In our case, the BL31 image is
-entry #2:<br></p>
-<div class="highlight"><pre><span></span>$ ./aml_bootloader_tool ./dump/bootloader.img H <span class="m">2</span>
-fip_toc_header.name:        aa640001
-fip_toc_header.serial_number:        <span class="m">12345678</span>
-fip_toc_header.flags:        <span class="m">0</span>
-TOC ENTRY <span class="c1">#2</span>
-fip_toc_entry.uuid:        47D4086D4CFE98469B952950CBBD5A00
-fip_toc_entry.offset_address:    <span class="m">14000</span> <span class="o">(</span>absolute: 0x20000<span class="o">)</span>
-fip_toc_entry.size:        0x11130
-fip_toc_entry.flags:        0x0
-magic<span class="o">[</span>@0x0<span class="o">]</span>:        @AML
-total_len<span class="o">[</span>@0x4<span class="o">]</span>:    0x11130
-header_len<span class="o">[</span>@0x8<span class="o">]</span>:    0x40
-unk_xC<span class="o">[</span>@0xC<span class="o">]</span>:        0x5eec9094
-sig_type<span class="o">[</span>@0x10<span class="o">]</span>:    0x0
-sig_offset<span class="o">[</span>@0x14<span class="o">]</span>:    0x40
-sig_len<span class="o">[</span>@0x18<span class="o">]</span>:        0x20
-data_offset<span class="o">[</span>@0x1c<span class="o">]</span>:    0x60
-unk_x20<span class="o">[</span>@0x20<span class="o">]</span>:        0x0
-cert_offset<span class="o">[</span>@0x24<span class="o">]</span>:    0x60
-cert_len:        0x0
-data_len:        0x110d0
-unk_x30<span class="o">[</span>@0x30<span class="o">]</span>:        0x0
-code_offset<span class="o">[</span>@0x34<span class="o">]</span>:    0x60
-code_len<span class="o">[</span>@0x38<span class="o">]</span>:    0x110d0
-unk_x3C<span class="o">[</span>@0x3C<span class="o">]</span>:        0x0
-signature:        263BEFAFC5A051C550D31791EC1212576BE65DB8AD365074560F0BABC076D3CA
-computed_sha256:    35AD6B284EE2D6B5672DD0958592028D5BF455A6DCD1EB086D8336FB86533853
-</pre></div>
+entry #2:<br>
+
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>./aml_bootloader_tool<span class="w"> </span>./dump/bootloader.img<span class="w"> </span>H<span class="w"> </span><span class="m">2</span>
+fip_toc_header.name:<span class="w">        </span>aa640001
+fip_toc_header.serial_number:<span class="w">        </span><span class="m">12345678</span>
+fip_toc_header.flags:<span class="w">        </span><span class="m">0</span>
+TOC<span class="w"> </span>ENTRY<span class="w"> </span><span class="c1">#2</span>
+fip_toc_entry.uuid:<span class="w">        </span>47D4086D4CFE98469B952950CBBD5A00
+fip_toc_entry.offset_address:<span class="w">    </span><span class="m">14000</span><span class="w"> </span><span class="o">(</span>absolute:<span class="w"> </span>0x20000<span class="o">)</span>
+fip_toc_entry.size:<span class="w">        </span>0x11130
+fip_toc_entry.flags:<span class="w">        </span>0x0
+magic<span class="o">[</span>@0x0<span class="o">]</span>:<span class="w">        </span>@AML
+total_len<span class="o">[</span>@0x4<span class="o">]</span>:<span class="w">    </span>0x11130
+header_len<span class="o">[</span>@0x8<span class="o">]</span>:<span class="w">    </span>0x40
+unk_xC<span class="o">[</span>@0xC<span class="o">]</span>:<span class="w">        </span>0x5eec9094
+sig_type<span class="o">[</span>@0x10<span class="o">]</span>:<span class="w">    </span>0x0
+sig_offset<span class="o">[</span>@0x14<span class="o">]</span>:<span class="w">    </span>0x40
+sig_len<span class="o">[</span>@0x18<span class="o">]</span>:<span class="w">        </span>0x20
+data_offset<span class="o">[</span>@0x1c<span class="o">]</span>:<span class="w">    </span>0x60
+unk_x20<span class="o">[</span>@0x20<span class="o">]</span>:<span class="w">        </span>0x0
+cert_offset<span class="o">[</span>@0x24<span class="o">]</span>:<span class="w">    </span>0x60
+cert_len:<span class="w">        </span>0x0
+data_len:<span class="w">        </span>0x110d0
+unk_x30<span class="o">[</span>@0x30<span class="o">]</span>:<span class="w">        </span>0x0
+code_offset<span class="o">[</span>@0x34<span class="o">]</span>:<span class="w">    </span>0x60
+code_len<span class="o">[</span>@0x38<span class="o">]</span>:<span class="w">    </span>0x110d0
+unk_x3C<span class="o">[</span>@0x3C<span class="o">]</span>:<span class="w">        </span>0x0
+signature:<span class="w">        </span>263BEFAFC5A051C550D31791EC1212576BE65DB8AD365074560F0BABC076D3CA
+computed_sha256:<span class="w">    </span>35AD6B284EE2D6B5672DD0958592028D5BF455A6DCD1EB086D8336FB86533853
+</code></pre></div>
 
 
-<p>The hash of the BL31 image has been updated, we can now reflash the
-dump on the device:<br></p>
-<div class="highlight"><pre><span></span>$ dd <span class="k">if</span><span class="o">=</span>./bootloader.img <span class="nv">of</span><span class="o">=</span>/dev/block/bootloader
-</pre></div>
+The hash of the BL31 image has been updated, we can now reflash the
+dump on the device:<br>
+
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>./bootloader.img<span class="w"> </span><span class="nv">of</span><span class="o">=</span>/dev/block/bootloader
+</code></pre></div>
 
 
-<p>Finally, we reboot the device to load our customized BL31 image in
+Finally, we reboot the device to load our customized BL31 image in
 TrustZone.<br>
 <h2>Dumping the BootROM</h2>
 The SMC system call can only be invoked from EL1 and above. So we
@@ -629,11 +687,12 @@ file&nbsp;<i>/sys/kernel/debug/aml_smc/smc</i>. The first argument
 is the ID of the called SMC function (0x82000018 in the case
 of&nbsp;<i>hdcp22_sec_read_reg</i>). The second argument (for this
 specific SMC ID) is the read memory address. The result DWORD is
-directly printed in kernel logs (we said dirty).<br></p>
-<div class="highlight"><pre><span></span>$ insmod ./smc_access.ko
-$ <span class="nb">echo</span> <span class="m">82000018</span> D9040000 &gt; /sys/kernel/debug/aml_smc/smc
-<span class="o">[</span>  <span class="m">219</span>.092948@0<span class="o">]</span> smc_access: SMC call <span class="m">82000018</span> returns: aa1f03e0
-</pre></div>
+directly printed in kernel logs (we said dirty).<br>
+
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>insmod<span class="w"> </span>./smc_access.ko
+$<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="m">82000018</span><span class="w"> </span>D9040000<span class="w"> </span>&gt;<span class="w"> </span>/sys/kernel/debug/aml_smc/smc
+<span class="o">[</span><span class="w">  </span><span class="m">219</span>.092948@0<span class="o">]</span><span class="w"> </span>smc_access:<span class="w"> </span>SMC<span class="w"> </span>call<span class="w"> </span><span class="m">82000018</span><span class="w"> </span>returns:<span class="w"> </span>aa1f03e0
+</code></pre></div>
 
 
 <div>The result <b>aa1f03e0</b> is promising, it corresponds to the
@@ -641,52 +700,51 @@ ARM instruction:&nbsp;<b>MOV &nbsp;X0, XZR</b><br>
 To automate the extraction of the entire BootROM memory region, we
 create a simple script:</div>
 
-<div class="highlight"><pre><span></span>$ seq -f %1.f 0xD9040000 0x4 0xD9050000 <span class="p">|</span> xargs <span class="nb">printf</span> <span class="s2">&quot;echo \&quot;82000018 %x\&quot; &gt; /sys/kernel/debug/aml_smc/smc\n&quot;</span>
-<span class="nb">echo</span> <span class="s2">&quot;82000018 d9040000&quot;</span> &gt; /sys/kernel/debug/aml_smc/smc
-<span class="nb">echo</span> <span class="s2">&quot;82000018 d9040004&quot;</span> &gt; /sys/kernel/debug/aml_smc/smc
-<span class="nb">echo</span> <span class="s2">&quot;82000018 d9040008&quot;</span> &gt; /sys/kernel/debug/aml_smc/smc
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>seq<span class="w"> </span>-f<span class="w"> </span>%1.f<span class="w"> </span>0xD9040000<span class="w"> </span>0x4<span class="w"> </span>0xD9050000<span class="w"> </span><span class="p">|</span><span class="w"> </span>xargs<span class="w"> </span><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;echo \&quot;82000018 %x\&quot; &gt; /sys/kernel/debug/aml_smc/smc\n&quot;</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;82000018 d9040000&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>/sys/kernel/debug/aml_smc/smc
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;82000018 d9040004&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>/sys/kernel/debug/aml_smc/smc
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;82000018 d9040008&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>/sys/kernel/debug/aml_smc/smc
 <span class="o">[</span>...<span class="o">]</span>
-<span class="nb">echo</span> <span class="s2">&quot;82000018 d904fff8&quot;</span> &gt; /sys/kernel/debug/aml_smc/smc
-<span class="nb">echo</span> <span class="s2">&quot;82000018 d904fffc&quot;</span> &gt; /sys/kernel/debug/aml_smc/smc
-</pre></div>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;82000018 d904fff8&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>/sys/kernel/debug/aml_smc/smc
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;82000018 d904fffc&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>/sys/kernel/debug/aml_smc/smc
+</code></pre></div>
 
 
 <div>And finally, we concate all these DWORDS into a file
 <b>bootrom.bin</b>.&nbsp;</div>
 
-<div class="highlight"><pre><span></span>$ ls -l ./bootrom.bin
--rw-r--r-- <span class="m">1</span> user user <span class="m">65537</span> juil.  <span class="m">8</span> <span class="m">12</span>:43 ./bootrom.bin
-$ sha1sum bootrom.bin
-bff0c7fb88b4f03e732dc7a4ce504d748d0d47dd  bootrom.bin
-$ strings bootrom.bin <span class="p">|</span>tail -22
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>ls<span class="w"> </span>-l<span class="w"> </span>./bootrom.bin
+-rw-r--r--<span class="w"> </span><span class="m">1</span><span class="w"> </span>user<span class="w"> </span>user<span class="w"> </span><span class="m">65537</span><span class="w"> </span>juil.<span class="w">  </span><span class="m">8</span><span class="w"> </span><span class="m">12</span>:43<span class="w"> </span>./bootrom.bin
+$<span class="w"> </span>sha1sum<span class="w"> </span>bootrom.bin
+bff0c7fb88b4f03e732dc7a4ce504d748d0d47dd<span class="w">  </span>bootrom.bin
+$<span class="w"> </span>strings<span class="w"> </span>bootrom.bin<span class="w"> </span><span class="p">|</span>tail<span class="w"> </span>-22
 BL1:
 FEAT
 READ
 EMMC
 NAND
 LOOP
-auth failed, reboot...
+auth<span class="w"> </span>failed,<span class="w"> </span>reboot...
 08dafda0fd31778
 glacier.amlogic
 qian
 <span class="m">04</span>/14/15_14:23:08
-gcc version <span class="m">4</span>.8
+gcc<span class="w"> </span>version<span class="w"> </span><span class="m">4</span>.8
 08dafda0fd31778
 boot@USB
 boot@SDC
-BAD PASSWORD
+BAD<span class="w"> </span>PASSWORD
 !!!!
 vRQ&gt;
 8STs
 LwH<span class="err">&#39;</span>
 Err:sha
 <span class="m">0</span>!0
-</pre></div>
+</code></pre></div>
 
 
 <h2>Conclusion</h2>
-
-<p>The S905 SoC provides hardware features to support Secure Boot,
+The S905 SoC provides hardware features to support Secure Boot,
 however OEMs can still choose to enable it or not. But even when
 Secure Boot is enforced, a flaw in the current version of Amlogic's
 BL2 allows to bypass it. So Trusted Execution Environment cannot be
@@ -695,7 +753,7 @@ trusted. The good news is BL2 can be patched, unlike BootROM.<br>
 <i>I would like to thank @Karnalzi for the help!</i><br>
 <h2>Disclosure Timeline</h2>
 2016-08-08 : Flaw discovered<br>
-2016-08-08 : Amlogic &amp; some affected OEMs contacted by email to
+2016-08-08 : Amlogic & some affected OEMs contacted by email to
 find a security PoC<br>
 2016-08-10 : OEM #1 replies that "Amlogic doesn't provide any
 direct contact."<br>
@@ -703,7 +761,7 @@ direct contact."<br>
 2016-09-05 : Bug report shared with Amlogic<br>
 2016-09-13 : Status update requested<br>
 2016-09-25 : Status update requested<br>
-2016-10-05 : Public disclosure</div></p>
+2016-10-05 : Public disclosure</div>
   </div>
   <div class="tag-cloud">
     <p>
@@ -720,16 +778,25 @@ direct contact."<br>
 
 
 
-    <div class="addthis_relatedposts_inline">
+
 
 
 </article>
 
-    <footer>
+<footer>
 <p>
-  &copy;   - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+  &copy;   - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.en_US" target="_blank">Creative Commons Attribution-ShareAlike 4.0 International License</a>
 </p>
-<p>    Powered by <a href="http://getpelican.com" target="_blank">Pelican</a> - Theme <a href="https://github.com/alexandrevicenzi/flex" target="_blank">Flex</a>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+  <span class="footer-separator">|</span>
+  Switch to the <a href="javascript:void(0)" onclick="theme.switch(`dark`)">dark</a> | <a href="javascript:void(0)" onclick="theme.switch(`light`)">light</a> | <a href="javascript:void(0)" onclick="theme.switch(`browser`)">browser</a> theme
+  <script id="dark-theme-script"
+          src="https://fredericb.info/theme/dark-theme/dark-theme.min.js"
+          data-enable-auto-detect-theme="True"
+          data-default-theme="light"
+          type="text/javascript">
+  </script>
 </p><p>
   <a rel="license"
      href="http://creativecommons.org/licenses/by-sa/4.0/"
@@ -737,15 +804,11 @@ direct contact."<br>
     <img alt="Creative Commons License"
          title="Creative Commons License"
          style="border-width:0"
-         src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+           src="https://fredericb.info/theme/img/cc/by-sa.png"
          width="80"
          height="15"/>
   </a>
-</p>    </footer>
-  </main>
-
-
-
+</p></footer>  </main>
 
 <script type="application/ld+json">
 {
@@ -753,10 +816,27 @@ direct contact."<br>
   "@type" : "Blog",
   "name": " fred's notes ",
   "url" : "https://fredericb.info",
-  "image": "/resources/sitelogo.jpg",
+  "image": "/sitelogo.jpg",
   "description": "Frédéric's Thoughts and Writings"
 }
-</script>
+</script><a href="https://github.com/frederic" target="_blank" class="github-corner" aria-label="View source on Github">
+    <svg width="80"
+         height="80"
+         viewBox="0 0 250 250"
+         style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;"
+         aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor"
+              style="transform-origin: 130px 106px;"
+              class="octo-arm">
+        </path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor"
+              class="octo-body">
+        </path>
+    </svg>
+</a>
 
 </body>
 </html>

@@ -2,110 +2,169 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
-
-    <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/stylesheet/style.min.css">
-
-  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/pygments/github.min.css">
-  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/font-awesome/css/font-awesome.min.css">
-
-
-    <link href="https://fredericb.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="fred's notes Atom">
-
-
-    <link rel="shortcut icon" href="/resources/favicon.ico" type="image/x-icon">
-    <link rel="icon" href="/resources/favicon.ico" type="image/x-icon">
-
-
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="HandheldFriendly" content="True" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="robots" content="" />
+  <meta name="robots" content="index, follow" />
 
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/stylesheet/style.min.css">
+
+    <link id="dark-theme-style" rel="stylesheet" type="text/css"
+          media="(prefers-color-scheme: dark)"
+    href="https://fredericb.info/theme/stylesheet/dark-theme.min.css">
+
+    <link id="pygments-dark-theme" rel="stylesheet" type="text/css"
+              media="(prefers-color-scheme: dark)"
+          href="https://fredericb.info/theme/pygments/monokai.min.css">
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+              media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)"
+          href="https://fredericb.info/theme/pygments/monokai.min.css">
+
+
+
+  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/font-awesome/css/solid.css">
+
+
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <!-- Chrome, Firefox OS and Opera -->
+  <meta name="theme-color" content="#333333">
+  <!-- Windows Phone -->
+  <meta name="msapplication-navbutton-color" content="#333333">
+  <!-- iOS Safari -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <!-- Microsoft EDGE -->
+  <meta name="msapplication-TileColor" content="#333333">
+
+  <link href="https://fredericb.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="fred's notes Atom">
+
+
+
+ 
 
     <meta name="author" content="Frédéric" />
     <meta name="description" content="Frédéric's Thoughts and Writings" />
-<meta property="og:site_name" content="fred's notes"/>
-<meta property="og:type" content="blog"/>
-<meta property="og:title" content="fred's notes"/>
-<meta property="og:description" content="Frédéric's Thoughts and Writings"/>
-<meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="https://fredericb.info"/>
-<meta property="og:image" content="/resources/sitelogo.jpg">
+  <meta property="og:site_name" content="fred's notes"/>
+  <meta property="og:type" content="blog"/>
+  <meta property="og:title" content="fred's notes"/>
+  <meta property="og:description" content="Frédéric's Thoughts and Writings"/>
+  <meta property="og:locale" content="en_US"/>
+  <meta property="og:url" content="https://fredericb.info"/>
+  <meta property="og:image" content="/sitelogo.jpg">
 
-  <title>fred's notes &ndash;     Tag kernel
-</title>
+  <title>fred's notes &ndash; Tag kernel</title>
+
 
 </head>
-<body>
-  <aside>
-    <div>
-      <a href="/">
-        <img src="/resources/sitelogo.jpg" alt="fred's notes" title="fred's notes">
-      </a>
-      <h1><a href="/">fred's notes</a></h1>
+<body >
 
-<p>Security & Stuff</p>
-      <nav>
-        <ul class="list">
-          <li><a href="https://fredericb.info/category/advisory.html">Advisory</a></li>
-          <li><a href="https://fredericb.info/category/article.html">Article</a></li>
-          <li><a href="https://fredericb.info/category/tool.html">Tool</a></li>
-          <li><a href="https://fredericb.info/pages/contact.html#contact">Contact</a></li>
+<aside>
+  <div>
+    <a href="https://fredericb.info/">
+      <img src="/sitelogo.jpg" alt="fred's notes" title="fred's notes">
+    </a>
 
-        </ul>
-      </nav>
+    <h1>
+      <a href="https://fredericb.info/">fred's notes</a>
+    </h1>
 
-      <ul class="social">
-        <li><a class="sc-github" href="https://github.com/frederic" target="_blank"><i class="fa fa-github"></i></a></li>
-        <li><a class="sc-linkedin" href="https://www.linkedin.com/in/fredericbasse" target="_blank"><i class="fa fa-linkedin"></i></a></li>
-        <li><a class="sc-rss" href="/feeds/all.atom.xml" target="_blank"><i class="fa fa-rss"></i></a></li>
-      </ul>
-    </div>
+    <p>Security & Stuff</p>
 
-
-  </aside>
-  <main>
 
     <nav>
-      <a href="https://fredericb.info/">    Home
-</a>
+      <ul class="list">
 
-      <a href="/archives.html">Archives</a>
-      <a href="/categories.html">Categories</a>
-      <a href="/tags.html">Tags</a>
 
-      <a href="https://fredericb.info/feeds/all.atom.xml">    Atom
-</a>
+            <li>
+              <a target="_self"
+                 href="https://fredericb.info/pages/contact.html">
+                Contact
+              </a>
+            </li>
 
+          <li>
+            <a target="_self" href="/category/advisory.html" >advisory</a>
+          </li>
+          <li>
+            <a target="_self" href="/category/article.html" >article</a>
+          </li>
+          <li>
+            <a target="_self" href="/category/tool.html" >tool</a>
+          </li>
+      </ul>
     </nav>
+
+    <ul class="social">
+      <li>
+        <a class="sc-github"
+           href="https://github.com/frederic"
+           target="_blank">
+          <i class="fa-brands fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a class="sc-mastodon"
+rel="me"           href="https://infosec.exchange/@zeewox"
+           target="_blank">
+          <i class="fa-brands fa-mastodon"></i>
+        </a>
+      </li>
+      <li>
+        <a class="sc-rss"
+           href="/feeds/all.atom.xml"
+           target="_blank">
+          <i class="fa-solid fa-rss"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+</aside>
+  <main>
+
+<nav>
+  <a href="https://fredericb.info/">Home</a>
+
+  <a href="/archives.html">Archives</a>
+  <a href="/categories.html">Categories</a>
+  <a href="/tags.html">Tags</a>
+
+  <a href="https://fredericb.info/feeds/all.atom.xml">Atom</a>
+
+</nav>
 
 
 
 <article>
   <header>
-    <h2><a href="https://fredericb.info/2017/11/netgear-nighthawk-r7800-add-usb-camera-support-to-create-a-security-webcam.html#netgear-nighthawk-r7800-add-usb-camera-support-to-create-a-security-webcam">Netgear Nighthawk R7800 : add USB camera support to create a security webcam</a></h2>
+    <h2><a href="https://fredericb.info/2017/11/netgear-nighthawk-r7800-add-usb-camera-support-to-create-a-security-webcam.html">Netgear Nighthawk R7800 : add USB camera support to create a security webcam</a></h2>
     <p>
-          Posted on Wed 22 November 2017 in <a href="https://fredericb.info/category/article.html">Article</a>
+      Posted on Wed 22 November 2017 in <a href="https://fredericb.info/category/article.html">Article</a>
 
-
-          &#8226;     Tagged with
-
+          &#8226; Tagged with
               <a href="https://fredericb.info/tag/kernel.html">kernel</a>,              <a href="https://fredericb.info/tag/netgear.html">netgear</a>,              <a href="https://fredericb.info/tag/usb.html">usb</a>,              <a href="https://fredericb.info/tag/v4l2.html">v4l2</a>
     </p>
   </header>
   <div>
-      <p>This article explains how to customize Nighthawk X4S firmware to add a security camera feature to this always-online &amp; almost-always-idle device.
+      <div><p>This article explains how to customize Nighthawk X4S firmware to add a security camera feature to this always-online &amp; almost-always-idle device.
 Alternative firmwares like <a href="https://openwrt.org/">OpenWRT</a> or <a href="https://lede-project.org/">LEDE</a> exist, but they don't fully support all stock features yet. So instead this approach is based on modified stock firmware.</p>
 <p><img alt="Netgear Nighthawk X4S" src="https://fredericb.info/blog/r7800-custom/x4s.jpg">
 <img alt="Serious webcam" src="https://fredericb.info/blog/r7800-custom/webcam.jpg"></p>
 <p>Main steps are:</p>
 <ul>
-<li>Customize …</li></ul>
-      <br>
-      <a class="btn" href="https://fredericb.info/2017/11/netgear-nighthawk-r7800-add-usb-camera-support-to-create-a-security-webcam.html#netgear-nighthawk-r7800-add-usb-camera-support-to-create-a-security-webcam">    Continue reading
-</a>
+<li>Customize …</li></ul></div>
+        <br>
+        <a class="btn"
+           href="https://fredericb.info/2017/11/netgear-nighthawk-r7800-add-usb-camera-support-to-create-a-security-webcam.html">
+          Continue reading
+        </a>
   </div>
 </article>
 
@@ -114,12 +173,20 @@ Alternative firmwares like <a href="https://openwrt.org/">OpenWRT</a> or <a href
 
 
 
-
-    <footer>
+<footer>
 <p>
-  &copy;   - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+  &copy;   - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.en_US" target="_blank">Creative Commons Attribution-ShareAlike 4.0 International License</a>
 </p>
-<p>    Powered by <a href="http://getpelican.com" target="_blank">Pelican</a> - Theme <a href="https://github.com/alexandrevicenzi/flex" target="_blank">Flex</a>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+  <span class="footer-separator">|</span>
+  Switch to the <a href="javascript:void(0)" onclick="theme.switch(`dark`)">dark</a> | <a href="javascript:void(0)" onclick="theme.switch(`light`)">light</a> | <a href="javascript:void(0)" onclick="theme.switch(`browser`)">browser</a> theme
+  <script id="dark-theme-script"
+          src="https://fredericb.info/theme/dark-theme/dark-theme.min.js"
+          data-enable-auto-detect-theme="True"
+          data-default-theme="light"
+          type="text/javascript">
+  </script>
 </p><p>
   <a rel="license"
      href="http://creativecommons.org/licenses/by-sa/4.0/"
@@ -127,15 +194,11 @@ Alternative firmwares like <a href="https://openwrt.org/">OpenWRT</a> or <a href
     <img alt="Creative Commons License"
          title="Creative Commons License"
          style="border-width:0"
-         src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+           src="https://fredericb.info/theme/img/cc/by-sa.png"
          width="80"
          height="15"/>
   </a>
-</p>    </footer>
-  </main>
-
-
-
+</p></footer>  </main>
 
 <script type="application/ld+json">
 {
@@ -143,10 +206,27 @@ Alternative firmwares like <a href="https://openwrt.org/">OpenWRT</a> or <a href
   "@type" : "Blog",
   "name": " fred's notes ",
   "url" : "https://fredericb.info",
-  "image": "/resources/sitelogo.jpg",
+  "image": "/sitelogo.jpg",
   "description": "Frédéric's Thoughts and Writings"
 }
-</script>
+</script><a href="https://github.com/frederic" target="_blank" class="github-corner" aria-label="View source on Github">
+    <svg width="80"
+         height="80"
+         viewBox="0 0 250 250"
+         style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;"
+         aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor"
+              style="transform-origin: 130px 106px;"
+              class="octo-arm">
+        </path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor"
+              class="octo-body">
+        </path>
+    </svg>
+</a>
 
 </body>
 </html>

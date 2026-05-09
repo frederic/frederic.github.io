@@ -2,101 +2,161 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
-
-    <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/stylesheet/style.min.css">
-
-  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/pygments/github.min.css">
-  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/font-awesome/css/font-awesome.min.css">
-
-
-    <link href="https://fredericb.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="fred's notes Atom">
-
-
-    <link rel="shortcut icon" href="/resources/favicon.ico" type="image/x-icon">
-    <link rel="icon" href="/resources/favicon.ico" type="image/x-icon">
-
-
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="HandheldFriendly" content="True" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="robots" content="" />
+  <meta name="robots" content="index, follow" />
 
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/stylesheet/style.min.css">
+
+    <link id="dark-theme-style" rel="stylesheet" type="text/css"
+          media="(prefers-color-scheme: dark)"
+    href="https://fredericb.info/theme/stylesheet/dark-theme.min.css">
+
+    <link id="pygments-dark-theme" rel="stylesheet" type="text/css"
+              media="(prefers-color-scheme: dark)"
+          href="https://fredericb.info/theme/pygments/monokai.min.css">
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+              media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)"
+          href="https://fredericb.info/theme/pygments/monokai.min.css">
+
+
+
+  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/font-awesome/css/solid.css">
+
+
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <!-- Chrome, Firefox OS and Opera -->
+  <meta name="theme-color" content="#333333">
+  <!-- Windows Phone -->
+  <meta name="msapplication-navbutton-color" content="#333333">
+  <!-- iOS Safari -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <!-- Microsoft EDGE -->
+  <meta name="msapplication-TileColor" content="#333333">
+
+  <link href="https://fredericb.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="fred's notes Atom">
+
+
+
+ 
 
 <meta name="author" content="Frédéric" />
 <meta name="description" content="This article explains how to customize Nighthawk X4S firmware to add a security camera feature to this always-online &amp; almost-always-idle device. Alternative firmwares like OpenWRT or LEDE exist, but they don&#39;t fully support all stock features yet. So instead this approach is based on modified stock firmware. Main steps are: Customize …" />
 <meta name="keywords" content="kernel, netgear, usb, v4l2">
 
-<meta property="og:site_name" content="fred's notes"/>
-<meta property="og:title" content="Netgear Nighthawk R7800 : add USB camera support to create a security webcam"/>
-<meta property="og:description" content="This article explains how to customize Nighthawk X4S firmware to add a security camera feature to this always-online &amp; almost-always-idle device. Alternative firmwares like OpenWRT or LEDE exist, but they don&#39;t fully support all stock features yet. So instead this approach is based on modified stock firmware. Main steps are: Customize …"/>
-<meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="https://fredericb.info/2017/11/netgear-nighthawk-r7800-add-usb-camera-support-to-create-a-security-webcam.html"/>
-<meta property="og:type" content="article"/>
-<meta property="article:published_time" content="2017-11-22 00:00:00-08:00"/>
-<meta property="article:modified_time" content=""/>
-<meta property="article:author" content="https://fredericb.info/author/frederic.html">
-<meta property="article:section" content="Article"/>
-<meta property="article:tag" content="kernel"/>
-<meta property="article:tag" content="netgear"/>
-<meta property="article:tag" content="usb"/>
-<meta property="article:tag" content="v4l2"/>
-<meta property="og:image" content="/resources/sitelogo.jpg">
+
+  <meta property="og:site_name" content="fred's notes"/>
+  <meta property="og:title" content="Netgear Nighthawk R7800 : add USB camera support to create a security webcam"/>
+  <meta property="og:description" content="This article explains how to customize Nighthawk X4S firmware to add a security camera feature to this always-online &amp; almost-always-idle device. Alternative firmwares like OpenWRT or LEDE exist, but they don&#39;t fully support all stock features yet. So instead this approach is based on modified stock firmware. Main steps are: Customize …"/>
+  <meta property="og:locale" content="en_US"/>
+  <meta property="og:url" content="https://fredericb.info/2017/11/netgear-nighthawk-r7800-add-usb-camera-support-to-create-a-security-webcam.html"/>
+  <meta property="og:type" content="article"/>
+  <meta property="article:published_time" content="2017-11-22 00:00:00-08:00"/>
+  <meta property="article:modified_time" content=""/>
+  <meta property="article:author" content="https://fredericb.info/author/frederic.html">
+  <meta property="article:section" content="Article"/>
+  <meta property="article:tag" content="kernel"/>
+  <meta property="article:tag" content="netgear"/>
+  <meta property="article:tag" content="usb"/>
+  <meta property="article:tag" content="v4l2"/>
+  <meta property="og:image" content="/sitelogo.jpg">
 
   <title>fred's notes &ndash; Netgear Nighthawk R7800 : add USB camera support to create a security webcam</title>
 
+
 </head>
-<body>
-  <aside>
-    <div>
-      <a href="/">
-        <img src="/resources/sitelogo.jpg" alt="fred's notes" title="fred's notes">
-      </a>
-      <h1><a href="/">fred's notes</a></h1>
+<body >
 
-<p>Security & Stuff</p>
-      <nav>
-        <ul class="list">
-          <li><a href="https://fredericb.info/category/advisory.html">Advisory</a></li>
-          <li><a href="https://fredericb.info/category/article.html">Article</a></li>
-          <li><a href="https://fredericb.info/category/tool.html">Tool</a></li>
-          <li><a href="https://fredericb.info/pages/contact.html#contact">Contact</a></li>
+<aside>
+  <div>
+    <a href="https://fredericb.info/">
+      <img src="/sitelogo.jpg" alt="fred's notes" title="fred's notes">
+    </a>
 
-        </ul>
-      </nav>
+    <h1>
+      <a href="https://fredericb.info/">fred's notes</a>
+    </h1>
 
-      <ul class="social">
-        <li><a class="sc-github" href="https://github.com/frederic" target="_blank"><i class="fa fa-github"></i></a></li>
-        <li><a class="sc-linkedin" href="https://www.linkedin.com/in/fredericbasse" target="_blank"><i class="fa fa-linkedin"></i></a></li>
-        <li><a class="sc-rss" href="/feeds/all.atom.xml" target="_blank"><i class="fa fa-rss"></i></a></li>
-      </ul>
-    </div>
+    <p>Security & Stuff</p>
 
-
-  </aside>
-  <main>
 
     <nav>
-      <a href="https://fredericb.info/">    Home
-</a>
+      <ul class="list">
 
-      <a href="/archives.html">Archives</a>
-      <a href="/categories.html">Categories</a>
-      <a href="/tags.html">Tags</a>
 
-      <a href="https://fredericb.info/feeds/all.atom.xml">    Atom
-</a>
+            <li>
+              <a target="_self"
+                 href="https://fredericb.info/pages/contact.html">
+                Contact
+              </a>
+            </li>
 
+          <li>
+            <a target="_self" href="/category/advisory.html" >advisory</a>
+          </li>
+          <li>
+            <a target="_self" href="/category/article.html" >article</a>
+          </li>
+          <li>
+            <a target="_self" href="/category/tool.html" >tool</a>
+          </li>
+      </ul>
     </nav>
+
+    <ul class="social">
+      <li>
+        <a class="sc-github"
+           href="https://github.com/frederic"
+           target="_blank">
+          <i class="fa-brands fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a class="sc-mastodon"
+rel="me"           href="https://infosec.exchange/@zeewox"
+           target="_blank">
+          <i class="fa-brands fa-mastodon"></i>
+        </a>
+      </li>
+      <li>
+        <a class="sc-rss"
+           href="/feeds/all.atom.xml"
+           target="_blank">
+          <i class="fa-solid fa-rss"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+</aside>
+  <main>
+
+<nav>
+  <a href="https://fredericb.info/">Home</a>
+
+  <a href="/archives.html">Archives</a>
+  <a href="/categories.html">Categories</a>
+  <a href="/tags.html">Tags</a>
+
+  <a href="https://fredericb.info/feeds/all.atom.xml">Atom</a>
+
+</nav>
 
 <article class="single">
   <header>
       
     <h1 id="netgear-nighthawk-r7800-add-usb-camera-support-to-create-a-security-webcam">Netgear Nighthawk R7800 : add USB camera support to create a security webcam</h1>
     <p>
-          Posted on Wed 22 November 2017 in <a href="https://fredericb.info/category/article.html">Article</a>
-
+      Posted on Wed 22 November 2017 in <a href="https://fredericb.info/category/article.html">Article</a>
 
     </p>
   </header>
@@ -127,12 +187,12 @@ Alternative firmwares like <a href="https://openwrt.org/">OpenWRT</a> or <a href
 <p>Telnet access is protected with the same password as WebUI, and gives a root shell.</p>
 <h1>Backup all the things</h1>
 <p>Thanks to telnet access, we backup the original kernel partition on an external USB drive :</p>
-<div class="highlight"><pre><span></span>$ telnet <span class="m">192</span>.168.1.1
-Trying <span class="m">192</span>.168.1.1...
-Connected to <span class="m">192</span>.168.1.1.
-Escape character is <span class="s1">&#39;^]&#39;</span>.
- <span class="o">===</span> <span class="nv">LOGIN</span> <span class="o">===============================</span>
-  Please enter your password,It<span class="s1">&#39;s the same</span>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>telnet<span class="w"> </span><span class="m">192</span>.168.1.1
+Trying<span class="w"> </span><span class="m">192</span>.168.1.1...
+Connected<span class="w"> </span>to<span class="w"> </span><span class="m">192</span>.168.1.1.
+Escape<span class="w"> </span>character<span class="w"> </span>is<span class="w"> </span><span class="s1">&#39;^]&#39;</span>.
+<span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="nv">LOGIN</span><span class="w"> </span><span class="o">===============================</span>
+<span class="w">  </span>Please<span class="w"> </span>enter<span class="w"> </span>your<span class="w"> </span>password,It<span class="s1">&#39;s the same</span>
 <span class="s1">  with DUT login password</span>
 <span class="s1"> ------------------------------------------</span>
 <span class="s1">telnet password:JCVD4l1FE</span>
@@ -149,120 +209,109 @@ Escape character is <span class="s1">&#39;^]&#39;</span>.
 <span class="s1">   $MMMMM        MMMMM                MMMMMMMMMMM      MMM     MMM</span>
 <span class="s1">  MMMMMMMM     MM MMMMM.              MMMMM:MMMMMM:   MMMM   MMMMM</span>
 <span class="s1">MMMM= MMMMMM  MMM   MMMM       MMMMM   MMMM  MMMMMM   MMMM  MMMMM&#39;</span>
-<span class="nv">MMMM</span><span class="o">=</span>  MMMMM MMMM    MM       MMMMM    MMMM    MMMM   MMMMNMMMMM
-<span class="nv">MMMM</span><span class="o">=</span>   MMMM  MMMMM          MMMMM     MMMM    MMMM   MMMMMMMM
-<span class="nv">MMMM</span><span class="o">=</span>   MMMM   MMMMMM       MMMMM      MMMM    MMMM   MMMMMMMMM
-<span class="nv">MMMM</span><span class="o">=</span>   MMMM     MMMMM,    NMMMMMMMM   MMMM    MMMM   MMMMMMMMMMM
-<span class="nv">MMMM</span><span class="o">=</span>   MMMM      MMMMMM   MMMMMMMM    MMMM    MMMM   MMMM  MMMMMM
-<span class="nv">MMMM</span><span class="o">=</span>   MMMM   MM    MMMM    MMMM      MMMM    MMMM   MMMM    MMMM
-MMMM$ ,MMMMM  MMMMM  MMMM    MMM       MMMM   MMMMM   MMMM    MMMM
-  MMMMMMM:      MMMMMMM     M         MMMMMMMMMMMM  MMMMMMM MMMMMMM
-    MMMMMM       MMMMN     M           MMMMMMMMM      MMMM    MMMM
-     MMMM          M                    MMMMMMM        M       M
-       M
- ---------------------------------------------------------------
-   For those about to rock... <span class="o">(</span>%C, %R<span class="o">)</span>
- ---------------------------------------------------------------
-root@R7800:/# cat /proc/mtd <span class="p">|</span> grep kernel
-mtd5: <span class="m">00220000</span> <span class="m">00020000</span> <span class="s2">&quot;kernel&quot;</span>
+<span class="nv">MMMM</span><span class="o">=</span><span class="w">  </span>MMMMM<span class="w"> </span>MMMM<span class="w">    </span>MM<span class="w">       </span>MMMMM<span class="w">    </span>MMMM<span class="w">    </span>MMMM<span class="w">   </span>MMMMNMMMMM
+<span class="nv">MMMM</span><span class="o">=</span><span class="w">   </span>MMMM<span class="w">  </span>MMMMM<span class="w">          </span>MMMMM<span class="w">     </span>MMMM<span class="w">    </span>MMMM<span class="w">   </span>MMMMMMMM
+<span class="nv">MMMM</span><span class="o">=</span><span class="w">   </span>MMMM<span class="w">   </span>MMMMMM<span class="w">       </span>MMMMM<span class="w">      </span>MMMM<span class="w">    </span>MMMM<span class="w">   </span>MMMMMMMMM
+<span class="nv">MMMM</span><span class="o">=</span><span class="w">   </span>MMMM<span class="w">     </span>MMMMM,<span class="w">    </span>NMMMMMMMM<span class="w">   </span>MMMM<span class="w">    </span>MMMM<span class="w">   </span>MMMMMMMMMMM
+<span class="nv">MMMM</span><span class="o">=</span><span class="w">   </span>MMMM<span class="w">      </span>MMMMMM<span class="w">   </span>MMMMMMMM<span class="w">    </span>MMMM<span class="w">    </span>MMMM<span class="w">   </span>MMMM<span class="w">  </span>MMMMMM
+<span class="nv">MMMM</span><span class="o">=</span><span class="w">   </span>MMMM<span class="w">   </span>MM<span class="w">    </span>MMMM<span class="w">    </span>MMMM<span class="w">      </span>MMMM<span class="w">    </span>MMMM<span class="w">   </span>MMMM<span class="w">    </span>MMMM
+MMMM$<span class="w"> </span>,MMMMM<span class="w">  </span>MMMMM<span class="w">  </span>MMMM<span class="w">    </span>MMM<span class="w">       </span>MMMM<span class="w">   </span>MMMMM<span class="w">   </span>MMMM<span class="w">    </span>MMMM
+<span class="w">  </span>MMMMMMM:<span class="w">      </span>MMMMMMM<span class="w">     </span>M<span class="w">         </span>MMMMMMMMMMMM<span class="w">  </span>MMMMMMM<span class="w"> </span>MMMMMMM
+<span class="w">    </span>MMMMMM<span class="w">       </span>MMMMN<span class="w">     </span>M<span class="w">           </span>MMMMMMMMM<span class="w">      </span>MMMM<span class="w">    </span>MMMM
+<span class="w">     </span>MMMM<span class="w">          </span>M<span class="w">                    </span>MMMMMMM<span class="w">        </span>M<span class="w">       </span>M
+<span class="w">       </span>M
+<span class="w"> </span>---------------------------------------------------------------
+<span class="w">   </span>For<span class="w"> </span>those<span class="w"> </span>about<span class="w"> </span>to<span class="w"> </span>rock...<span class="w"> </span><span class="o">(</span>%C,<span class="w"> </span>%R<span class="o">)</span>
+<span class="w"> </span>---------------------------------------------------------------
+root@R7800:/#<span class="w"> </span>cat<span class="w"> </span>/proc/mtd<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>kernel
+mtd5:<span class="w"> </span><span class="m">00220000</span><span class="w"> </span><span class="m">00020000</span><span class="w"> </span><span class="s2">&quot;kernel&quot;</span>
 
-root@R7800:/# dd <span class="k">if</span><span class="o">=</span>/dev/mtdblock5 <span class="nv">of</span><span class="o">=</span>/mnt/sda1/kernel.img
-<span class="m">4352</span>+0 records in
-<span class="m">4352</span>+0 records out
-</pre></div>
-
+root@R7800:/#<span class="w"> </span>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/mtdblock5<span class="w"> </span><span class="nv">of</span><span class="o">=</span>/mnt/sda1/kernel.img
+<span class="m">4352</span>+0<span class="w"> </span>records<span class="w"> </span><span class="k">in</span>
+<span class="m">4352</span>+0<span class="w"> </span>records<span class="w"> </span>out
+</code></pre></div>
 
 <h1>Kernel</h1>
 <p>Netgear has released <a href="https://github.com/frederic/netgear-R7800-GPL">GPL source code</a> for the Linux kernel used in this device. 
 This copy on GitHub integrates few fixes to compile with newer GCC and V4L2 headers, and also the original kernel configuration dumped from live device.</p>
-<div class="highlight"><pre><span></span>$ git clone https://github.com/frederic/netgear-R7800-GPL.git
-$ <span class="nb">cd</span> netgear-R7800-GPL/
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/frederic/netgear-R7800-GPL.git
+$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>netgear-R7800-GPL/
+</code></pre></div>
 
 <h2>Build mkimage tool</h2>
 <p>The <em>mkimage</em> tool is used at the end of kernel building process to create the new kernel image partition for the device.</p>
-<div class="highlight"><pre><span></span>$ make tools/mkimage/install
- make<span class="o">[</span><span class="m">1</span><span class="o">]</span> tools/mkimage/install
- make<span class="o">[</span><span class="m">2</span><span class="o">]</span> -C tools/sed compile
- make<span class="o">[</span><span class="m">2</span><span class="o">]</span> -C tools/sed install
- make<span class="o">[</span><span class="m">2</span><span class="o">]</span> -C tools/mkimage compile
- make<span class="o">[</span><span class="m">2</span><span class="o">]</span> -C tools/mkimage install
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>make<span class="w"> </span>tools/mkimage/install
+<span class="w"> </span>make<span class="o">[</span><span class="m">1</span><span class="o">]</span><span class="w"> </span>tools/mkimage/install
+<span class="w"> </span>make<span class="o">[</span><span class="m">2</span><span class="o">]</span><span class="w"> </span>-C<span class="w"> </span>tools/sed<span class="w"> </span>compile
+<span class="w"> </span>make<span class="o">[</span><span class="m">2</span><span class="o">]</span><span class="w"> </span>-C<span class="w"> </span>tools/sed<span class="w"> </span>install
+<span class="w"> </span>make<span class="o">[</span><span class="m">2</span><span class="o">]</span><span class="w"> </span>-C<span class="w"> </span>tools/mkimage<span class="w"> </span>compile
+<span class="w"> </span>make<span class="o">[</span><span class="m">2</span><span class="o">]</span><span class="w"> </span>-C<span class="w"> </span>tools/mkimage<span class="w"> </span>install
+</code></pre></div>
 
 <p>Add freshly built <em>mkimage</em> binary to our PATH environment:</p>
-<div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$PWD</span>/build_dir/host/u-boot-2012.04.01/tools:<span class="nv">$PATH</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PWD</span>/build_dir/host/u-boot-2012.04.01/tools:<span class="nv">$PATH</span>
+</code></pre></div>
 
 <h2>Build Linux kernel</h2>
 <p>To build a kernel for this ARM-based device, we need to add a cross-compilation toolchain to our build environment :</p>
-<div class="highlight"><pre><span></span>$ git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-eabi-4.8
-$ <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$PWD</span>/arm-eabi-4.8/bin:<span class="nv">$PATH</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-eabi-4.8
+$<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PWD</span>/arm-eabi-4.8/bin:<span class="nv">$PATH</span>
+</code></pre></div>
 
 <p>Then we create a new kernel configuration based on the original one :</p>
-<div class="highlight"><pre><span></span>$ <span class="nb">cd</span> git_home/linux.git/sourcecode/
-$ make r7800_defconfig <span class="nv">ARCH</span><span class="o">=</span>arm <span class="nv">CROSS_COMPILE</span><span class="o">=</span>arm-eabi-
-$ make menuconfig <span class="nv">ARCH</span><span class="o">=</span>arm <span class="nv">CROSS_COMPILE</span><span class="o">=</span>arm-eabi-
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>git_home/linux.git/sourcecode/
+$<span class="w"> </span>make<span class="w"> </span>r7800_defconfig<span class="w"> </span><span class="nv">ARCH</span><span class="o">=</span>arm<span class="w"> </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span>arm-eabi-
+$<span class="w"> </span>make<span class="w"> </span>menuconfig<span class="w"> </span><span class="nv">ARCH</span><span class="o">=</span>arm<span class="w"> </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span>arm-eabi-
+</code></pre></div>
 
 <p>In the kernel configuration menu, we enable the following options to get V4L2 &amp; USB Video support :</p>
-<div class="highlight"><pre><span></span>Device Drivers ---&gt;
+<div class="highlight"><pre><span></span><code>Device Drivers ---&gt;
 -&gt; &lt;*&gt; Multimedia support ---&gt;
 --&gt; &lt;*&gt; Video For Linux
 --&gt; &lt;*&gt; Video capture adapters ---&gt;
 ---&gt; &lt;*&gt; V4L USB devices ---&gt;
 ----&gt; &lt;*&gt; USB Video Class (UVC)
 ----&gt; &lt;*&gt; GSPCA based webcams
-</pre></div>
-
+</code></pre></div>
 
 <p>For info, that should correspond to these options :</p>
-<div class="highlight"><pre><span></span>CONFIG_USB_VIDEO_CLASS=y
+<div class="highlight"><pre><span></span><code>CONFIG_USB_VIDEO_CLASS=y
 CONFIG_USB_GSPCA=y
 CONFIG_VIDEO_V4L2_COMMON=y
 CONFIG_VIDEO_V4L2=y
 CONFIG_V4L_USB_DRIVERS=y
-</pre></div>
-
+</code></pre></div>
 
 <p>Finally, we build the kernel image :</p>
-<div class="highlight"><pre><span></span>$ make -j8 uImage <span class="nv">ARCH</span><span class="o">=</span>arm <span class="nv">CROSS_COMPILE</span><span class="o">=</span>arm-eabi-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>make<span class="w"> </span>-j8<span class="w"> </span>uImage<span class="w"> </span><span class="nv">ARCH</span><span class="o">=</span>arm<span class="w"> </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span>arm-eabi-
 <span class="o">[</span>...<span class="o">]</span>
-  Kernel: arch/arm/boot/Image is ready
-  Kernel: arch/arm/boot/zImage is ready
-  UIMAGE  arch/arm/boot/uImage
-Image Name:   Linux-3.4.103
-Created:      Mon Jan <span class="m">29</span> <span class="m">23</span>:58:38 <span class="m">2018</span>
-Image Type:   ARM Linux Kernel Image <span class="o">(</span>uncompressed<span class="o">)</span>
-Data Size:    <span class="m">2210952</span> <span class="nv">Bytes</span> <span class="o">=</span> <span class="m">2159</span>.13 <span class="nv">kB</span> <span class="o">=</span> <span class="m">2</span>.11 MB
-Load Address: <span class="m">41508000</span>
-Entry Point:  <span class="m">41508000</span>
-  Image arch/arm/boot/uImage is ready
-</pre></div>
-
+<span class="w">  </span>Kernel:<span class="w"> </span>arch/arm/boot/Image<span class="w"> </span>is<span class="w"> </span>ready
+<span class="w">  </span>Kernel:<span class="w"> </span>arch/arm/boot/zImage<span class="w"> </span>is<span class="w"> </span>ready
+<span class="w">  </span>UIMAGE<span class="w">  </span>arch/arm/boot/uImage
+Image<span class="w"> </span>Name:<span class="w">   </span>Linux-3.4.103
+Created:<span class="w">      </span>Mon<span class="w"> </span>Jan<span class="w"> </span><span class="m">29</span><span class="w"> </span><span class="m">23</span>:58:38<span class="w"> </span><span class="m">2018</span>
+Image<span class="w"> </span>Type:<span class="w">   </span>ARM<span class="w"> </span>Linux<span class="w"> </span>Kernel<span class="w"> </span>Image<span class="w"> </span><span class="o">(</span>uncompressed<span class="o">)</span>
+Data<span class="w"> </span>Size:<span class="w">    </span><span class="m">2210952</span><span class="w"> </span><span class="nv">Bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2159</span>.13<span class="w"> </span><span class="nv">kB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span>.11<span class="w"> </span>MB
+Load<span class="w"> </span>Address:<span class="w"> </span><span class="m">41508000</span>
+Entry<span class="w"> </span>Point:<span class="w">  </span><span class="m">41508000</span>
+<span class="w">  </span>Image<span class="w"> </span>arch/arm/boot/uImage<span class="w"> </span>is<span class="w"> </span>ready
+</code></pre></div>
 
 <p>Output kernel image is <strong>arch/arm/boot/uImage</strong></p>
-<div class="highlight"><pre><span></span>$ file arch/arm/boot/uImage
-arch/arm/boot/uImage: u-boot legacy uImage, Linux-3.4.103, Linux/ARM, OS Kernel Image <span class="o">(</span>Not compressed<span class="o">)</span>, <span class="m">2210952</span> bytes, Tue Jan <span class="m">30</span> <span class="m">07</span>:58:38 <span class="m">2018</span>, Load Address: 0x41508000, Entry Point: 0x41508000, Header CRC: 0x81013485, Data CRC: 0xDEA9B00E
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>file<span class="w"> </span>arch/arm/boot/uImage
+arch/arm/boot/uImage:<span class="w"> </span>u-boot<span class="w"> </span>legacy<span class="w"> </span>uImage,<span class="w"> </span>Linux-3.4.103,<span class="w"> </span>Linux/ARM,<span class="w"> </span>OS<span class="w"> </span>Kernel<span class="w"> </span>Image<span class="w"> </span><span class="o">(</span>Not<span class="w"> </span>compressed<span class="o">)</span>,<span class="w"> </span><span class="m">2210952</span><span class="w"> </span>bytes,<span class="w"> </span>Tue<span class="w"> </span>Jan<span class="w"> </span><span class="m">30</span><span class="w"> </span><span class="m">07</span>:58:38<span class="w"> </span><span class="m">2018</span>,<span class="w"> </span>Load<span class="w"> </span>Address:<span class="w"> </span>0x41508000,<span class="w"> </span>Entry<span class="w"> </span>Point:<span class="w"> </span>0x41508000,<span class="w"> </span>Header<span class="w"> </span>CRC:<span class="w"> </span>0x81013485,<span class="w"> </span>Data<span class="w"> </span>CRC:<span class="w"> </span>0xDEA9B00E
+</code></pre></div>
 
 <p>In current firmware, kernel partition size is 2228224 bytes. So the new kernel image cannot be larger.</p>
 <p>We copy that image to a USB drive and then, <strong>from the telnet shell</strong>, we overwrite original kernel with the new image :</p>
-<div class="highlight"><pre><span></span>root@R7800:/# dd <span class="k">if</span><span class="o">=</span>/mnt/sda1/uImage <span class="nv">of</span><span class="o">=</span>/dev/mtdblock5
-root@R7800:/# sync
-root@R7800:/# reboot
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>root@R7800:/#<span class="w"> </span>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/mnt/sda1/uImage<span class="w"> </span><span class="nv">of</span><span class="o">=</span>/dev/mtdblock5
+root@R7800:/#<span class="w"> </span>sync
+root@R7800:/#<span class="w"> </span>reboot
+</code></pre></div>
 
 <p><em>Note: You have to enable telnet in WebUI after each reboot.</em></p>
 <p>Now the router detects USB camera when plugged in :</p>
-<div class="highlight"><pre><span></span>usb 3-1: new high-speed USB device number 5 using xhci-hcd
+<div class="highlight"><pre><span></span><code>usb 3-1: new high-speed USB device number 5 using xhci-hcd
 usb 3-1: New USB device found, idVendor=1908, idProduct=2310
 usb 3-1: New USB device strings: Mfr=1, Product=2, SerialNumber=3
 usb 3-1: Product: USB2.0 PC CAMERA
@@ -272,135 +321,128 @@ INFO008C: Add device intf d39cc400, dev d39a5000
 INFO0C15:  filter audio device
 uvcvideo: Found UVC 1.00 device USB2.0 PC CAMERA (1908:2310)
 input: USB2.0 PC CAMERA as /devices/platform/ipq-dwc3.1/dwc3.1/xhci-hcd.1/usb3/3-1/3-1:1.0/input/input3
-</pre></div>
-
+</code></pre></div>
 
 <h1>Install software packages</h1>
 <p><em>"<a href="https://motion-project.github.io/">Motion</a> is a program that monitors the video signal from cameras. It is able to detect if a significant part of the picture has changed; in other words, it can detect motion."</em></p>
 <p>Fortunately, this package is available in OpenWrt repositories for our architecture.
 And stock firmware includes the OpenWrt package manager <strong>opkg</strong>.</p>
 <p>However, <strong>opkg</strong> is outdated and needs to be <a href="https://gist.github.com/frederic/fcb7ddc14c46aa630143aaeafe2d706f">patched</a> first :</p>
-<div class="highlight"><pre><span></span>root@R7800:/# curl -k https://gist.githubusercontent.com/frederic/fcb7ddc14c46aa630143aaeafe2d706f/raw/8242c18a514f19b58c74387d4bfa0e5511bbb4e5/functions.sh -o <span class="s1">&#39;/lib/functions.sh&#39;</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>root@R7800:/#<span class="w"> </span>curl<span class="w"> </span>-k<span class="w"> </span>https://gist.githubusercontent.com/frederic/fcb7ddc14c46aa630143aaeafe2d706f/raw/8242c18a514f19b58c74387d4bfa0e5511bbb4e5/functions.sh<span class="w"> </span>-o<span class="w"> </span><span class="s1">&#39;/lib/functions.sh&#39;</span>
+</code></pre></div>
 
 <p>Then, we can install <em>motion</em> &amp; <em>libjpeg</em> packages :</p>
-<div class="highlight"><pre><span></span>root@R7800:~# curl -k https://raw.githubusercontent.com/frederic/netgear-R7800-GPL/master/ipk/libjpeg_9a-1_ipq806x.ipk -o /tmp/libjpeg_9a-1_ipq806x.ipk
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-<span class="m">100</span> <span class="m">92994</span>  <span class="m">100</span> <span class="m">92994</span>    <span class="m">0</span>     <span class="m">0</span>   259k      <span class="m">0</span> --:--:-- --:--:-- --:--:--  430k
-root@R7800:~# opkg install /tmp/libjpeg_9a-1_ipq806x.ipk 
-Installing libjpeg <span class="o">(</span>9a-1<span class="o">)</span> to root...
-Configuring libjpeg.
+<div class="highlight"><pre><span></span><code>root@R7800:~#<span class="w"> </span>curl<span class="w"> </span>-k<span class="w"> </span>https://raw.githubusercontent.com/frederic/netgear-R7800-GPL/master/ipk/libjpeg_9a-1_ipq806x.ipk<span class="w"> </span>-o<span class="w"> </span>/tmp/libjpeg_9a-1_ipq806x.ipk
+<span class="w">  </span>%<span class="w"> </span>Total<span class="w">    </span>%<span class="w"> </span>Received<span class="w"> </span>%<span class="w"> </span>Xferd<span class="w">  </span>Average<span class="w"> </span>Speed<span class="w">   </span>Time<span class="w">    </span>Time<span class="w">     </span>Time<span class="w">  </span>Current
+<span class="w">                                 </span>Dload<span class="w">  </span>Upload<span class="w">   </span>Total<span class="w">   </span>Spent<span class="w">    </span>Left<span class="w">  </span>Speed
+<span class="m">100</span><span class="w"> </span><span class="m">92994</span><span class="w">  </span><span class="m">100</span><span class="w"> </span><span class="m">92994</span><span class="w">    </span><span class="m">0</span><span class="w">     </span><span class="m">0</span><span class="w">   </span>259k<span class="w">      </span><span class="m">0</span><span class="w"> </span>--:--:--<span class="w"> </span>--:--:--<span class="w"> </span>--:--:--<span class="w">  </span>430k
+root@R7800:~#<span class="w"> </span>opkg<span class="w"> </span>install<span class="w"> </span>/tmp/libjpeg_9a-1_ipq806x.ipk<span class="w"> </span>
+Installing<span class="w"> </span>libjpeg<span class="w"> </span><span class="o">(</span>9a-1<span class="o">)</span><span class="w"> </span>to<span class="w"> </span>root...
+Configuring<span class="w"> </span>libjpeg.
 
 
-root@R7800:~# curl -k https://raw.githubusercontent.com/frederic/netgear-R7800-GPL/master/ipk/motion_3.4.0-20141018-9479d910f2149b5558788bb86f97f26522794212-1_ipq806x.ipk -o /tmp/motion_3.4.0-20141018-9479d910f2149b5558788bb86f97f26522794212-1_ipq806x.ipk
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-<span class="m">100</span> <span class="m">94802</span>  <span class="m">100</span> <span class="m">94802</span>    <span class="m">0</span>     <span class="m">0</span>   297k      <span class="m">0</span> --:--:-- --:--:-- --:--:--  387k
-root@R7800:~# opkg install /tmp/motion_3.4.0-20141018-9479d910f2149b5558788bb86f97f26522794212-1_ipq806x.ipk
-Installing motion <span class="o">(</span><span class="m">3</span>.4.0-20141018-9479d910f2149b5558788bb86f97f26522794212-1<span class="o">)</span> to root...
-Configuring motion.
-</pre></div>
-
+root@R7800:~#<span class="w"> </span>curl<span class="w"> </span>-k<span class="w"> </span>https://raw.githubusercontent.com/frederic/netgear-R7800-GPL/master/ipk/motion_3.4.0-20141018-9479d910f2149b5558788bb86f97f26522794212-1_ipq806x.ipk<span class="w"> </span>-o<span class="w"> </span>/tmp/motion_3.4.0-20141018-9479d910f2149b5558788bb86f97f26522794212-1_ipq806x.ipk
+<span class="w">  </span>%<span class="w"> </span>Total<span class="w">    </span>%<span class="w"> </span>Received<span class="w"> </span>%<span class="w"> </span>Xferd<span class="w">  </span>Average<span class="w"> </span>Speed<span class="w">   </span>Time<span class="w">    </span>Time<span class="w">     </span>Time<span class="w">  </span>Current
+<span class="w">                                 </span>Dload<span class="w">  </span>Upload<span class="w">   </span>Total<span class="w">   </span>Spent<span class="w">    </span>Left<span class="w">  </span>Speed
+<span class="m">100</span><span class="w"> </span><span class="m">94802</span><span class="w">  </span><span class="m">100</span><span class="w"> </span><span class="m">94802</span><span class="w">    </span><span class="m">0</span><span class="w">     </span><span class="m">0</span><span class="w">   </span>297k<span class="w">      </span><span class="m">0</span><span class="w"> </span>--:--:--<span class="w"> </span>--:--:--<span class="w"> </span>--:--:--<span class="w">  </span>387k
+root@R7800:~#<span class="w"> </span>opkg<span class="w"> </span>install<span class="w"> </span>/tmp/motion_3.4.0-20141018-9479d910f2149b5558788bb86f97f26522794212-1_ipq806x.ipk
+Installing<span class="w"> </span>motion<span class="w"> </span><span class="o">(</span><span class="m">3</span>.4.0-20141018-9479d910f2149b5558788bb86f97f26522794212-1<span class="o">)</span><span class="w"> </span>to<span class="w"> </span>root...
+Configuring<span class="w"> </span>motion.
+</code></pre></div>
 
 <p>Note that motion software expects its default configuration file at different path than the one actually provided. So we move it back to default path :</p>
-<div class="highlight"><pre><span></span>root@R7800:/# mkdir /etc/motion
-root@R7800:/# mv /overlay/etc/motion.conf /etc/motion/motion.conf
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>root@R7800:/#<span class="w"> </span>mkdir<span class="w"> </span>/etc/motion
+root@R7800:/#<span class="w"> </span>mv<span class="w"> </span>/overlay/etc/motion.conf<span class="w"> </span>/etc/motion/motion.conf
+</code></pre></div>
 
 <h1>Configuration</h1>
 <p>To enable motion detection only when our smartphone (hence we) is not at home, we call our custom script in Hostapd script <strong>/lib/wifi/wps-hostapd-update-uci</strong>.
 It will only be triggered when a station connects or disconnects from the router.</p>
-<div class="highlight"><pre><span></span><span class="gh">diff --git a/lib/wifi/wps-hostapd-update-uci b/lib/wifi/wps-hostapd-update-uci</span>
+<div class="highlight"><pre><span></span><code><span class="gh">diff --git a/lib/wifi/wps-hostapd-update-uci b/lib/wifi/wps-hostapd-update-uci</span>
 <span class="gh">index f60abe3..dd6f3f2 100755</span>
 <span class="gd">--- a/lib/wifi/wps-hostapd-update-uci</span>
 <span class="gi">+++ b/lib/wifi/wps-hostapd-update-uci</span>
 <span class="gu">@@ -157,6 +157,9 @@ check_ap_lock_down()</span>
- }
+<span class="w"> </span>}
 
- case &quot;$CMD&quot; in
+<span class="w"> </span>case &quot;$CMD&quot; in
 <span class="gi">+        AP-STA-CONNECTED|AP-STA-DISCONNECTED)</span>
 <span class="gi">+                /etc/motion_cron.sh $CMD $3</span>
 <span class="gi">+        ;;</span>
-        WPS-NEW-AP-SETTINGS|WPS-NEW-AP-SETTINGS-AP-PIN)
-                local ssid=$(hostapd_cli -i$IFNAME -p/var/run/hostapd-$parent get_config | grep ^ssid= | cut -f2- -d =)
-                local wpa=$(hostapd_cli -i$IFNAME -p/var/run/hostapd-$parent get_config | grep ^wpa= | cut -f2- -d=)
-</pre></div>
-
+<span class="w"> </span>       WPS-NEW-AP-SETTINGS|WPS-NEW-AP-SETTINGS-AP-PIN)
+<span class="w"> </span>               local ssid=$(hostapd_cli -i$IFNAME -p/var/run/hostapd-$parent get_config | grep ^ssid= | cut -f2- -d =)
+<span class="w"> </span>               local wpa=$(hostapd_cli -i$IFNAME -p/var/run/hostapd-$parent get_config | grep ^wpa= | cut -f2- -d=)
+</code></pre></div>
 
 <p>We create the following script in <strong>/etc/motion_cron.sh</strong> :</p>
-<div class="highlight"><pre><span></span><span class="ch">#!/bin/sh</span>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/sh</span>
 <span class="c1"># Start or stop motion service depending on wifi client status</span>
 <span class="c1"># Usage: motion_cron.sh [&lt;event_type&gt; &lt;mac addr&gt;]</span>
 
-<span class="nv">HWADDR</span><span class="o">=</span><span class="m">00</span>:11:22:33:44:55 <span class="c1"># Update with your smartphone MAC address</span>
+<span class="nv">HWADDR</span><span class="o">=</span><span class="m">00</span>:11:22:33:44:55<span class="w"> </span><span class="c1"># Update with your smartphone MAC address</span>
 
 <span class="nv">CONNECTED</span><span class="o">=</span><span class="m">0</span>
 <span class="nv">CMD</span><span class="o">=</span>motion
 <span class="nv">CMD_PID</span><span class="o">=</span>/var/run/<span class="nv">$CMD</span>.pid
 <span class="nv">CMD_BIN</span><span class="o">=</span>/usr/bin/<span class="nv">$CMD</span>
-<span class="nv">PID</span><span class="o">=</span><span class="sb">`</span>pidof <span class="nv">$CMD</span><span class="sb">`</span>
+<span class="nv">PID</span><span class="o">=</span><span class="sb">`</span>pidof<span class="w"> </span><span class="nv">$CMD</span><span class="sb">`</span>
 
-<span class="k">if</span> <span class="o">[</span> <span class="nv">$#</span> -eq <span class="m">2</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
- <span class="nv">EVENT</span><span class="o">=</span><span class="nv">$1</span>
- <span class="nv">EVENT_MAC</span><span class="o">=</span><span class="nv">$2</span>
- <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$EVENT_MAC</span><span class="s2">&quot;</span> <span class="o">==</span> <span class="s2">&quot;</span><span class="nv">$HWADDR</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-  <span class="k">case</span> <span class="s2">&quot;</span><span class="nv">$EVENT</span><span class="s2">&quot;</span> in
-    AP-STA-DISCONNECTED<span class="o">)</span>
-      <span class="nv">CONNECTED</span><span class="o">=</span><span class="m">0</span>
-      <span class="p">;;</span>
-    AP-STA-CONNECTED<span class="o">)</span>
-      <span class="nv">CONNECTED</span><span class="o">=</span><span class="m">1</span>
-      <span class="p">;;</span>
-    *<span class="o">)</span>
-      <span class="nb">echo</span> <span class="s2">&quot;Non-interesting event, ignore...&quot;</span>
-      <span class="nb">exit</span> <span class="m">0</span>
-  <span class="k">esac</span>
-  <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$EVENT</span><span class="s2"> </span><span class="nv">$EVENT_MAC</span><span class="s2">&quot;</span>
- <span class="k">else</span>
-  <span class="nb">echo</span> <span class="s2">&quot;Not our MAC, ignore...&quot;</span>
-  <span class="nb">exit</span> <span class="m">0</span>
- <span class="k">fi</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="nv">$#</span><span class="w"> </span>-eq<span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w"> </span><span class="nv">EVENT</span><span class="o">=</span><span class="nv">$1</span>
+<span class="w"> </span><span class="nv">EVENT_MAC</span><span class="o">=</span><span class="nv">$2</span>
+<span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$EVENT_MAC</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HWADDR</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="k">case</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$EVENT</span><span class="s2">&quot;</span><span class="w"> </span><span class="k">in</span>
+<span class="w">    </span>AP-STA-DISCONNECTED<span class="o">)</span>
+<span class="w">      </span><span class="nv">CONNECTED</span><span class="o">=</span><span class="m">0</span>
+<span class="w">      </span><span class="p">;;</span>
+<span class="w">    </span>AP-STA-CONNECTED<span class="o">)</span>
+<span class="w">      </span><span class="nv">CONNECTED</span><span class="o">=</span><span class="m">1</span>
+<span class="w">      </span><span class="p">;;</span>
+<span class="w">    </span>*<span class="o">)</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Non-interesting event, ignore...&quot;</span>
+<span class="w">      </span><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
+<span class="w">  </span><span class="k">esac</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$EVENT</span><span class="s2"> </span><span class="nv">$EVENT_MAC</span><span class="s2">&quot;</span>
+<span class="w"> </span><span class="k">else</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Not our MAC, ignore...&quot;</span>
+<span class="w">  </span><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
+<span class="w"> </span><span class="k">fi</span>
 <span class="k">else</span>
- <span class="k">if</span> grep <span class="s2">&quot;0x2\W\+</span><span class="nv">$HWADDR</span><span class="s2">&quot;</span> /proc/net/arp <span class="p">;</span> <span class="k">then</span>
-  <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$HWADDR</span><span class="s2"> is connected in arp table&quot;</span>
-  <span class="nv">CONNECTED</span><span class="o">=</span><span class="m">1</span>
- <span class="k">else</span>
-  <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$HWADDR</span><span class="s2"> is disconnected in arp table&quot;</span>
-  <span class="nv">CONNECTED</span><span class="o">=</span><span class="m">0</span>
- <span class="k">fi</span>
+<span class="w"> </span><span class="k">if</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;0x2\W\+</span><span class="nv">$HWADDR</span><span class="s2">&quot;</span><span class="w"> </span>/proc/net/arp<span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HWADDR</span><span class="s2"> is connected in arp table&quot;</span>
+<span class="w">  </span><span class="nv">CONNECTED</span><span class="o">=</span><span class="m">1</span>
+<span class="w"> </span><span class="k">else</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HWADDR</span><span class="s2"> is disconnected in arp table&quot;</span>
+<span class="w">  </span><span class="nv">CONNECTED</span><span class="o">=</span><span class="m">0</span>
+<span class="w"> </span><span class="k">fi</span>
 <span class="k">fi</span>
 
-<span class="k">if</span> <span class="o">[</span> <span class="nv">$CONNECTED</span> -eq <span class="m">1</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
- <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$HWADDR</span><span class="s2"> is connected&quot;</span>
- <span class="k">if</span> <span class="o">[</span> -n <span class="s2">&quot;</span><span class="nv">$PID</span><span class="s2">&quot;</span> <span class="o">]</span>
- <span class="k">then</span>
-      <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$CMD</span><span class="s2"> is running, stopping it...&quot;</span>
-      start-stop-daemon -K -x <span class="nv">$CMD_BIN</span> -p <span class="nv">$CMD_PID</span>
- <span class="k">fi</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="nv">$CONNECTED</span><span class="w"> </span>-eq<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HWADDR</span><span class="s2"> is connected&quot;</span>
+<span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PID</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]</span>
+<span class="w"> </span><span class="k">then</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CMD</span><span class="s2"> is running, stopping it...&quot;</span>
+<span class="w">      </span>start-stop-daemon<span class="w"> </span>-K<span class="w"> </span>-x<span class="w"> </span><span class="nv">$CMD_BIN</span><span class="w"> </span>-p<span class="w"> </span><span class="nv">$CMD_PID</span>
+<span class="w"> </span><span class="k">fi</span>
 <span class="k">else</span>
- <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$HWADDR</span><span class="s2"> is disconnected&quot;</span>
- <span class="k">if</span> <span class="o">[</span> -z <span class="s2">&quot;</span><span class="nv">$PID</span><span class="s2">&quot;</span> <span class="o">]</span>
- <span class="k">then</span>
-      <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$CMD</span><span class="s2"> is not running, starting it...&quot;</span>
-      start-stop-daemon -S -x <span class="nv">$CMD_BIN</span> -- -b -p <span class="nv">$CMD_PID</span>
- <span class="k">fi</span>
+<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$HWADDR</span><span class="s2"> is disconnected&quot;</span>
+<span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PID</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]</span>
+<span class="w"> </span><span class="k">then</span>
+<span class="w">      </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CMD</span><span class="s2"> is not running, starting it...&quot;</span>
+<span class="w">      </span>start-stop-daemon<span class="w"> </span>-S<span class="w"> </span>-x<span class="w"> </span><span class="nv">$CMD_BIN</span><span class="w"> </span>--<span class="w"> </span>-b<span class="w"> </span>-p<span class="w"> </span><span class="nv">$CMD_PID</span>
+<span class="w"> </span><span class="k">fi</span>
 <span class="k">fi</span>
-</pre></div>
-
+</code></pre></div>
 
 <p><strong>$HWADDR</strong> has to be set to MAC address of our smartphone.</p>
 <p>As failsafe mechanism, we can also add this script to cron :</p>
-<div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s2">&quot;  0 *  *   *   *     /etc/motion_cron.sh&quot;</span> &gt;&gt; /etc/crontabs/root
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  0 *  *   *   *     /etc/motion_cron.sh&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>/etc/crontabs/root
+</code></pre></div>
 
 <p>Finally, we edit the file <em>/etc/motion/motion.conf</em> to configure motion. A <a href="http://htmlpreview.github.io/?https://github.com/Motion-Project/motion/blob/master/motion_guide.html">guide is available on official motion website</a>.
 In addition of your own settings, I recommend to set the output storage path to an external USB drive :</p>
-<div class="highlight"><pre><span></span>target_dir /mnt/sda1
-</pre></div>
+<div class="highlight"><pre><span></span><code>target_dir /mnt/sda1
+</code></pre></div>
   </div>
   <div class="tag-cloud">
     <p>
@@ -413,16 +455,25 @@ In addition of your own settings, I recommend to set the output storage path to 
 
 
 
-    <div class="addthis_relatedposts_inline">
+
 
 
 </article>
 
-    <footer>
+<footer>
 <p>
-  &copy;   - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+  &copy;   - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.en_US" target="_blank">Creative Commons Attribution-ShareAlike 4.0 International License</a>
 </p>
-<p>    Powered by <a href="http://getpelican.com" target="_blank">Pelican</a> - Theme <a href="https://github.com/alexandrevicenzi/flex" target="_blank">Flex</a>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+  <span class="footer-separator">|</span>
+  Switch to the <a href="javascript:void(0)" onclick="theme.switch(`dark`)">dark</a> | <a href="javascript:void(0)" onclick="theme.switch(`light`)">light</a> | <a href="javascript:void(0)" onclick="theme.switch(`browser`)">browser</a> theme
+  <script id="dark-theme-script"
+          src="https://fredericb.info/theme/dark-theme/dark-theme.min.js"
+          data-enable-auto-detect-theme="True"
+          data-default-theme="light"
+          type="text/javascript">
+  </script>
 </p><p>
   <a rel="license"
      href="http://creativecommons.org/licenses/by-sa/4.0/"
@@ -430,15 +481,11 @@ In addition of your own settings, I recommend to set the output storage path to 
     <img alt="Creative Commons License"
          title="Creative Commons License"
          style="border-width:0"
-         src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+           src="https://fredericb.info/theme/img/cc/by-sa.png"
          width="80"
          height="15"/>
   </a>
-</p>    </footer>
-  </main>
-
-
-
+</p></footer>  </main>
 
 <script type="application/ld+json">
 {
@@ -446,10 +493,27 @@ In addition of your own settings, I recommend to set the output storage path to 
   "@type" : "Blog",
   "name": " fred's notes ",
   "url" : "https://fredericb.info",
-  "image": "/resources/sitelogo.jpg",
+  "image": "/sitelogo.jpg",
   "description": "Frédéric's Thoughts and Writings"
 }
-</script>
+</script><a href="https://github.com/frederic" target="_blank" class="github-corner" aria-label="View source on Github">
+    <svg width="80"
+         height="80"
+         viewBox="0 0 250 250"
+         style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;"
+         aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor"
+              style="transform-origin: 130px 106px;"
+              class="octo-arm">
+        </path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor"
+              class="octo-body">
+        </path>
+    </svg>
+</a>
 
 </body>
 </html>

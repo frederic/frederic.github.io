@@ -1,0 +1,509 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>fred's notes - Advisory</title><link href="https://fredericb.info/" rel="alternate"/><link href="https://fredericb.info/feeds/advisory.atom.xml" rel="self"/><id>https://fredericb.info/</id><updated>2020-12-07T00:00:00-07:00</updated><subtitle>Security &amp; Stuff</subtitle><entry><title>SVE-2019-13963 : Remote stack overflow in Samsung baseband caused by malformed IMMEDIATE ASSIGNMENT message</title><link href="https://fredericb.info/2020/12/sve-2019-13963-remote-stack-overflow-in-samsung-baseband-caused-by-malformed-immediate-assignment-message.html" rel="alternate"/><published>2020-12-07T00:00:00-07:00</published><updated>2020-12-07T00:00:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2020-12-07:/2020/12/sve-2019-13963-remote-stack-overflow-in-samsung-baseband-caused-by-malformed-immediate-assignment-message.html</id><summary type="html">&lt;h1&gt;Description&lt;/h1&gt;
+&lt;p&gt;When Samsung Shannon baseband receives message IMMEDIATE ASSIGNMENT (9.1.18 in &lt;a href="https://www.etsi.org/deliver/etsi_gts/04/0408/05.03.00_60/gsmts_0408v050300p.pdf"&gt;GSM/04.08&lt;/a&gt;) from network, the length of the Mobile Allocation IE (GSM/04.08 10.5.2.21) is not properly checked.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="GSM/04.08 IMMEDIATE ASSIGNMENT message" src="https://fredericb.info/blog/SVE-2019-13963/gsm_imm-assign.png" width="700px"&gt;&lt;/p&gt;
+&lt;p&gt;Mobile allocation data is directly copied to a buffer on the stack without checking …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Description&lt;/h1&gt;
+&lt;p&gt;When Samsung Shannon baseband receives message IMMEDIATE ASSIGNMENT (9.1.18 in &lt;a href="https://www.etsi.org/deliver/etsi_gts/04/0408/05.03.00_60/gsmts_0408v050300p.pdf"&gt;GSM/04.08&lt;/a&gt;) from network, the length of the Mobile Allocation IE (GSM/04.08 10.5.2.21) is not properly checked.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="GSM/04.08 IMMEDIATE ASSIGNMENT message" src="https://fredericb.info/blog/SVE-2019-13963/gsm_imm-assign.png" width="700px"&gt;&lt;/p&gt;
+&lt;p&gt;Mobile allocation data is directly copied to a buffer on the stack without checking its size. This stack overflow can lead to remote arbitrary code execution in the Shannon modem.&lt;/p&gt;
+&lt;h1&gt;CVSS Version 3 Metrics&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;Attack Vector (AV): Adjacent (A)&lt;/li&gt;
+&lt;li&gt;Attack Complexity (AC): Low (L)&lt;/li&gt;
+&lt;li&gt;Privileges Required (PR): None (N)&lt;/li&gt;
+&lt;li&gt;User Interaction (UI): None (N)&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:A/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"&gt;Overall CVSS Score: 8.8&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;Affected Versions&lt;/h1&gt;
+&lt;p&gt;Samsung smartphones based on Android N(7.x), O(8.x), Go(8.1), P(9.0), Go(9.0) with Exynos chipsets.&lt;/p&gt;
+&lt;h1&gt;Solution&lt;/h1&gt;
+&lt;p&gt;Samsung security update of April 2019 fixes this vulnerability.&lt;/p&gt;
+&lt;h1&gt;Timeline&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;2019-02-05 Privately reported to Samsung&lt;/li&gt;
+&lt;li&gt;2019-04-02 Bug fixed in Samsung Bulletin &lt;a href="https://security.samsungmobile.com/securityUpdate.smsb"&gt;SMR-APR-2019&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><category term="Advisory"/><category term="vulnerability"/><category term="advisory"/><category term="samsung"/><category term="shannon"/><category term="baseband"/><category term="security"/><category term="arm"/></entry><entry><title>Remote stack overflow in Samsung baseband caused by malformed GMM ATTACH ACCEPT message</title><link href="https://fredericb.info/2020/11/remote-stack-overflow-in-samsung-baseband-caused-by-malformed-gmm-attach-accept-message.html" rel="alternate"/><published>2020-11-30T00:00:00-07:00</published><updated>2020-11-30T00:00:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2020-11-30:/2020/11/remote-stack-overflow-in-samsung-baseband-caused-by-malformed-gmm-attach-accept-message.html</id><summary type="html">&lt;h1&gt;Description&lt;/h1&gt;
+&lt;p&gt;When Samsung Shannon baseband receives message GMM ATTACH ACCEPT (9.4.2 in &lt;a href="https://www.etsi.org/deliver/etsi_ts/124000_124099/124008/14.04.00_60/ts_124008v140400p.pdf"&gt;TS 24.008&lt;/a&gt;) from network,
+the minimum length for MS Identity IE (10.5.1.4) is not properly checked.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="TS 24.008 GMM ATTACH ACCEPT message" src="https://fredericb.info/blog/Shannon_MS_ID/gmm_attach_accept.png" width="700px"&gt;&lt;/p&gt;
+&lt;p&gt;MS Identity (IEI 0x23) length is decremented without prior check. If this value is zero, a …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Description&lt;/h1&gt;
+&lt;p&gt;When Samsung Shannon baseband receives message GMM ATTACH ACCEPT (9.4.2 in &lt;a href="https://www.etsi.org/deliver/etsi_ts/124000_124099/124008/14.04.00_60/ts_124008v140400p.pdf"&gt;TS 24.008&lt;/a&gt;) from network,
+the minimum length for MS Identity IE (10.5.1.4) is not properly checked.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="TS 24.008 GMM ATTACH ACCEPT message" src="https://fredericb.info/blog/Shannon_MS_ID/gmm_attach_accept.png" width="700px"&gt;&lt;/p&gt;
+&lt;p&gt;MS Identity (IEI 0x23) length is decremented without prior check. If this value is zero, a short integer underflow occurs. This invalid size is then used to copy received MS Identity data to a stack buffer. This stack overflow can lead to remote arbitrary code execution in the Shannon modem.&lt;/p&gt;
+&lt;h1&gt;CVSS Version 3 Metrics&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;Attack Vector (AV): Adjacent (A)&lt;/li&gt;
+&lt;li&gt;Attack Complexity (AC): Low (L)&lt;/li&gt;
+&lt;li&gt;Privileges Required (PR): None (N)&lt;/li&gt;
+&lt;li&gt;User Interaction (UI): None (N)&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:A/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"&gt;Overall CVSS Score: 8.8&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;Affected Versions&lt;/h1&gt;
+&lt;p&gt;Discovered in Shannon baseband of Galaxy S8 (SM-G950FD), it may affect other models based on Exynos chipsets.&lt;/p&gt;
+&lt;h1&gt;Solution&lt;/h1&gt;
+&lt;p&gt;Samsung security update of December 2018 fixes this vulnerability.&lt;/p&gt;
+&lt;h1&gt;Timeline&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;2018-12-04 Bug fixed in Samsung security update &lt;a href="https://security.samsungmobile.com/securityUpdate.smsb"&gt;SMR-DEC-2018&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;2019-05-25 Bug discovered in old firmware&lt;/li&gt;
+&lt;li&gt;2019-05-28 Bug fix discovered in latest firmware&lt;/li&gt;
+&lt;li&gt;2019-05-28 Bug hunting procedures reconsidered&lt;/li&gt;
+&lt;/ul&gt;</content><category term="Advisory"/><category term="vulnerability"/><category term="advisory"/><category term="samsung"/><category term="shannon"/><category term="baseband"/><category term="security"/><category term="arm"/></entry><entry><title>Remote stack overflow in Samsung baseband caused by malformed P-TMSI REALLOCATION COMMAND</title><link href="https://fredericb.info/2020/11/remote-stack-overflow-in-samsung-baseband-caused-by-malformed-p-tmsi-reallocation-command.html" rel="alternate"/><published>2020-11-23T00:00:00-07:00</published><updated>2020-11-23T00:00:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2020-11-23:/2020/11/remote-stack-overflow-in-samsung-baseband-caused-by-malformed-p-tmsi-reallocation-command.html</id><summary type="html">&lt;h1&gt;Description&lt;/h1&gt;
+&lt;p&gt;When Samsung Shannon baseband receives message P-TMSI REALLOCATION COMMAND (9.4.7 in &lt;a href="https://www.etsi.org/deliver/etsi_ts/124000_124099/124008/13.07.00_60/ts_124008v130700p.pdf"&gt;TS 24.008&lt;/a&gt;) from network,
+the length of the Mobile Identity IE (10.5.1.4) is not properly checked.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="TS 24.008 P-TMSI REALLOCATION COMMAND message" src="https://fredericb.info/blog/PTMSI/TS24.008_PTMSI-realloc-cmd.png" width="700px"&gt;&lt;/p&gt;
+&lt;p&gt;Mobile identity data is directly copied to a stack buffer without prior size check. This stack …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Description&lt;/h1&gt;
+&lt;p&gt;When Samsung Shannon baseband receives message P-TMSI REALLOCATION COMMAND (9.4.7 in &lt;a href="https://www.etsi.org/deliver/etsi_ts/124000_124099/124008/13.07.00_60/ts_124008v130700p.pdf"&gt;TS 24.008&lt;/a&gt;) from network,
+the length of the Mobile Identity IE (10.5.1.4) is not properly checked.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="TS 24.008 P-TMSI REALLOCATION COMMAND message" src="https://fredericb.info/blog/PTMSI/TS24.008_PTMSI-realloc-cmd.png" width="700px"&gt;&lt;/p&gt;
+&lt;p&gt;Mobile identity data is directly copied to a stack buffer without prior size check. This stack overflow can lead to remote code execution in the Shannon modem.&lt;/p&gt;
+&lt;h1&gt;CVSS Version 3 Metrics&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;Attack Vector (AV): Adjacent (A)&lt;/li&gt;
+&lt;li&gt;Attack Complexity (AC): Low (L)&lt;/li&gt;
+&lt;li&gt;Privileges Required (PR): None (N)&lt;/li&gt;
+&lt;li&gt;User Interaction (UI): None (N)&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:A/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"&gt;Overall CVSS Score: 8.8&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;Affected Versions&lt;/h1&gt;
+&lt;p&gt;Discovered in Shannon baseband of Galaxy S8 (SM-G950FD), it may affect other models based on Exynos chipsets.&lt;/p&gt;
+&lt;h1&gt;Solution&lt;/h1&gt;
+&lt;p&gt;Samsung security update of December 2018 fixes this vulnerability.&lt;/p&gt;
+&lt;h1&gt;Timeline&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;2018-11-19 Working proof-of-concept&lt;/li&gt;
+&lt;li&gt;2018-12-04 Bug fixed in Samsung security update &lt;a href="https://security.samsungmobile.com/securityUpdate.smsb"&gt;SMR-DEC-2018&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;2018-12-05 Reconsider life choices&lt;/li&gt;
+&lt;/ul&gt;</content><category term="Advisory"/><category term="vulnerability"/><category term="advisory"/><category term="samsung"/><category term="shannon"/><category term="baseband"/><category term="security"/><category term="arm"/></entry><entry><title>SVE-2016-7930: Multiple buffer overflows in Samsung Galaxy bootloader</title><link href="https://fredericb.info/2017/07/sve-2016-7930-multiple-buffer-overflows-in-samsung-galaxy-bootloader.html" rel="alternate"/><published>2017-07-23T00:00:00-07:00</published><updated>2017-07-23T00:00:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2017-07-23:/2017/07/sve-2016-7930-multiple-buffer-overflows-in-samsung-galaxy-bootloader.html</id><summary type="html">&lt;h1&gt;Prequel&lt;/h1&gt;
+&lt;p&gt;On October 21st 2015, mobile forensics company &lt;a href="https://www.cellebrite.com/"&gt;Cellebrite&lt;/a&gt; published a video that demonstrates how their solution can dump eMMC of Samsung Galaxy devices :&lt;/p&gt;
+&lt;iframe width="560" height="315" src="https://www.youtube.com/embed/ZsGBbswJGi4?rel=0" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen&gt;&lt;/iframe&gt;
+
+&lt;p&gt;This video strongly suggests that Samsung Galaxy bootloader can be exploited to execute arbitrary code.&lt;/p&gt;
+&lt;h1&gt;Summary&lt;/h1&gt;
+&lt;p&gt;Several bugs in Samsung Galaxy bootloader allow an attacker with …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Prequel&lt;/h1&gt;
+&lt;p&gt;On October 21st 2015, mobile forensics company &lt;a href="https://www.cellebrite.com/"&gt;Cellebrite&lt;/a&gt; published a video that demonstrates how their solution can dump eMMC of Samsung Galaxy devices :&lt;/p&gt;
+&lt;iframe width="560" height="315" src="https://www.youtube.com/embed/ZsGBbswJGi4?rel=0" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen&gt;&lt;/iframe&gt;
+
+&lt;p&gt;This video strongly suggests that Samsung Galaxy bootloader can be exploited to execute arbitrary code.&lt;/p&gt;
+&lt;h1&gt;Summary&lt;/h1&gt;
+&lt;p&gt;Several bugs in Samsung Galaxy bootloader allow an attacker with physical access to execute arbitrary code. Protections like OS lock screen and reactivation lock can be defeated.&lt;/p&gt;
+&lt;p&gt;Download mode (a.k.a. ODIN) doesn't properly sanitize headers of flashed images. This can lead to integer &amp;amp; buffer overflows.&lt;/p&gt;
+&lt;p&gt;Bugs and exploitation technique are detailed in the &lt;a href="https://www.sstic.org/media/SSTIC2017/SSTIC-actes/attacking_samsung_secure_boot/SSTIC2017-Article-attacking_samsung_secure_boot-basse.pdf"&gt;paper released at SSTIC 2017 conference&lt;/a&gt;.&lt;/p&gt;
+&lt;h1&gt;Proof-of-Concept&lt;/h1&gt;
+&lt;p&gt;PoC code for Samsung Galaxy S5 has been &lt;a href="https://github.com/frederic/SVE-2016-7930"&gt;released on GitHub&lt;/a&gt;&lt;/p&gt;
+&lt;h1&gt;CVSS Version 3 Metrics&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;Attack Vector (AV): Physical (P)&lt;/li&gt;
+&lt;li&gt;Attack Complexity (AC): Low (L)&lt;/li&gt;
+&lt;li&gt;Privileges Required (PR): None (N)&lt;/li&gt;
+&lt;li&gt;User Interaction (UI): None (N)&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:P/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"&gt;Overall CVSS Score: 6.8&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;Solution&lt;/h1&gt;
+&lt;p&gt;Samsung has released a fix via OTA.&lt;/p&gt;
+&lt;h1&gt;Disclosure Timeline&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;2016-12-20 Disclosed to Samsung&lt;/li&gt;
+&lt;li&gt;2017-03-07 Public disclosure in Samsung Bulletin &lt;a href="https://security.samsungmobile.com/securityUpdate.smsb"&gt;SMR-MAR-2017&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;2017-06-08 Talk at &lt;a href="https://www.sstic.org/2017/presentation/attacking_samsung_secure_boot/"&gt;SSTIC 2017 conference&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;2017-07-21 &lt;a href="https://github.com/frederic/SVE-2016-7930"&gt;Proof-of-Concept released&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><category term="Advisory"/><category term="vulnerability"/><category term="advisory"/><category term="samsung"/><category term="cellebrite"/><category term="bootloader"/><category term="exploit"/><category term="firmware"/><category term="security"/><category term="usb"/><category term="arm"/><category term="odin"/></entry><entry><title>[QPSIIR-80] Qualcomm TrustZone Integer Signedness bug</title><link href="https://fredericb.info/2014/12/qpsiir-80-qualcomm-trustzone-integer.html" rel="alternate"/><published>2014-12-18T02:05:00-08:00</published><updated>2014-12-18T02:05:00-08:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2014-12-18:/2014/12/qpsiir-80-qualcomm-trustzone-integer.html</id><summary type="html">&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;div style="text-align: justify;"&gt;Qualcomm TrustZone is prone to an
+integer signedness bug that may allow to write NULL words to barely
+controllable locations in memory.&lt;br&gt;
+&lt;br&gt;
+The vulnerability can be triggered from Non-Secure World through
+the TrustZone call "tzbsp_smmu_fault_regs_dump".&lt;br&gt;
+&lt;br&gt;
+This issue has been discovered in Samsung Galaxy S5 firmware, but
+other devices can …&lt;/div&gt;</summary><content type="html">&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;div style="text-align: justify;"&gt;Qualcomm TrustZone is prone to an
+integer signedness bug that may allow to write NULL words to barely
+controllable locations in memory.&lt;br&gt;
+&lt;br&gt;
+The vulnerability can be triggered from Non-Secure World through
+the TrustZone call "tzbsp_smmu_fault_regs_dump".&lt;br&gt;
+&lt;br&gt;
+This issue has been discovered in Samsung Galaxy S5 firmware, but
+other devices can be affected as well.&lt;/div&gt;
+
+&lt;h2&gt;Details&lt;/h2&gt;
+&lt;div style="text-align: justify;"&gt;This vulnerability has been
+discovered in TrustZone binary of Samsung Galaxy S5 firmware,
+version 4.4.2.&lt;br&gt;
+The tzbsp_smmu_fault_regs_dump function can be called from
+Non-Secure World through the SMC instruction. It takes 4 arguments
+passed in R0-R3 registers.&lt;br&gt;
+When called with argument R0 &amp;gt; 1, nested function subfunc_1 is
+called with arguments (R0 = 0xFFFFFFFF, R1) :&lt;/div&gt;
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;FE84B9B6&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;tzbsp_smmu_fault_regs_dump&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9B6&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;PUSH.W&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="no"&gt;R4-R8&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="no"&gt;LR&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9BA&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;MOVS&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;R6&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;R2&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9BC&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;MOV&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;R8&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;R1&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9BE&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;MOV&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;R7&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;R3&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9C0&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;MOV.W&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="no"&gt;R4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;#0&lt;/span&gt;&lt;span class="no"&gt;xFFFFFFFF&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9C4&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;MOV&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;R5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;#0&lt;/span&gt;&lt;span class="no"&gt;xFFFFFFEE&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9C8&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;BEQ&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;loc_FE84BA1A&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9CA&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;CBZ&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;R0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;loc_FE84B9D2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;; R0 &amp;gt; 1 : branch not taken&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9CC&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;CMP&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;R0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;#1&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9CE&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;BEQ&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;loc_FE84B9D6&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;; R0 &amp;gt; 1 : branch not taken&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9D0&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;B&lt;/span&gt;&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="no"&gt;loc_FE84B9D8&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;; branch&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9D2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;; ---------------------------------------------------------&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9D2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;loc_FE84B9D2&lt;/span&gt;&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;; if R0 == 0&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9D2&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;MOVS&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;R4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;#1&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9D4&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;B&lt;/span&gt;&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="no"&gt;loc_FE84B9D8&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9D6&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;; ---------------------------------------------------------&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9D6&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;loc_FE84B9D6&lt;/span&gt;&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;; if R0 == 1&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9D6&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;MOVS&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;R4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;#0&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9D8&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9D8&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;loc_FE84B9D8&lt;/span&gt;&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;; for any value of R0&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9D8&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;MOVS&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;R0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;#1&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9DA&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;BL&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="no"&gt;subfunc_0&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;; kind of &amp;quot;is retail hardware?&amp;quot; test&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9DE&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;CBZ&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;R0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;loc_FE84B9EE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;; not taken&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9E0&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;MOV&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;R1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;R8&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9E2&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;MOV&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;R0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;R4&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;; R4 == #0xFFFFFFFF&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9E4&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;BL&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="no"&gt;subfunc_1&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9E8&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="p"&gt;[...]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;div style="text-align: justify;"&gt;Then subfunc_1 checks if R0 value
+is valid. It will Branch and return if R0 is Greater than or Equal
+to 2. However, BGE instruction operates on signed integers. So R0
+== -1 &amp;lt; 2 will pass the test and the execution will continue
+:&lt;/div&gt;
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;FE853124&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;subfunc_1&lt;/span&gt;
+&lt;span class="nf"&gt;FE853124&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;CMP&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;R0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;#2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;; R0 == #0xFFFFFFFF&lt;/span&gt;
+&lt;span class="nf"&gt;FE853126&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;BGE&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;locret_FE85314C&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;; signed comparison :&lt;/span&gt;
+&lt;span class="nf"&gt;FE853126&lt;/span&gt;&lt;span class="w"&gt;                              &lt;/span&gt;&lt;span class="c1"&gt;; R0(-1) &amp;lt; 2 so branch not taken&lt;/span&gt;
+&lt;span class="nf"&gt;FE853128&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;MOVW&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;R2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;#0&lt;/span&gt;&lt;span class="no"&gt;x9EE0&lt;/span&gt;
+&lt;span class="nf"&gt;FE85312C&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;ADD.W&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="no"&gt;R3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;R0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;R0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="no"&gt;LSL&lt;/span&gt;&lt;span class="mi"&gt;#1&lt;/span&gt;
+&lt;span class="nf"&gt;FE853130&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;MOVT.W&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="no"&gt;R2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;#0&lt;/span&gt;&lt;span class="no"&gt;xFE82&lt;/span&gt;
+&lt;span class="nf"&gt;FE853134&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;ADD.W&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="no"&gt;R0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;R3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;R0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="no"&gt;LSL&lt;/span&gt;&lt;span class="mi"&gt;#3&lt;/span&gt;
+&lt;span class="nf"&gt;FE853138&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;LDR&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;R2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="no"&gt;R2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="c1"&gt;#(dword_FE829EE4 - 0xFE829EE0)]&lt;/span&gt;
+&lt;span class="nf"&gt;FE85313A&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;ADD.W&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="no"&gt;R0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;R2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;R0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="no"&gt;LSL&lt;/span&gt;&lt;span class="mi"&gt;#4&lt;/span&gt;
+&lt;span class="nf"&gt;FE85313E&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;LDRB&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;R2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="no"&gt;R0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;#4&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="nf"&gt;FE853140&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;CMP&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;R2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;R1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;; with R1 &amp;lt; R2&lt;/span&gt;
+&lt;span class="nf"&gt;FE853142&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;BLS&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;locret_FE85314C&lt;/span&gt;
+&lt;span class="nf"&gt;FE853144&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;LDR&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;R0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="no"&gt;R0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="nf"&gt;FE853146&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;MOVS&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;R2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;#0&lt;/span&gt;
+&lt;span class="nf"&gt;FE853148&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;B.W&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;sub_FE856C84&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;; write NULL DWORD to a barely arbitrary address (derived from R1 value)&lt;/span&gt;
+&lt;span class="nf"&gt;FE85314C&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="p"&gt;[...]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;div style="text-align: justify;"&gt;Finally, the last nested function
+could allow to write NULL words to a limited range of memory
+locations.&lt;/div&gt;
+
+&lt;h2&gt;Fix&lt;/h2&gt;
+&lt;div style="text-align: justify;"&gt;This bug is fixed in Lolipop
+version of the firmware. Several changes have been made. First,
+subfunc_1 function is not reachable anymore with an invalid R0
+value:&lt;/div&gt;
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;FE84B970&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;tzbsp_smmu_fault_regs_dump&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B970&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;PUSH.W&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="no"&gt;R4-R8&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="no"&gt;LR&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B974&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;MOVS&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;R6&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;R2&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B976&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;MOV&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;R8&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;R1&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B978&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;MOV&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;R7&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;R3&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B97A&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;MOV&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;R5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;#0&lt;/span&gt;&lt;span class="no"&gt;xFFFFFFEE&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B97E&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;BEQ&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;loc_FE84B9D2&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B980&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;CBZ&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;R0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;loc_FE84B98A&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B982&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;CMP&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;R0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;#1&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B984&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;BEQ&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;loc_FE84B98E&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B986&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;ADDS&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;R0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;R5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;#2&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B988&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;B&lt;/span&gt;&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="no"&gt;locret_FE84B7AA&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;; branch if R0 &amp;gt; 1&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B98A&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;; ---------------------------------------------------------&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B98A&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;loc_FE84B98A&lt;/span&gt;&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;; if R0 == 0&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B98A&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;MOVS&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;R4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;#1&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B98C&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;B&lt;/span&gt;&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="no"&gt;loc_FE84B990&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B98E&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;; ---------------------------------------------------------&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B98E&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;loc_FE84B98E&lt;/span&gt;&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;; if R0 == 1&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B98E&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;MOVS&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;R4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;#0&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B990&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B990&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;loc_FE84B990&lt;/span&gt;&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;; if 0 &amp;lt;= R0 &amp;lt; 2&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B990&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;MOVS&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;R0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;#1&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B992&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;BL&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="no"&gt;subfunc_0&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;; kind of &amp;quot;is retail hardware?&amp;quot; test&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B996&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;CBZ&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;R0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;loc_FE84B9A6&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;; not taken&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B998&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;MOV&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;R1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;R8&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B99A&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;MOV&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;R0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;R4&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;; R4 is either 0 or 1&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B99C&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;BL&lt;/span&gt;&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="no"&gt;subfunc_1&lt;/span&gt;
+&lt;span class="nf"&gt;FE84B9A0&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="p"&gt;[...]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;div style="text-align: justify;"&gt;Then in (sub)subfunc_1, R0 value
+is now tested with an unsigned comparison:&lt;/div&gt;
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nf"&gt;FE852B94&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="no"&gt;sub&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="no"&gt;subfunc_1&lt;/span&gt;
+&lt;span class="nf"&gt;FE852B94&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;CMP&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;R0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;#2&lt;/span&gt;
+&lt;span class="nf"&gt;FE852B96&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;BCS&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="no"&gt;loc_FE852BBA&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;;unsigned comparison: branch if R0 &amp;gt; 1&lt;/span&gt;
+&lt;span class="nf"&gt;FE852B98&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;MOVW&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;R2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;#0&lt;/span&gt;&lt;span class="no"&gt;x9F38&lt;/span&gt;
+&lt;span class="nf"&gt;FE852B9C&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="p"&gt;[...]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;div style="text-align: justify;"&gt;The bug can no longer be
+triggered.&lt;/div&gt;
+
+&lt;h2&gt;CVSS Version 2 Metrics&lt;/h2&gt;
+
+&lt;p&gt;Access Vector: Local&lt;/p&gt;
+&lt;p&gt;Access Complexity: High&lt;/p&gt;
+&lt;p&gt;Authentication: Single&lt;/p&gt;
+&lt;p&gt;Confidentiality Impact: Complete&lt;/p&gt;
+&lt;p&gt;Integrity Impact: Complete&lt;/p&gt;
+&lt;p&gt;Availability Impact: Complete&lt;/p&gt;
+&lt;h2&gt;Disclosure Timeline&lt;/h2&gt;
+
+&lt;p&gt;2014-08-28 Intial vendor notification&lt;/p&gt;
+&lt;p&gt;2014-09-03 Vendor reply; severity of the issue rated as high&lt;/p&gt;
+&lt;p&gt;2014-00-00 Vendor has notified all OEMs&lt;/p&gt;
+&lt;p&gt;2014-12-18 Public advisory&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;References:&lt;/span&gt;&lt;br&gt;
+&lt;span style="white-space: pre;"&gt;&lt;a href=
+"https://www.qualcomm.com/connect/contact/security/product-security/hall-of-fame"&gt;
+https://www.qualcomm.com/connect/contact/security/product-security/hall-of-fame&lt;/a&gt;&lt;/span&gt;&lt;br&gt;&lt;/p&gt;
+&lt;hr&gt;</content><category term="Advisory"/><category term="vulnerability"/><category term="advisory"/><category term="arm"/><category term="security"/><category term="qualcomm"/><category term="android"/><category term="trustzone"/></entry><entry><title>[CVE-2014-2978] DirectFB remote out-of-bounds write vulnerability</title><link href="https://fredericb.info/2014/05/cve-2014-2978-directfb-remote-out-of.html" rel="alternate"/><published>2014-05-15T16:09:00-07:00</published><updated>2014-05-15T16:09:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2014-05-15:/2014/05/cve-2014-2978-directfb-remote-out-of.html</id><summary type="html">&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;DirectFB is prone to an out-of-bound write vulnerability since version
+1.4.4.&lt;/p&gt;
+&lt;p&gt;The vulnerability can be triggered remotely without authentication
+through Voodoo interface (network layer of DirectFB).&lt;/p&gt;
+&lt;h2&gt;Details&lt;/h2&gt;
+&lt;p&gt;An attacker can choose to overflow in the heap or the stack.&lt;/p&gt;
+&lt;h2&gt;CVSS Version 2 Metrics&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Access Vector: Network exploitable …&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;DirectFB is prone to an out-of-bound write vulnerability since version
+1.4.4.&lt;/p&gt;
+&lt;p&gt;The vulnerability can be triggered remotely without authentication
+through Voodoo interface (network layer of DirectFB).&lt;/p&gt;
+&lt;h2&gt;Details&lt;/h2&gt;
+&lt;p&gt;An attacker can choose to overflow in the heap or the stack.&lt;/p&gt;
+&lt;h2&gt;CVSS Version 2 Metrics&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Access Vector: Network exploitable&lt;/li&gt;
+&lt;li&gt;Access Complexity: Low&lt;/li&gt;
+&lt;li&gt;Authentication: None&lt;/li&gt;
+&lt;li&gt;Confidentiality Impact: Complete&lt;/li&gt;
+&lt;li&gt;Integrity Impact: Complete&lt;/li&gt;
+&lt;li&gt;Availability Impact: Complete&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Disclosure Timeline&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;2014-03-27 Developer notified&lt;/li&gt;
+&lt;li&gt;2014-04-21 CVE-2014-2978 assigned&lt;/li&gt;
+&lt;li&gt;2014-05-16 Public advisory&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;http://www.directfb.org/&lt;/li&gt;
+&lt;li&gt;http://mail.directfb.org/pipermail/directfb-dev/2014-March/006805.html&lt;/li&gt;
+&lt;/ul&gt;</content><category term="Advisory"/><category term="vulnerability"/><category term="advisory"/></entry><entry><title>[CVE-2014-2977] DirectFB integer signedness vulnerability</title><link href="https://fredericb.info/2014/05/cve-2014-2977-directfb-integer.html" rel="alternate"/><published>2014-05-15T16:05:00-07:00</published><updated>2014-05-15T16:05:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2014-05-15:/2014/05/cve-2014-2977-directfb-integer.html</id><summary type="html">&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;DirectFB is prone to an integer signedness vulnerability since
+version 1.4.13.&lt;/p&gt;
+&lt;p&gt;The vulnerability can be triggered remotely without authentication
+through Voodoo interface (network layer of DirectFB).&lt;/p&gt;
+&lt;h2&gt;Details&lt;/h2&gt;
+&lt;p&gt;This integer coercion error may lead to a stack overflow.&lt;/p&gt;
+&lt;h2&gt;CVSS Version 2 Metrics&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Access Vector: Network exploitable&lt;/li&gt;
+&lt;li&gt;Access Complexity …&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;DirectFB is prone to an integer signedness vulnerability since
+version 1.4.13.&lt;/p&gt;
+&lt;p&gt;The vulnerability can be triggered remotely without authentication
+through Voodoo interface (network layer of DirectFB).&lt;/p&gt;
+&lt;h2&gt;Details&lt;/h2&gt;
+&lt;p&gt;This integer coercion error may lead to a stack overflow.&lt;/p&gt;
+&lt;h2&gt;CVSS Version 2 Metrics&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Access Vector: Network exploitable&lt;/li&gt;
+&lt;li&gt;Access Complexity: Low&lt;/li&gt;
+&lt;li&gt;Authentication: None&lt;/li&gt;
+&lt;li&gt;Confidentiality Impact: Complete&lt;/li&gt;
+&lt;li&gt;Integrity Impact: Complete&lt;/li&gt;
+&lt;li&gt;Availability Impact: Complete&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Disclosure Timeline&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;2014-03-27 Developer notified&lt;/li&gt;
+&lt;li&gt;2014-04-21 CVE-2014-2977 assigned&lt;/li&gt;
+&lt;li&gt;2014-05-16 Public advisory&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;http://www.directfb.org/&lt;/li&gt;
+&lt;li&gt;http://mail.directfb.org/pipermail/directfb-dev/2014-March/006805.html&lt;/li&gt;
+&lt;/ul&gt;</content><category term="Advisory"/><category term="vulnerability"/><category term="advisory"/></entry><entry><title>Axis Camera M1011 Remote Code Execution Exploit</title><link href="https://fredericb.info/2013/07/axis-camera-m1011-remote-code-execution.html" rel="alternate"/><published>2013-07-31T08:22:00-07:00</published><updated>2013-07-31T08:22:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2013-07-31:/2013/07/axis-camera-m1011-remote-code-execution.html</id><summary type="html">&lt;p&gt;In January 2013, &lt;a href="https://community.rapid7.com/community/infosec/blog/2013/01/29/security-flaws-in-universal-plug-and-play-unplug-dont-play"&gt;Rapid7 published&lt;/a&gt; a &lt;a href="https://community.rapid7.com/docs/DOC-2150"&gt;great paper&lt;/a&gt; describing several vulnerabilities in the most common UPnP libraries.
+Six months later, many devices based on these libraries have not been updated and are still exposed.&lt;/p&gt;
+&lt;p&gt;For example, the Axis M1011 camera contains a vulnerable version of libupnp, which can lead to …&lt;/p&gt;</summary><content type="html">&lt;p&gt;In January 2013, &lt;a href="https://community.rapid7.com/community/infosec/blog/2013/01/29/security-flaws-in-universal-plug-and-play-unplug-dont-play"&gt;Rapid7 published&lt;/a&gt; a &lt;a href="https://community.rapid7.com/docs/DOC-2150"&gt;great paper&lt;/a&gt; describing several vulnerabilities in the most common UPnP libraries.
+Six months later, many devices based on these libraries have not been updated and are still exposed.&lt;/p&gt;
+&lt;p&gt;For example, the Axis M1011 camera contains a vulnerable version of libupnp, which can lead to arbitrary remote code execution without authentication.&lt;/p&gt;
+&lt;p&gt;You can find the corresponding &lt;a href="https://github.com/frederic/metasploit-framework/blob/master/modules/exploits/multi/upnp/libupnp_ssdp_overflow.rb"&gt;metasploit module on my Github&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;To check whether your devices are vulnerable to known UPnP attacks, you can use &lt;a href="https://www.rapid7.com/resources/free-security-software-downloads/universal-plug-and-play-jan-2013.jsp"&gt;ScanNow&lt;/a&gt; tool by Rapid7.&lt;/p&gt;</content><category term="Advisory"/><category term="vulnerability"/><category term="advisory"/></entry><entry><title>Huawei Mobile Hostpot remote root code execution by SMS (user-triggered)</title><link href="https://fredericb.info/2013/07/huawei-mobile-hostpot-remote-root-code.html" rel="alternate"/><published>2013-07-15T03:59:00-07:00</published><updated>2013-07-15T03:59:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2013-07-15:/2013/07/huawei-mobile-hostpot-remote-root-code.html</id><summary type="html">&lt;p&gt;Huawei E587 3G Mobile Hotspot, version 11.203.27, is prone to two vulnerabilities
+in WebUI; an XSS and a command injection.&lt;br&gt;
+The combination of both allows an attacker (with a little help from
+the victim) to&amp;nbsp;remotely&amp;nbsp;execute code on the device with
+root privileges, by sending a specifically …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Huawei E587 3G Mobile Hotspot, version 11.203.27, is prone to two vulnerabilities
+in WebUI; an XSS and a command injection.&lt;br&gt;
+The combination of both allows an attacker (with a little help from
+the victim) to&amp;nbsp;remotely&amp;nbsp;execute code on the device with
+root privileges, by sending a specifically&amp;nbsp;crafted SMS.&lt;br&gt;
+The vendor has been notified on the 2013/03/18.&lt;/p&gt;
+&lt;h3&gt;Huawei WebUI XSS in SMS inbox page&lt;/h3&gt;
+&lt;p&gt;In /js/main.js, function&amp;nbsp;smsReplaceData() is used to escape
+HTML tags in incoming SMS before displaying them in the UI.&lt;br&gt;
+But a&amp;nbsp;specifically&amp;nbsp;crafted SMS can bypass this flawed
+function and inject HTML tags in SMS inbox page:&lt;br&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="p"&gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;Content&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;Index&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;0&amp;#39;/&amp;gt;&lt;span class="cp"&gt;&amp;lt;![CDATA[&amp;lt;script type=&amp;quot;text/javascript&amp;quot;&amp;gt;alert(1);&amp;lt;/script&amp;gt;&amp;lt;input type=&amp;quot;checkbox&amp;quot; id=&amp;#39;x]]&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;Index&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;Content&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;Coucou, tu veux voir ma balise ?
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This XSS is executed when the user browses to SMS inbox page. The
+device has a notifying icon on its tiny screen to alert user of
+incoming SMS.&lt;/p&gt;
+&lt;h3&gt;Huawei WebUI Shell injection (CVE-2013-2612)&lt;/h3&gt;
+&lt;p&gt;The HTTP endpoint "/api/device/time" in WebUI is vulnerable to
+shell command injection. This allows code execution with root
+privileges.&lt;br&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;javascript:saveAjaxData(&amp;quot;api/device/time&amp;quot;,&amp;quot;&lt;span class="cp"&gt;&amp;lt;?xml ?&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;request&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;Month&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;;mkdir &lt;span class="p"&gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;Month&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;Day&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;/tmp/A #&lt;span class="p"&gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;Day&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;Hour&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;Hour&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;Min&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;Min&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;Year&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;Year&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;Sec&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;Sec&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;request&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;&amp;quot;);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;You need to split your shell command into children of
+&amp;lt;request&amp;gt; node in order to respect the 7 chars limit for each
+child nodes.&lt;br&gt;
+&lt;br&gt;
+Now, you may try to combine them.&lt;/p&gt;</content><category term="Advisory"/><category term="vulnerability"/><category term="advisory"/><category term="xss"/><category term="CVE-2013-2612"/><category term="huawei"/></entry><entry><title>[CVE-2013-2612] Huawei E587 3G Mobile Hotspot Command Injection</title><link href="https://fredericb.info/2013/07/cve-2013-2612-huawei-e587-3g-mobile.html" rel="alternate"/><published>2013-07-15T03:58:00.001000-07:00</published><updated>2013-07-15T03:58:00.001000-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2013-07-15:/2013/07/cve-2013-2612-huawei-e587-3g-mobile.html</id><summary type="html">&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+[CVE-2013-2612] Huawei E587 3G Mobile Hotspot Command Injection
+________________________________________________________________________
+Summary:
+Huawei E587 3G Mobile Hotspot, version 11.203.27, is prone to a command
+injection vulnerability in the Web UI.
+
+Successful exploitation allows unauthenticated attackers to execute
+arbitrary commands with root privileges.
+________________________________________________________________________
+Details …&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+[CVE-2013-2612] Huawei E587 3G Mobile Hotspot Command Injection
+________________________________________________________________________
+Summary:
+Huawei E587 3G Mobile Hotspot, version 11.203.27, is prone to a command
+injection vulnerability in the Web UI.
+
+Successful exploitation allows unauthenticated attackers to execute
+arbitrary commands with root privileges.
+________________________________________________________________________
+Details:
+The HTTP endpoint &amp;quot;/api/device/time&amp;quot; in Web UI is vulnerable to shell
+command injection. This allows code execution with root privileges.
+________________________________________________________________________
+CVSS Version 2 Metrics:
+Access Vector: Network exploitable
+Access Complexity: Low
+Authentication: Not required to exploit
+Confidentiality Impact: Complete
+Integrity Impact: Complete
+Availability Impact: Complete
+________________________________________________________________________
+Disclosure Timeline:
+2013-03-18 Vendor notified
+2013-03-18 CVE-2013-2612 assigned
+2013-07-15 Public advisory
+________________________________________________________________________
+References:
+http://www.huawei.com/en/security/psirt/
+________________________________________________________________________
+Frédéric Basse
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org/
+
+iQEcBAEBAgAGBQJR48qZAAoJENQ4kG3hg80AJMEH/Rdyx2zmDPzr2Ar5Nc+Fw1ih
+aiby28PhIKfXhAst2SrkIp6ogtDEj+PBrgbEy2YJlyKi01z1Uf2UGukxijlQTg7H
+0zYivz55vleBrr9OD/A2pxo7sZZy7eswH5jia5abRUVXYYqEVWYp5KWvzbMPO3CY
+EgLYxE4uv00ojqHCl9QsD7oa+mR52Jur3QZ/IdCbJJZgmEKmwNJvJ8rb6RvTMcae
++8dWhC8bhfL3UkTW5snYZ4K/euA84LmGvcfd1PXrMAX01xXDdnPJ/JxrzSPLfb1x
+6WyZO6cZpgxQqvogemXKOy2MmnNkWlkK0P9OmmDpBQBI66WnyBUxXNFxEr/HFKo=
+=6yIl
+-----END PGP SIGNATURE-----
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Advisory"/><category term="vulnerability"/><category term="advisory"/><category term="CVE-2013-2612"/><category term="huawei"/></entry><entry><title>[CVE-2013-2560] Foscam &lt;= 11.37.2.48 path traversal vulnerability</title><link href="https://fredericb.info/2013/03/cve-2013-2560-foscam-1137248-path.html.html" rel="alternate"/><published>2013-03-17T14:39:00.003000-07:00</published><updated>2013-03-17T14:39:00.003000-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2013-03-17:/2013/03/cve-2013-2560-foscam-1137248-path.html.html</id><summary type="html">&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;Foscam firmware &amp;lt;= 11.37.2.48 is prone to a path traversal
+vulnerability in the embedded web interface.&lt;/p&gt;
+&lt;p&gt;The unauthenticated attacker can access to the entire filesystem and
+steal web &amp;amp; wifi credentials.&lt;/p&gt;
+&lt;h2&gt;Details&lt;/h2&gt;
+
+&lt;p&gt;GET //../proc/kcore HTTP/1.0&lt;/p&gt;
+&lt;h2&gt;CVSS Version 2 Metrics&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Access Vector: Network exploitable&lt;/li&gt;
+&lt;li&gt;Access Complexity …&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;Foscam firmware &amp;lt;= 11.37.2.48 is prone to a path traversal
+vulnerability in the embedded web interface.&lt;/p&gt;
+&lt;p&gt;The unauthenticated attacker can access to the entire filesystem and
+steal web &amp;amp; wifi credentials.&lt;/p&gt;
+&lt;h2&gt;Details&lt;/h2&gt;
+
+&lt;p&gt;GET //../proc/kcore HTTP/1.0&lt;/p&gt;
+&lt;h2&gt;CVSS Version 2 Metrics&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Access Vector: Network exploitable&lt;/li&gt;
+&lt;li&gt;Access Complexity: Low&lt;/li&gt;
+&lt;li&gt;Authentication: Not required to exploit&lt;/li&gt;
+&lt;li&gt;Confidentiality Impact: Complete&lt;/li&gt;
+&lt;li&gt;Availability Impact: Complete&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Disclosure Timeline&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;2013-01-18 Vendor fixed the issue in fw 11.37.2.49; no security notice&lt;/li&gt;
+&lt;li&gt;2013-02-21 Vulnerability found&lt;/li&gt;
+&lt;li&gt;2013-03-01 Public advisory&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Solution&lt;/h2&gt;
+&lt;p&gt;A new firmware is available on vendor's site: &lt;a href="http://www.foscam.com/down3.aspx"&gt;http://www.foscam.com/down3.aspx&lt;/a&gt;&lt;/p&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;http://code.google.com/p/bflt-utils/&lt;/li&gt;
+&lt;li&gt;http://wiki.openipcam.com/&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;Arnaud Calmejane - Frederic Basse&lt;/p&gt;</content><category term="Advisory"/><category term="vulnerability"/><category term="advisory"/><category term="foscam"/></entry><entry><title>[CVE-2012-6426] LemonLDAP-NG SAML XML Signature Wrapping</title><link href="https://fredericb.info/2013/03/cve-2012-6426-lemonldap-ng-saml-xml.html" rel="alternate"/><published>2013-03-17T14:31:00-07:00</published><updated>2013-03-17T14:31:00-07:00</updated><author><name>Frédéric</name></author><id>tag:fredericb.info,2013-03-17:/2013/03/cve-2012-6426-lemonldap-ng-saml-xml.html</id><summary type="html">&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;LemonLDAP-NG &amp;lt;=1.2.2 is prone to a security vulnerability involving
+XML signature wrapping in authentication process.&lt;/p&gt;
+&lt;p&gt;Successful exploits may allow unauthenticated attackers to construct
+specially crafted messages that can be successfully verified and
+contain arbitrary content.&lt;/p&gt;
+&lt;p&gt;This may lead to authentication bypass.&lt;/p&gt;
+&lt;h2&gt;Details&lt;/h2&gt;
+&lt;p&gt;Due to a bad use …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;LemonLDAP-NG &amp;lt;=1.2.2 is prone to a security vulnerability involving
+XML signature wrapping in authentication process.&lt;/p&gt;
+&lt;p&gt;Successful exploits may allow unauthenticated attackers to construct
+specially crafted messages that can be successfully verified and
+contain arbitrary content.&lt;/p&gt;
+&lt;p&gt;This may lead to authentication bypass.&lt;/p&gt;
+&lt;h2&gt;Details&lt;/h2&gt;
+&lt;p&gt;Due to a bad use of Lasso library, SAML signatures are never checked,
+even if SP forces signature check.&lt;/p&gt;
+&lt;h2&gt;CVSS Version 2 Metrics&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Access Vector: Network exploitable&lt;/li&gt;
+&lt;li&gt;Access Complexity: Low&lt;/li&gt;
+&lt;li&gt;Authentication: Not required to exploit&lt;/li&gt;
+&lt;li&gt;Impact Type:Allows unauthorized disclosure of information; Allows unauthorized modification&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Disclosure Timeline&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;2012-11-08 Vendor contacted&lt;/li&gt;
+&lt;li&gt;2012-12-18 Vendor: fixed issue in svn r2698&lt;/li&gt;
+&lt;li&gt;2012-12-19 CVE-2012-6426 assigned&lt;/li&gt;
+&lt;li&gt;2012-12-20 Public advisory&lt;/li&gt;
+&lt;li&gt;2012-12-21 EoW&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;p&gt;&lt;a href="http://jira.ow2.org/browse/LEMONLDAP-570"&gt;http://jira.ow2.org/browse/LEMONLDAP-570&lt;/a&gt;&lt;/p&gt;</content><category term="Advisory"/><category term="vulnerability"/><category term="advisory"/><category term="lemonldap"/></entry></feed>

